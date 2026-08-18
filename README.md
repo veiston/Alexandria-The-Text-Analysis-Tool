@@ -1,5 +1,7 @@
 # Alexandria The Text Analysis Tool
 
+Alexandria is a JavaFX-based desktop application for quantitative analysis of large texts and text collections. Its key features include searching for words and phrases within uploaded texts, including different forms of the same word, getting statistics on how often they are used, and comparing texts. The application is designed for language researchers who work with texts in study or research projects.
+
 ## Product Vision
 
 ### Problem Statement
