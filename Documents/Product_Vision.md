@@ -1,25 +1,18 @@
-# Alexandria The Text Analysis Tool
+# Product Vision
 
-## Product Vision
-
-### Problem Statement
+## Problem Statement
 
 Researching books and documents may include finding words and phrases, counting how many times they are used, and comparing these results between different texts. For this kind of work, the results should be accurate and repeatable. Generative AI can help with understanding and interpreting texts, but it is less suitable for exact statistical analysis.
 
-### Target Audience
+## Target Audience
 
 This product is designed for linguists, literary scholars, philologists, humanities researchers, teachers, and students who work with texts in study or research projects and need advanced text search, statistics, comparison of several texts, and tools for working with quotations.
 
-### Value Proposition
+## Value Proposition
 
 Alexandria is a desktop application that provides advanced text search, statistical analysis, text comparison, and the ability to save results and quotations in one place. The results can be checked against the original text and used later in research.
 
-### Key Features and Functionality
-
-- Text Upload
-  - Open one or more local files to work with them in the application,
-  - Support several file formats when possible,
-  - Display the opened texts next to the search and statistics panel.
+## Key Features and Functionality
 
 - Text search
     - Search for a word or phrase, including different forms of the same word,
@@ -42,13 +35,13 @@ Alexandria is a desktop application that provides advanced text search, statisti
     - Show saved results from text search, statistical analysis, and text comparison, including the text title, result type, result data, and save date,
     - Show saved quotations, including the quotation text, source title, location when available, and save date.
 
-### Goals and Objectives
+## Goals and Objectives
 
-- Create a tool for text search and quantitative text analysis,
-- Allow users to find relevant parts of a text, count how often words are used, compare several texts, and save results and quotations for later use,
-- Create a working prototype of the desktop application within 8 weeks,
+- Create a tool for text search and quantitative text analysis.
+- Allow users to find relevant parts of a text, count how often words are used, compare several texts, and save results and quotations for later use.
+- Create a working prototype of the desktop application within 8 weeks.
 - Develop the project using the practices and tools used in the course.
 
-### Vision Statement
+## Vision Statement
 
 Our vision is to create a desktop application for quantitative text research using modern development, testing, automation, and deployment practices. The application should provide accurate and repeatable results, save them for later work, and remain a simple and practical tool for people who research texts.
