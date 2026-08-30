@@ -1,1 +1,63 @@
 -- SQL Schema
+CREATE TABLE USERS
+(
+  id INT NOT NULL,
+  name INT NOT NULL,
+  email INT NOT NULL,
+  photo INT NOT NULL,
+  organization INT NOT NULL,
+  password INT NOT NULL,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE TEXTS
+(
+  id INT NOT NULL,
+  title INT NOT NULL,
+  file_name INT,
+  file_type INT,
+  content INT NOT NULL,
+  created_at INT NOT NULL,
+  id INT NOT NULL,
+  PRIMARY KEY (id),
+  FOREIGN KEY (id) REFERENCES USERS(id)
+);
+
+CREATE TABLE TEXT_STATISTICS
+(
+  id INT NOT NULL,
+  statistics_data INT NOT NULL,
+  created_at INT NOT NULL,
+  id INT NOT NULL,
+  id INT NOT NULL,
+  PRIMARY KEY (id),
+  FOREIGN KEY (id) REFERENCES USERS(id),
+  FOREIGN KEY (id) REFERENCES TEXTS(id)
+);
+
+CREATE TABLE SEARCH_RESULTS
+(
+  id INT NOT NULL,
+  query INT NOT NULL,
+  result_text INT NOT NULL,
+  location INT NOT NULL,
+  created_at INT NOT NULL,
+  id INT NOT NULL,
+  id INT NOT NULL,
+  PRIMARY KEY (id),
+  FOREIGN KEY (id) REFERENCES USERS(id),
+  FOREIGN KEY (id) REFERENCES TEXTS(id)
+);
+
+CREATE TABLE QUOTATIONS
+(
+  id INT NOT NULL,
+  quotation_text INT NOT NULL,
+  location INT NOT NULL,
+  created_at INT NOT NULL,
+  id INT NOT NULL,
+  id INT NOT NULL,
+  PRIMARY KEY (id),
+  FOREIGN KEY (id) REFERENCES USERS(id),
+  FOREIGN KEY (id) REFERENCES TEXTS(id)
+);
