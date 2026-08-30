@@ -56,8 +56,11 @@ Alexandria is a desktop application that provides advanced text search, statisti
 Our vision is to create a desktop application for quantitative text research using modern development, testing, automation, and deployment practices. The application should provide accurate and repeatable results, save them for later work, and remain a simple and practical tool for people who research texts.
 
 ## Folder Structure
+```markdown
 
-'''Alexandria-The-Text-Analysis-Tool/
+```
+
+Alexandria-The-Text-Analysis-Tool/
 ├── pom.xml
 ├── README.md
 ├── LICENSE
@@ -114,9 +117,12 @@ Our vision is to create a desktop application for quantitative text research usi
 │   └── Jenkinsfile
 │
 └── scripts/
-    ├── setup-db.sh
-    ├── run-app.sh
-    ├── run-gui-windows.sh
-    ├── run-gui-linux.sh
-    └── run-gui-mac.sh
-'''
+├── setup-db.sh
+├── run-app.sh
+├── run-gui-windows.sh
+├── run-gui-linux.sh
+└── run-gui-mac.sh
+
+```
+
+```
