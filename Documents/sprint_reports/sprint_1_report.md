@@ -67,10 +67,10 @@ What went well:
 - Team members helped each other when work overlapped
 
 What could be improved:
-- Scrum master's work could be organized during the sprint:
-	- Sprint planning and task distribution should be clearer from the beginning
-	- Tasks should be defined and added to Trello earlier 
-	- Some Sprint 1 requirements were found too late and had to be completed close to the deadline
-	- Scrum master involvement should have been stronger when team members faced blockers or uneven workloads
-	- Scrum master can create a Sprint Planning Report at the beginning of the sprint to make the goals, tasks, responsibilities, and expectations clear and avoid confusion later.
+- Scrum Master's work could have been better organized during the sprint:
+  - Sprint planning and task distribution should have been clearer from the beginning
+  - Tasks should have been defined and added to Trello earlier
+  - Some Sprint 1 requirements were found too late and had to be completed close to the deadline
+  - Scrum Master involvement should have been stronger when team members faced blockers or uneven workloads
+  - The Scrum Master could have created a Sprint Planning Report at the beginning of the sprint to make the goals, tasks, responsibilities, and expectations clear and avoid confusion later.
 - Time spent on tasks should be recorded during the sprint, not at the end
