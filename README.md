@@ -24,25 +24,25 @@ Alexandria is a desktop application that provides advanced text search, statisti
   - Display the opened texts next to the search and statistics panel.
 
 - Text search
-    - Search for a word or phrase, including different forms of the same word,
-    - Show all found uses with the surrounding text and, when possible, their location in the text,
-    - Save search results to the user profile,
-    - Save found quotations to the user profile.
+  - Search for a word or phrase, including different forms of the same word,
+  - Show all found uses with the surrounding text and, when possible, their location in the text,
+  - Save search results to the user profile,
+  - Save found quotations to the user profile.
 
 - Statistics for one text
-    - Show the most common words in the text and how many times each of them is used, excluding stop words,
-    - Allow the user to enter any word or phrase and see how many times it is used in the text,
-    - Save the statistical result to the user profile.
+  - Show the most common words in the text and how many times each of them is used, excluding stop words,
+  - Allow the user to enter any word or phrase and see how many times it is used in the text,
+  - Save the statistical result to the user profile.
 
 - Comparison of two or more texts
-    - Show the most common words in two or more texts and how many times each word is used in each text,
-    - Allow the user to enter one word or phrase and see how many times it is used in all provided texts at the same time,
-    - Save the comparison result to the user profile.
+  - Show the most common words in two or more texts and how many times each word is used in each text,
+  - Allow the user to enter one word or phrase and see how many times it is used in all provided texts at the same time,
+  - Save the comparison result to the user profile.
 
 - User Profile
-    - Store the user's name, email, profile photo, and organization,
-    - Show saved results from text search, statistical analysis, and text comparison, including the text title, result type, result data, and save date,
-    - Show saved quotations, including the quotation text, source title, location when available, and save date.
+  - Store the user's name, email, profile photo, and organization,
+  - Show saved results from text search, statistical analysis, and text comparison, including the text title, result type, result data, and save date,
+  - Show saved quotations, including the quotation text, source title, location when available, and save date.
 
 ### Goals and Objectives
 
@@ -54,3 +54,69 @@ Alexandria is a desktop application that provides advanced text search, statisti
 ### Vision Statement
 
 Our vision is to create a desktop application for quantitative text research using modern development, testing, automation, and deployment practices. The application should provide accurate and repeatable results, save them for later work, and remain a simple and practical tool for people who research texts.
+
+## Folder Structure
+
+'''Alexandria-The-Text-Analysis-Tool/
+├── pom.xml
+├── README.md
+├── LICENSE
+│
+├── docs/
+│   ├── architecture-diagram.png
+│   ├── user-guide.md
+│   └── deployment-guide.md
+│
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── com/
+│   │   │       └── alexandria/
+│   │   │           ├── controller/
+│   │   │           ├── dao/
+│   │   │           ├── model/
+│   │   │           ├── service/
+│   │   │           ├── utils/
+│   │   │           ├── Main.java
+│   │   │           └── ParsePdf.java
+│   │   └── resources/
+│   │       ├── fxml/
+│   │       │   └── main.fxml
+│   │       ├── styles/
+│   │       │   └── application.css
+│   │       └── images/
+│   │           └── logo.png
+│   │
+│   └── test/
+│       ├── java/
+│       │   └── com/
+│       │       └── alexandria/
+│       │           ├── dao/
+│       │           ├── service/
+│       │           └── integration/
+│       └── resources/
+│           └── test-database.properties
+│
+├── database/
+│   ├── schema.sql
+│   └── data.sql
+│
+├── docker/
+│   ├── Dockerfile
+│   ├── docker-compose.yml
+│   ├── .dockerignore
+│   ├── mariadb/
+│   │   └── init.sql
+│   └── jenkins/
+│       └── Dockerfile
+│
+├── jenkins/
+│   └── Jenkinsfile
+│
+└── scripts/
+    ├── setup-db.sh
+    ├── run-app.sh
+    ├── run-gui-windows.sh
+    ├── run-gui-linux.sh
+    └── run-gui-mac.sh
+'''
