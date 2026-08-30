@@ -57,9 +57,6 @@ Our vision is to create a desktop application for quantitative text research usi
 
 ## Folder Structure
 ```markdown
-
-```
-
 Alexandria-The-Text-Analysis-Tool/
 ├── pom.xml
 ├── README.md
@@ -122,7 +119,5 @@ Alexandria-The-Text-Analysis-Tool/
 ├── run-gui-windows.sh
 ├── run-gui-linux.sh
 └── run-gui-mac.sh
-
-```
 
 ```
