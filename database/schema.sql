@@ -1,63 +1,63 @@
 -- SQL Schema
-CREATE TABLE USERS
-(
-  id INT NOT NULL,
-  name INT NOT NULL,
-  email INT NOT NULL,
-  photo INT NOT NULL,
-  organization INT NOT NULL,
-  password INT NOT NULL,
-  PRIMARY KEY (id)
+CREATE TABLE users (
+    id INT NOT NULL AUTO_INCREMENT,
+    name VARCHAR(150) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    photo VARCHAR(255),
+    organization VARCHAR(150),
+    password VARCHAR(255) NOT NULL,
+
+    PRIMARY KEY (id)
 );
 
-CREATE TABLE TEXTS
-(
-  id INT NOT NULL,
-  title INT NOT NULL,
-  file_name INT,
-  file_type INT,
-  content INT NOT NULL,
-  created_at INT NOT NULL,
-  id INT NOT NULL,
-  PRIMARY KEY (id),
-  FOREIGN KEY (id) REFERENCES USERS(id)
+CREATE TABLE texts (
+    id INT NOT NULL AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    file_name VARCHAR(255),
+    file_type VARCHAR(20),
+    content LONGTEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (id),
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
-CREATE TABLE TEXT_STATISTICS
-(
-  id INT NOT NULL,
-  statistics_data INT NOT NULL,
-  created_at INT NOT NULL,
-  id INT NOT NULL,
-  id INT NOT NULL,
-  PRIMARY KEY (id),
-  FOREIGN KEY (id) REFERENCES USERS(id),
-  FOREIGN KEY (id) REFERENCES TEXTS(id)
+CREATE TABLE text_statistics (
+    id INT NOT NULL AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    text_id INT NOT NULL,
+    statistics_data LONGTEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (id),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (text_id) REFERENCES texts(id)
 );
 
-CREATE TABLE SEARCH_RESULTS
-(
-  id INT NOT NULL,
-  query INT NOT NULL,
-  result_text INT NOT NULL,
-  location INT NOT NULL,
-  created_at INT NOT NULL,
-  id INT NOT NULL,
-  id INT NOT NULL,
-  PRIMARY KEY (id),
-  FOREIGN KEY (id) REFERENCES USERS(id),
-  FOREIGN KEY (id) REFERENCES TEXTS(id)
+CREATE TABLE search_results (
+    id INT NOT NULL AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    text_id INT NOT NULL,
+    query VARCHAR(500) NOT NULL,
+    result_text LONGTEXT NOT NULL,
+    location VARCHAR(255),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (id),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (text_id) REFERENCES texts(id)
 );
 
-CREATE TABLE QUOTATIONS
-(
-  id INT NOT NULL,
-  quotation_text INT NOT NULL,
-  location INT NOT NULL,
-  created_at INT NOT NULL,
-  id INT NOT NULL,
-  id INT NOT NULL,
-  PRIMARY KEY (id),
-  FOREIGN KEY (id) REFERENCES USERS(id),
-  FOREIGN KEY (id) REFERENCES TEXTS(id)
+CREATE TABLE quotations (
+    id INT NOT NULL AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    text_id INT NOT NULL,
+    quotation_text TEXT NOT NULL,
+    location VARCHAR(255),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	
+    PRIMARY KEY (id),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (text_id) REFERENCES texts(id)
 );
