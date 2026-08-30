@@ -82,6 +82,11 @@ Our vision is to create a desktop application for quantitative text research usi
 | Containerization | Docker | Reproducible project environment |
 | Container orchestration | Kubernetes | Running and managing containers |
 
+## Sprint Documentation
+
+### Sprint 1
+
+- [Sprint 1 Report](https://github.com/veiston/Alexandria-The-Text-Analysis-Tool/blob/main/Documents/sprint_reports/sprint_1_report.md)
 
 ## Folder Structure
 ```markdown
