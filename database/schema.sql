@@ -20,7 +20,7 @@ CREATE TABLE texts (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id),
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE text_statistics (
@@ -31,8 +31,8 @@ CREATE TABLE text_statistics (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id),
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (text_id) REFERENCES texts(id)
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (text_id) REFERENCES texts(id) ON DELETE CASCADE
 );
 
 CREATE TABLE search_results (
@@ -45,8 +45,8 @@ CREATE TABLE search_results (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id),
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (text_id) REFERENCES texts(id)
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (text_id) REFERENCES texts(id) ON DELETE CASCADE
 );
 
 CREATE TABLE quotations (
@@ -56,8 +56,8 @@ CREATE TABLE quotations (
     quotation_text TEXT NOT NULL,
     location VARCHAR(255),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	
+
     PRIMARY KEY (id),
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (text_id) REFERENCES texts(id)
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (text_id) REFERENCES texts(id) ON DELETE CASCADE
 );
