@@ -1,21 +1,17 @@
 # Sprint 1 Report
 
-## Team member tasks
-
-| Team Member | Assigned Tasks | Time Spent (hrs) | In-class Tasks |
-|---|---|---:|---|
-| Veikka Liukkonen | Set up initial project structure<br>Set up GitHub repository<br>Set up Trello workspace and sprint boards<br>Fill in initial product backlog<br>Research PDF text extraction<br>Create initial PDF parser<br>Project Plan: Project Overview<br>Project Plan: Resource Allocation<br>Project Plan: Risk Management | 10 | Submitted |
-| Kseniia Shlenskaia | Write Product Vision<br>Write user stories<br>Prioritize user stories<br>Project Plan: Project Objectives<br>Project Plan: Scope and Deliverables<br>Project Plan: Project Timeline<br>Design Initial Database Architecture | 8 | Submitted |
-| Luara Moreira Da Silva | Project Plan: Documentation and Reporting<br>Project Plan: Testing and Quality Assurance<br>Design Application UI in Figma | 5.5 | Submitted |
-| Unna Postila | Estimate user stories with Story Points<br>Fill in initial product backlog<br>Organize user stories into tasks in Trello<br>Create Use Case Diagram | 5.5 | Submitted |
+During Sprint 1, the team managed to set up the project, prepare the main documents, create the first backlog and designs, and start the first work with the code.
 
 ## Individual commit update
 
-See the Team Member Tasks table. All team members contributed to the project through their assigned tasks.
+- Veikka Liukkonen: project setup, repository setup, PDF parser, Project Plan sections
+- Kseniia Shlenskaia: Product Vision, user stories, Project Plan sections, database architecture
+- Luara Moreira Da Silva: Project Plan sections, Figma UI design
+- Unna Postila: backlog organization, Story Point estimation, Use Case Diagram
 
 ## Product / Sprint backlog update
 
-All tasks planned for Sprint 1 were completed. Completed Sprint 1 tasks:
+All planned tasks were completed:
 - Set up initial project structure
 - Set up GitHub repository
 - Set up Trello workspace and sprint boards
@@ -44,7 +40,7 @@ Additional completed tasks:
 
 ## GitHub update
 
-GitHub work completed during Sprint 1:
+Changes made to the GitHub repository:
 - Created the project repository
 - Added the initial Java project structure
 - Added the Product Vision to README and the documents folder
@@ -55,6 +51,16 @@ GitHub work completed during Sprint 1:
 - Added the Use Case Diagram
 - Added the initial PDF parser
 - Added the Figma mockups to the documents folder
+
+## Team member tasks
+
+| Team Member | Assigned Tasks | Time Spent (hrs) | In-class Tasks |
+|---|---|---:|---|
+| Veikka Liukkonen | Set up initial project structure<br>Set up GitHub repository<br>Set up Trello workspace and sprint boards<br>Fill in initial product backlog<br>Research PDF text extraction<br>Create initial PDF parser<br>Project Plan: Project Overview<br>Project Plan: Resource Allocation<br>Project Plan: Risk Management | 10 | Submitted |
+| Kseniia Shlenskaia | Write Product Vision<br>Write user stories<br>Prioritize user stories<br>Project Plan: Project Objectives<br>Project Plan: Scope and Deliverables<br>Project Plan: Project Timeline<br>Design Initial Database Architecture | 8 | Submitted |
+| Luara Moreira Da Silva | Project Plan: Documentation and Reporting<br>Project Plan: Testing and Quality Assurance<br>Design Application UI in Figma | 5.5 | Submitted |
+| Unna Postila | Estimate user stories with Story Points<br>Fill in initial product backlog<br>Organize user stories into tasks in Trello<br>Create Use Case Diagram | 5.5 | Submitted |
+
 
 ## Sprint summary
 
