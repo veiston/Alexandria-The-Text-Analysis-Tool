@@ -67,18 +67,20 @@ Our vision is to create a desktop application for quantitative text research usi
 
 ## Technology Stack
 
-- Programming language: Java - because the course uses Java and Java works well for desktop applications.
-- User interface: JavaFX - because it is made for building desktop interfaces in Java.
-- Build and dependency management: Maven - because it is a standard tool for Java projects.
-- Database: MariaDB - because it works well with Java, supports SQL, and fits our relational data.
-- PDF processing: iText - because it can extract text from PDF files in Java.
-- Testing: JUnit 5 - because it is widely used for testing Java applications.
-- Version control: Git - because it supports branches and team development.
-- Repository hosting: GitHub - for pull requests, collaboration, and project files.
-- Project management: Trello - because it is simple for managing backlog, sprints, tasks.
-- CI/CD: Jenkins - because it can automate builds and tests and is used in the course.
-- Containerization: Docker - because it makes the project environment easier to run and reproduce.
-- Container orchestration: Kubernetes - because it is used in the course for running containers.
+| Area | Technology | Reason |
+|---|---|---|
+| Programming language | Java | Course standard and suitable for desktop applications |
+| User interface | JavaFX | Native Java framework for desktop UI |
+| Build and dependencies | Maven | Standard Java build and dependency management |
+| Database | MariaDB | Relational SQL database that works well with Java |
+| PDF processing | iText | Extracts text from PDF files |
+| Testing | JUnit 5 | Standard testing framework for Java |
+| Version control | Git | Supports branches and team development |
+| Repository hosting | GitHub | Pull requests, collaboration, and project files |
+| Project management | Trello | Backlog, sprints, and task tracking |
+| CI/CD | Jenkins | Automated builds and tests |
+| Containerization | Docker | Reproducible project environment |
+| Container orchestration | Kubernetes | Running and managing containers |
 
 
 ## Folder Structure
