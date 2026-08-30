@@ -88,6 +88,15 @@ Our vision is to create a desktop application for quantitative text research usi
 
 - [Sprint 1 Report](https://github.com/veiston/Alexandria-The-Text-Analysis-Tool/blob/main/Documents/sprint_reports/sprint_1_report.md)
 
+### Sprint 2
+- To be added
+
+### Sprint 3
+- To be added
+
+### Sprint 4
+- To be added
+
 ## Folder Structure
 ```markdown
 Alexandria-The-Text-Analysis-Tool/
