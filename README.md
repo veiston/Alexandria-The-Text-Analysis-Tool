@@ -2,6 +2,16 @@
 
 Alexandria is a JavaFX-based desktop application for quantitative analysis of large texts and text collections. Its key features include searching for words and phrases within uploaded texts, including different forms of the same word, getting statistics on how often they are used, and comparing texts. The application is designed for language researchers who work with texts in study or research projects.
 
+## Team
+
+- Kseniia Shlenskaia
+- Veikka Liukkonen
+- Luara Moreira Da Silva
+- Unna Postila
+
+## Methodology
+Agile development using Scrum. Trello is used for the product backlog, sprint planning, task assignment, and progress tracking.
+
 ## Product Vision
 
 ### Problem Statement
@@ -54,6 +64,22 @@ Alexandria is a desktop application that provides advanced text search, statisti
 ### Vision Statement
 
 Our vision is to create a desktop application for quantitative text research using modern development, testing, automation, and deployment practices. The application should provide accurate and repeatable results, save them for later work, and remain a simple and practical tool for people who research texts.
+
+## Technology Stack
+
+- Programming language: Java - because the course uses Java and Java works well for desktop applications.
+- User interface: JavaFX - because it is made for building desktop interfaces in Java.
+- Build and dependency management: Maven - because it is a standard tool for Java projects.
+- Database: MariaDB - because it works well with Java, supports SQL, and fits our relational data.
+- PDF processing: iText - because it can extract text from PDF files in Java.
+- Testing: JUnit 5 - because it is widely used for testing Java applications.
+- Version control: Git - because it supports branches and team development.
+- Repository hosting: GitHub - for pull requests, collaboration, and project files.
+- Project management: Trello - because it is simple for managing backlog, sprints, tasks.
+- CI/CD: Jenkins - because it can automate builds and tests and is used in the course.
+- Containerization: Docker - because it makes the project environment easier to run and reproduce.
+- Container orchestration: Kubernetes - because it is used in the course for running containers.
+
 
 ## Folder Structure
 ```markdown
