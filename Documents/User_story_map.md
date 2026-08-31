@@ -21,4 +21,3 @@
 |  | Saved Statistics | As a user, I want to save text statistics results so that I can return to them later. | 3 |
 |  |  | As a user, I want to view saved statistics with information about the source text and date so that I can review previous analysis. | 5 |
 |  | Saved Quotations | As a user, I want to save quotations from texts with source information and location so that I can use them later. | 3 |
-|  | 
