@@ -1,4 +1,4 @@
-# Sprint 1 Report
+# Sprint 1 Review Report
 
 During Sprint 1, the team managed to set up the project, prepare the main documents, create the first backlog and designs, and start the first work with the code.
 
