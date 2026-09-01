@@ -1,5 +1,4 @@
--- SQL Schema
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id INT NOT NULL AUTO_INCREMENT,
     name VARCHAR(150) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -10,7 +9,7 @@ CREATE TABLE users (
     PRIMARY KEY (id)
 );
 
-CREATE TABLE texts (
+CREATE TABLE IF NOT EXISTS texts (
     id INT NOT NULL AUTO_INCREMENT,
     user_id INT NOT NULL,
     title VARCHAR(255) NOT NULL,
@@ -23,7 +22,7 @@ CREATE TABLE texts (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-CREATE TABLE search_results (
+CREATE TABLE IF NOT EXISTS search_results (
     id INT NOT NULL AUTO_INCREMENT,
     user_id INT NOT NULL,
     text_id INT NOT NULL,
@@ -36,7 +35,7 @@ CREATE TABLE search_results (
     FOREIGN KEY (text_id) REFERENCES texts(id) ON DELETE CASCADE
 );
 
-CREATE TABLE text_statistics (
+CREATE TABLE IF NOT EXISTS text_statistics (
     id INT NOT NULL AUTO_INCREMENT,
     user_id INT NOT NULL,
     text_id INT NOT NULL,
@@ -48,7 +47,7 @@ CREATE TABLE text_statistics (
     FOREIGN KEY (text_id) REFERENCES texts(id) ON DELETE CASCADE
 );
 
-CREATE TABLE term_analysis (
+CREATE TABLE IF NOT EXISTS term_analysis (
     id INT NOT NULL AUTO_INCREMENT,
     user_id INT NOT NULL,
     text_id INT NOT NULL,
@@ -61,7 +60,7 @@ CREATE TABLE term_analysis (
     FOREIGN KEY (text_id) REFERENCES texts(id) ON DELETE CASCADE
 );
 
-CREATE TABLE text_comparisons (
+CREATE TABLE IF NOT EXISTS text_comparisons (
     id INT NOT NULL AUTO_INCREMENT,
     user_id INT NOT NULL,
     comparison_data JSON NOT NULL,
@@ -71,7 +70,7 @@ CREATE TABLE text_comparisons (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-CREATE TABLE text_comparison_texts (
+CREATE TABLE IF NOT EXISTS text_comparison_texts (
     comparison_id INT NOT NULL,
     text_id INT NOT NULL,
 
@@ -80,7 +79,7 @@ CREATE TABLE text_comparison_texts (
     FOREIGN KEY (text_id) REFERENCES texts(id) ON DELETE CASCADE
 );
 
-CREATE TABLE term_comparisons (
+CREATE TABLE IF NOT EXISTS term_comparisons (
     id INT NOT NULL AUTO_INCREMENT,
     user_id INT NOT NULL,
     term VARCHAR(500) NOT NULL,
@@ -91,7 +90,7 @@ CREATE TABLE term_comparisons (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-CREATE TABLE term_comparison_texts (
+CREATE TABLE IF NOT EXISTS term_comparison_texts (
     comparison_id INT NOT NULL,
     text_id INT NOT NULL,
 
@@ -100,7 +99,7 @@ CREATE TABLE term_comparison_texts (
     FOREIGN KEY (text_id) REFERENCES texts(id) ON DELETE CASCADE
 );
 
-CREATE TABLE quotations (
+CREATE TABLE IF NOT EXISTS quotations (
     id INT NOT NULL AUTO_INCREMENT,
     user_id INT NOT NULL,
     text_id INT NOT NULL,
