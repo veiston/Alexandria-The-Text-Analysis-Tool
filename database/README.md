@@ -29,13 +29,22 @@ mariadb -u root
 
 ### 3. Create the database
 
-First, check the available collations. Run:
+First, check the port. Run:
+
+```sql
+SHOW VARIABLES LIKE 'port';
+
+```
+
+The result should be `3306`.
+
+Then, check the available collations. Run:
 
 ```sql
 SHOW COLLATION WHERE Charset = 'utf8mb4';
 ```
 
-If `utf8mb4_unicode_ci` is inn the list, run:
+If `utf8mb4_unicode_ci` is in the list, run:
 
 ```sql
 CREATE DATABASE alexandria
@@ -49,7 +58,7 @@ If `utf8mb4_unicode_ci` is not on the list, go to AI and say:
 
 *"My classmate asked me to run this: `CREATE DATABASE alexandria CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`, but my MariaDB doesn't support `utf8mb4_unicode_ci`. What should I replace it with?"*
 
-Follow the instructions, create the database with a supported collation, and then run:
+Follow the instructions, create the database with a supported collation, notify your classmates about collation problem please and then run:
 
 ```sql
 USE alexandria;
