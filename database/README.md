@@ -1,85 +1,72 @@
-## MariaDB setup
+## Database Setup
 
-To connect to the database, you need to set it up first.
+## Install MariaDB
 
-### 1. Install MariaDB (Windows)
+### Windows
 
-Download MariaDB Community Server if you do not have it yet:
+1. Download MariaDB Community Server: https://mariadb.com/downloads/
+2. Run the installer.
+3. Keep port `3306`.
+4. Set a password for the MariaDB `root` user.
+5. Install MariaDB as a Windows service.
 
-https://mariadb.com/downloads/
+### macOS
 
-During installation:
-
-- keep the default port `3306`;
-- create a `root` user;
-- set a password for `root` if you want;
-- install MariaDB as a Windows service.
-
-### 2. Open MariaDB
-
-Open PowerShell, Command Prompt, or Terminal and run one of these:
+Install MariaDB with Homebrew:
 
 ```bash
-# use this if you set a password for root
-mariadb -u root -p 
-
-# use this  if you did not set a password for root
-mariadb -u root 
+brew install mariadb
 ```
 
-### 3. Create the database
+Start it:
 
-First, check the port. Run:
-
-```sql
-SHOW VARIABLES LIKE 'port';
-
+```bash
+brew services start mariadb
 ```
 
-The result should be `3306`.
+## Create the Local Project Database
 
-Then, check the available collations. Run:
+Start MariaDB before running the setup script.
 
-```sql
-SHOW COLLATION WHERE Charset = 'utf8mb4';
+Windows, open Command Prompt as Administrator:
+
+```bash
+net start MariaDB
 ```
 
-If `utf8mb4_unicode_ci` is in the list, run:
+macOS:
 
-```sql
-CREATE DATABASE alexandria
-    CHARACTER SET utf8mb4
-    COLLATE utf8mb4_unicode_ci;
-
-USE alexandria;
+```bash
+brew services start mariadb
 ```
 
-If `utf8mb4_unicode_ci` is not on the list, go to AI and say:
+From the project root, run:
 
-*"My classmate asked me to run this: `CREATE DATABASE alexandria CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`, but my MariaDB doesn't support `utf8mb4_unicode_ci`. What should I replace it with?"*
-
-Follow the instructions, create the database with a supported collation, notify your classmates about collation problem please and then run:
-
-```sql
-USE alexandria;
+```bash
+./scripts/setup-db.sh
 ```
 
-### 4. Create the database user
+Enter the MariaDB `root` password. If `root` has no password, press Enter.
 
-Run:
+The script creates the `alexandria` database and user, creates all tables from `schema.sql`, and loads `data.sql`.
 
-```sql
-CREATE USER 'alexandria'@'localhost'
-    IDENTIFIED BY 'alexandria';
+## Use the Application
 
-GRANT ALL PRIVILEGES
-    ON alexandria.*
-    TO 'alexandria'@'localhost';
+After setup, start the Java application normally. MariaDB usually continues running in the background, including after a computer restart.
 
-FLUSH PRIVILEGES;
+If the application cannot connect to the database, start MariaDB server using the command for your operating system above.
+
+## Update the Schema
+
+After changing `schema.sql` or `data.sql`, run:
+
+```bash
+./scripts/setup-db.sh
 ```
 
-Now you have the local database with specified credentials:
+This deletes all data in Alexandria tables and creates the tables again. The database and user remain.
+
+## Application Connection
 
 ```text
 username: alexandria
@@ -89,57 +76,6 @@ port: 3306
 database: alexandria
 ```
 
-### 5. Create the tables
+## Docker Later
 
-The database schema is stored in this project in `database/schema.sql`. Open it, copy the whole file, paste it into the MariaDB terminal, and press Enter to create all tables.
-
-### 6. Check the tables
-
-Run:
-
-```sql
-SHOW TABLES;
-```
-
-You should see:
-
-```text
-users
-texts
-search_results
-text_statistics
-term_analysis
-text_comparisons
-text_comparison_texts
-term_comparisons
-term_comparison_texts
-quotations
-```
-
-### 7. Exit MariaDB
-
-```sql
-exit;
-```
-
-### 8. Connect as the project user
-
-Next time, you can connect directly with:
-
-```bash
-mariadb -u alexandria -p
-```
-
-Enter the password:
-
-```text
-alexandria
-```
----
-
-If you're wondering why we create a separate `alexandria` user for MariaDB instead of using `root`:
-
-- everyone in the team uses the same database credentials
-- the same credentials is used in the backend connection configuration
-- later, the same setup is easier to reproduce in deployment and automated environments
-- using root for an application is unsafe because it gives the application full database permissions
+Later, MariaDB will run in Docker. The schema and DAO code stay the same; only the JDBC host changes from `localhost` to the MariaDB service name.
