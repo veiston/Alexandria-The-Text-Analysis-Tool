@@ -58,7 +58,7 @@ If the application cannot connect to the database, start MariaDB server using th
 
 ## Update the Schema
 
-After changing `schema.sql` or `data.sql`, run:
+After changing `schema.sql` or `data.sql`, run from the project root:
 
 ```bash
 ./scripts/setup-db.sh
