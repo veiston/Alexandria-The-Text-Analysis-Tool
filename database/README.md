@@ -139,6 +139,7 @@ alexandria
 
 If you're wondering why we create a separate `alexandria` user for MariaDB instead of using `root`:
 
-- everyone in the team uses the same database credentials;
-- the same credentials is used in the backend connection configuration;
-- later, the same setup is easier to reproduce in deployment and automated environments.
+- everyone in the team uses the same database credentials
+- the same credentials is used in the backend connection configuration
+- later, the same setup is easier to reproduce in deployment and automated environments
+- using root for an application is unsafe because it gives the application full database permissions
