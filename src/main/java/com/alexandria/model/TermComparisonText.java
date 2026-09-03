@@ -1,7 +1,10 @@
 package com.alexandria.model;
 
 /**
- * Links a term comparison to a text it was done for.
+ * Text Comparison with entered word/phrase junction.
+ *
+ * A term comparison can include several texts. This model stores one link
+ * between a saved term comparison and each text included in it.
  */
 public class TermComparisonText {
 	private Integer comparisonId;

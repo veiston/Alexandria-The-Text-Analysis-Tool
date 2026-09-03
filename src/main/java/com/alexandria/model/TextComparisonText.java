@@ -1,7 +1,10 @@
 package com.alexandria.model;
 
 /**
- * Links a text comparison to a text it was done for.
+ * Text Comparison junction.
+ *
+ * A text comparison can include several texts. This model stores one link
+ * between a saved text comparison and each text included in it.
  */
 public class TextComparisonText {
 	private Integer comparisonId;

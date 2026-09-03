@@ -3,7 +3,10 @@ package com.alexandria.model;
 import java.time.LocalDateTime;
 
 /**
- * Represents saved analysis for a text.
+ * Text Analysis.
+ *
+ * Stores analysis for one text: total words, unique words, sentences,
+ * paragraphs, most frequently used words, and important text fragments.
  */
 public class TextAnalysis {
 	private Integer id;

@@ -3,7 +3,11 @@ package com.alexandria.model;
 import java.time.LocalDateTime;
 
 /**
- * Represents saved analysis for a word or phrase in a text.
+ * Text Analysis with entered word/phrase.
+ *
+ * Stores analysis for a word or phrase entered by the user in one text:
+ * total occurrences, relative frequency, sentences and paragraphs containing it,
+ * and common words near it.
  */
 public class TermAnalysis {
 	private Integer id;

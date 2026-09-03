@@ -11,6 +11,11 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Text Comparison.
+ *
+ * Manages a comparison of two or more texts, including common frequently used words.
+ */
 public class TextComparisonDAO {
 	public TextComparison create(TextComparison comparison) throws SQLException {
 		String sql = "INSERT INTO text_comparisons (user_id, comparison_data) VALUES (?, ?)";

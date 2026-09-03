@@ -3,7 +3,10 @@ package com.alexandria.model;
 import java.time.LocalDateTime;
 
 /**
- * Represents a saved term comparison result for several texts.
+ * Text Comparison with entered word/phrase.
+ *
+ * Stores a comparison of a word or phrase entered by the user across several texts,
+ * including its total occurrences.
  */
 public class TermComparison {
 	private Integer id;

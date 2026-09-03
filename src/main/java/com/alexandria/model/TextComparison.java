@@ -3,7 +3,9 @@ package com.alexandria.model;
 import java.time.LocalDateTime;
 
 /**
- * Represents a saved comparison result for several texts.
+ * Text Comparison.
+ *
+ * Stores a comparison of two or more texts, including common frequently used words.
  */
 public class TextComparison {
 	private Integer id;

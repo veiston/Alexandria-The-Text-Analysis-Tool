@@ -3,7 +3,10 @@ package com.alexandria.model;
 import java.time.LocalDateTime;
 
 /**
- * Represents saved search results for a query in a text.
+ * Text Search.
+ *
+ * Stores results of a search for a word or phrase entered by the user.
+ * Search settings are selected by the user.
  */
 public class SearchResult {
 	private Integer id;

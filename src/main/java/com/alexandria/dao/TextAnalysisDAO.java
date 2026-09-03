@@ -11,6 +11,12 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Text Analysis.
+ *
+ * Manages analysis for one text: total words, unique words, sentences,
+ * paragraphs, most frequently used words, and important text fragments.
+ */
 public class TextAnalysisDAO {
 	public TextAnalysis create(TextAnalysis analysis) throws SQLException {
 		String sql = "INSERT INTO text_analysis (user_id, text_id, analysis_data) VALUES (?, ?, ?)";
