@@ -16,6 +16,13 @@ public class Quotation {
 	public Quotation() {
 	}
 
+	public Quotation(Integer userId, Integer textId, String quotationText, String location) {
+		this.userId = userId;
+		this.textId = textId;
+		this.quotationText = quotationText;
+		this.location = location;
+	}
+
 	public Quotation(Integer id, Integer userId, Integer textId, String quotationText,
 			String location, LocalDateTime createdAt) {
 		this.id = id;
