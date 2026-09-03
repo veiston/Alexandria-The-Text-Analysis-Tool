@@ -79,7 +79,7 @@ public class UserDAO {
 		return null;
 	}
 
-	public User update(User user) throws SQLException {
+	public boolean update(User user) throws SQLException {
 		String sql = "UPDATE users SET name = ?, email = ?, photo = ?, organization = ?, password = ? WHERE id = ?";
 
 		try (Connection connection = DatabaseConnection.getConnection();
@@ -93,12 +93,8 @@ public class UserDAO {
 
 			int updatedRows = statement.executeUpdate();
 
-			if (updatedRows > 0) {
-				return user;
-			}
+			return updatedRows > 0;
 		}
-
-		return null;
 	}
 
 	public boolean delete(int id) throws SQLException {
