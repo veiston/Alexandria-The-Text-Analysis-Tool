@@ -15,6 +15,12 @@ public class TextAnalysis {
 	public TextAnalysis() {
 	}
 
+	public TextAnalysis(Integer userId, Integer textId, String statisticsData) {
+		this.userId = userId;
+		this.textId = textId;
+		this.statisticsData = statisticsData;
+	}
+
 	public TextAnalysis(Integer id, Integer userId, Integer textId,
 			String statisticsData, LocalDateTime createdAt) {
 		this.id = id;
