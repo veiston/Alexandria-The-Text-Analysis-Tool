@@ -67,9 +67,7 @@ public class UserDAOTest {
 		user.setOrganization("Updated test organization");
 		user.setPassword("updated-hashed-password");
 
-		boolean updatedUser = userDAO.update(user);
-
-		assertTrue(updatedUser);
+		assertTrue(userDAO.update(user));
     }
 
     @Test
