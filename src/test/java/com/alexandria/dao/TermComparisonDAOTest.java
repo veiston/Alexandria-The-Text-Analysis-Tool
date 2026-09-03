@@ -39,10 +39,10 @@ public class TermComparisonDAOTest {
 		termComparison = new TermComparison(user.getId(), "test", "{\"occurrences\":[]}");
 		termComparison = termComparisonDAO.create(termComparison);
 
-		TermComparison secondComparison = new TermComparison(
+		TermComparison secondTermComparison = new TermComparison(
 				user.getId(), "text", "{\"occurrences\":[1]}"
 		);
-		termComparisonDAO.create(secondComparison);
+		termComparisonDAO.create(secondTermComparison);
 	}
 
 	@After
@@ -59,17 +59,17 @@ public class TermComparisonDAOTest {
 
 	@Test
 	public void findsTermComparisonById() throws SQLException {
-		TermComparison foundComparison = termComparisonDAO.findById(termComparison.getId());
+		TermComparison foundTermComparison = termComparisonDAO.findById(termComparison.getId());
 
-		assertNotNull(foundComparison);
-		assertEquals(termComparison.getId(), foundComparison.getId());
+		assertNotNull(foundTermComparison);
+		assertEquals(termComparison.getId(), foundTermComparison.getId());
 	}
 
 	@Test
 	public void findsTermComparisonsByUserId() throws SQLException {
-		List<TermComparison> comparisons = termComparisonDAO.findAllByUserId(user.getId());
+		List<TermComparison> termComparisons = termComparisonDAO.findAllByUserId(user.getId());
 
-		assertEquals(2, comparisons.size());
+		assertEquals(2, termComparisons.size());
 	}
 
 	@Test
@@ -79,9 +79,9 @@ public class TermComparisonDAOTest {
 
 		assertTrue(termComparisonDAO.update(termComparison));
 
-		TermComparison foundComparison = termComparisonDAO.findById(termComparison.getId());
-		assertEquals("updated", foundComparison.getTerm());
-		assertEquals("{\"occurrences\":[2]}", foundComparison.getComparisonData());
+		TermComparison foundTermComparison = termComparisonDAO.findById(termComparison.getId());
+		assertEquals("updated", foundTermComparison.getTerm());
+		assertEquals("{\"occurrences\":[2]}", foundTermComparison.getComparisonData());
 	}
 
 	@Test

@@ -20,17 +20,17 @@ import static org.junit.Assert.assertTrue;
 public class TextAnalysisDAOTest {
 	private UserDAO userDAO;
 	private TextDAO textDAO;
-	private TextAnalysisDAO analysisDAO;
+	private TextAnalysisDAO textAnalysisDAO;
 	
 	private User user;
 	private Text text;
-	private TextAnalysis analysis;
+	private TextAnalysis textAnalysis;
 
 	@Before
 	public void setup() throws SQLException {
 		userDAO = new UserDAO();
 		textDAO = new TextDAO();
-		analysisDAO = new TextAnalysisDAO();
+		textAnalysisDAO = new TextAnalysisDAO();
 
 		user = new User(
 				"Test user",
@@ -52,11 +52,11 @@ public class TextAnalysisDAOTest {
 
 		text = textDAO.create(text);
 
-		analysis = new TextAnalysis(user.getId(), text.getId(), "{\"totalWords\":3}");
-		analysis = analysisDAO.create(analysis);
+		textAnalysis = new TextAnalysis(user.getId(), text.getId(), "{\"totalWords\":3}");
+		textAnalysis = textAnalysisDAO.create(textAnalysis);
 
-		TextAnalysis secondAnalysis = new TextAnalysis(user.getId(), text.getId(), "{\"totalWords\":5}");
-		analysisDAO.create(secondAnalysis);
+		TextAnalysis secondTextAnalysis = new TextAnalysis(user.getId(), text.getId(), "{\"totalWords\":5}");
+		textAnalysisDAO.create(secondTextAnalysis);
 	}
 
 	@After
@@ -68,44 +68,44 @@ public class TextAnalysisDAOTest {
 
 	@Test
 	public void createsTextAnalysis() {
-		assertNotNull(analysis.getId());
+		assertNotNull(textAnalysis.getId());
 	}
 
 	@Test
 	public void findsTextAnalysisById() throws SQLException {
-		TextAnalysis foundAnalysis = analysisDAO.findById(analysis.getId());
+		TextAnalysis foundTextAnalysis = textAnalysisDAO.findById(textAnalysis.getId());
 
-		assertNotNull(foundAnalysis);
-		assertEquals(analysis.getId(), foundAnalysis.getId());
+		assertNotNull(foundTextAnalysis);
+		assertEquals(textAnalysis.getId(), foundTextAnalysis.getId());
 	}
 
 	@Test
 	public void findsTextAnalysesByUserId() throws SQLException {
-		List<TextAnalysis> analyses = analysisDAO.findAllByUserId(user.getId());
+		List<TextAnalysis> textAnalyses = textAnalysisDAO.findAllByUserId(user.getId());
 
-		assertEquals(2, analyses.size());
+		assertEquals(2, textAnalyses.size());
 	}
 
 	@Test
 	public void findsTextAnalysesByTextId() throws SQLException {
-		List<TextAnalysis> analyses = analysisDAO.findAllByTextId(text.getId());
+		List<TextAnalysis> textAnalyses = textAnalysisDAO.findAllByTextId(text.getId());
 
-		assertEquals(2, analyses.size());
+		assertEquals(2, textAnalyses.size());
 	}
 
 	@Test
 	public void updatesTextAnalysis() throws SQLException {
-		analysis.setAnalysisData("{\"totalWords\":10}");
+		textAnalysis.setAnalysisData("{\"totalWords\":10}");
 
-		assertTrue(analysisDAO.update(analysis));
+		assertTrue(textAnalysisDAO.update(textAnalysis));
 
-		TextAnalysis foundAnalysis = analysisDAO.findById(analysis.getId());
-		assertEquals("{\"totalWords\":10}", foundAnalysis.getAnalysisData());
+		TextAnalysis foundTextAnalysis = textAnalysisDAO.findById(textAnalysis.getId());
+		assertEquals("{\"totalWords\":10}", foundTextAnalysis.getAnalysisData());
 	}
 
 	@Test
 	public void deletesTextAnalysis() throws SQLException {
-		assertTrue(analysisDAO.delete(analysis.getId()));
-		assertNull(analysisDAO.findById(analysis.getId()));
+		assertTrue(textAnalysisDAO.delete(textAnalysis.getId()));
+		assertNull(textAnalysisDAO.findById(textAnalysis.getId()));
 	}
 }

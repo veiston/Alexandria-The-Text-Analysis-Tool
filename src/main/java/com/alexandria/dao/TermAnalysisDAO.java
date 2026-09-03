@@ -19,26 +19,26 @@ import java.util.List;
  * and common words near it.
  */
 public class TermAnalysisDAO {
-	public TermAnalysis create(TermAnalysis analysis) throws SQLException {
+	public TermAnalysis create(TermAnalysis termAnalysis) throws SQLException {
 		String sql = "INSERT INTO term_analysis (user_id, text_id, term, analysis_data) VALUES (?, ?, ?, ?)";
 
 		try (Connection connection = DatabaseConnection.getConnection();
 				PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-			statement.setInt(1, analysis.getUserId());
-			statement.setInt(2, analysis.getTextId());
-			statement.setString(3, analysis.getTerm());
-			statement.setString(4, analysis.getAnalysisData());
+			statement.setInt(1, termAnalysis.getUserId());
+			statement.setInt(2, termAnalysis.getTextId());
+			statement.setString(3, termAnalysis.getTerm());
+			statement.setString(4, termAnalysis.getAnalysisData());
 
 			statement.executeUpdate();
 
 			try (ResultSet keys = statement.getGeneratedKeys()) {
 				if (keys.next()) {
-					analysis.setId(keys.getInt(1));
+					termAnalysis.setId(keys.getInt(1));
 				}
 			}
 		}
 
-		return analysis;
+		return termAnalysis;
 	}
 
 	public TermAnalysis findById(int id) throws SQLException {
@@ -66,7 +66,7 @@ public class TermAnalysisDAO {
 
 	public List<TermAnalysis> findAllByUserId(int userId) throws SQLException {
 		String sql = "SELECT * FROM term_analysis WHERE user_id = ?";
-		List<TermAnalysis> analyses = new ArrayList<>();
+		List<TermAnalysis> termAnalyses = new ArrayList<>();
 
 		try (Connection connection = DatabaseConnection.getConnection();
 				PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -74,7 +74,7 @@ public class TermAnalysisDAO {
 
 			try (ResultSet resultSet = statement.executeQuery()) {
 				while (resultSet.next()) {
-					TermAnalysis analysis = new TermAnalysis(
+					TermAnalysis termAnalysis = new TermAnalysis(
 							resultSet.getInt("id"),
 							resultSet.getInt("user_id"),
 							resultSet.getInt("text_id"),
@@ -82,17 +82,17 @@ public class TermAnalysisDAO {
 							resultSet.getString("analysis_data"),
 							resultSet.getTimestamp("created_at").toLocalDateTime());
 
-					analyses.add(analysis);
+					termAnalyses.add(termAnalysis);
 				}
 			}
 		}
 
-		return analyses;
+		return termAnalyses;
 	}
 
 	public List<TermAnalysis> findAllByTextId(int textId) throws SQLException {
 		String sql = "SELECT * FROM term_analysis WHERE text_id = ?";
-		List<TermAnalysis> analyses = new ArrayList<>();
+		List<TermAnalysis> termAnalyses = new ArrayList<>();
 
 		try (Connection connection = DatabaseConnection.getConnection();
 				PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -100,7 +100,7 @@ public class TermAnalysisDAO {
 
 			try (ResultSet resultSet = statement.executeQuery()) {
 				while (resultSet.next()) {
-					TermAnalysis analysis = new TermAnalysis(
+					TermAnalysis termAnalysis = new TermAnalysis(
 							resultSet.getInt("id"),
 							resultSet.getInt("user_id"),
 							resultSet.getInt("text_id"),
@@ -108,22 +108,22 @@ public class TermAnalysisDAO {
 							resultSet.getString("analysis_data"),
 							resultSet.getTimestamp("created_at").toLocalDateTime());
 
-					analyses.add(analysis);
+					termAnalyses.add(termAnalysis);
 				}
 			}
 		}
 
-		return analyses;
+		return termAnalyses;
 	}
 
-	public boolean update(TermAnalysis analysis) throws SQLException {
+	public boolean update(TermAnalysis termAnalysis) throws SQLException {
 		String sql = "UPDATE term_analysis SET term = ?, analysis_data = ? WHERE id = ?";
 
 		try (Connection connection = DatabaseConnection.getConnection();
 				PreparedStatement statement = connection.prepareStatement(sql)) {
-			statement.setString(1, analysis.getTerm());
-			statement.setString(2, analysis.getAnalysisData());
-			statement.setInt(3, analysis.getId());
+			statement.setString(1, termAnalysis.getTerm());
+			statement.setString(2, termAnalysis.getAnalysisData());
+			statement.setInt(3, termAnalysis.getId());
 
 			int updatedRows = statement.executeUpdate();
 

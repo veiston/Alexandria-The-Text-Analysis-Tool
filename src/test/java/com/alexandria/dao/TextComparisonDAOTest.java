@@ -17,14 +17,14 @@ import static org.junit.Assert.assertTrue;
 
 public class TextComparisonDAOTest {
 	private UserDAO userDAO;
-	private TextComparisonDAO comparisonDAO;
+	private TextComparisonDAO textComparisonDAO;
 	private User user;
-	private TextComparison comparison;
+	private TextComparison textComparison;
 
 	@Before
 	public void setup() throws SQLException {
 		userDAO = new UserDAO();
-		comparisonDAO = new TextComparisonDAO();
+		textComparisonDAO = new TextComparisonDAO();
 
 		user = new User(
 				"Test user",
@@ -36,11 +36,11 @@ public class TextComparisonDAOTest {
 
 		user = userDAO.create(user);
 
-		comparison = new TextComparison(user.getId(), "{\"commonWords\":[]}");
-		comparison = comparisonDAO.create(comparison);
+		textComparison = new TextComparison(user.getId(), "{\"commonWords\":[]}");
+		textComparison = textComparisonDAO.create(textComparison);
 
-		TextComparison secondComparison = new TextComparison(user.getId(), "{\"commonWords\":[\"text\"]}");
-		comparisonDAO.create(secondComparison);
+		TextComparison secondTextComparison = new TextComparison(user.getId(), "{\"commonWords\":[\"text\"]}");
+		textComparisonDAO.create(secondTextComparison);
 	}
 
 	@After
@@ -52,37 +52,37 @@ public class TextComparisonDAOTest {
 
 	@Test
 	public void createsTextComparison() {
-		assertNotNull(comparison.getId());
+		assertNotNull(textComparison.getId());
 	}
 
 	@Test
 	public void findsTextComparisonById() throws SQLException {
-		TextComparison foundComparison = comparisonDAO.findById(comparison.getId());
+		TextComparison foundTextComparison = textComparisonDAO.findById(textComparison.getId());
 
-		assertNotNull(foundComparison);
-		assertEquals(comparison.getId(), foundComparison.getId());
+		assertNotNull(foundTextComparison);
+		assertEquals(textComparison.getId(), foundTextComparison.getId());
 	}
 
 	@Test
 	public void findsTextComparisonsByUserId() throws SQLException {
-		List<TextComparison> comparisons = comparisonDAO.findAllByUserId(user.getId());
+		List<TextComparison> textComparisons = textComparisonDAO.findAllByUserId(user.getId());
 
-		assertEquals(2, comparisons.size());
+		assertEquals(2, textComparisons.size());
 	}
 
 	@Test
 	public void updatesTextComparison() throws SQLException {
-		comparison.setComparisonData("{\"commonWords\":[\"updated\"]}");
+		textComparison.setComparisonData("{\"commonWords\":[\"updated\"]}");
 
-		assertTrue(comparisonDAO.update(comparison));
+		assertTrue(textComparisonDAO.update(textComparison));
 
-		TextComparison foundComparison = comparisonDAO.findById(comparison.getId());
-		assertEquals("{\"commonWords\":[\"updated\"]}", foundComparison.getComparisonData());
+		TextComparison foundTextComparison = textComparisonDAO.findById(textComparison.getId());
+		assertEquals("{\"commonWords\":[\"updated\"]}", foundTextComparison.getComparisonData());
 	}
 
 	@Test
 	public void deletesTextComparison() throws SQLException {
-		assertTrue(comparisonDAO.delete(comparison.getId()));
-		assertNull(comparisonDAO.findById(comparison.getId()));
+		assertTrue(textComparisonDAO.delete(textComparison.getId()));
+		assertNull(textComparisonDAO.findById(textComparison.getId()));
 	}
 }

@@ -18,25 +18,25 @@ import java.util.List;
  * paragraphs, most frequently used words, and important text fragments.
  */
 public class TextAnalysisDAO {
-	public TextAnalysis create(TextAnalysis analysis) throws SQLException {
+	public TextAnalysis create(TextAnalysis textAnalysis) throws SQLException {
 		String sql = "INSERT INTO text_analysis (user_id, text_id, analysis_data) VALUES (?, ?, ?)";
 
 		try (Connection connection = DatabaseConnection.getConnection();
 				PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-			statement.setInt(1, analysis.getUserId());
-			statement.setInt(2, analysis.getTextId());
-			statement.setString(3, analysis.getAnalysisData());
+			statement.setInt(1, textAnalysis.getUserId());
+			statement.setInt(2, textAnalysis.getTextId());
+			statement.setString(3, textAnalysis.getAnalysisData());
 			
 			statement.executeUpdate();
 
 			try (ResultSet keys = statement.getGeneratedKeys()) {
 				if (keys.next()) {
-					analysis.setId(keys.getInt(1));
+					textAnalysis.setId(keys.getInt(1));
 				}
 			}
 		}
 
-		return analysis;
+		return textAnalysis;
 	}
 
 	public TextAnalysis findById(int id) throws SQLException {
@@ -63,7 +63,7 @@ public class TextAnalysisDAO {
 
 	public List<TextAnalysis> findAllByUserId(int userId) throws SQLException {
 		String sql = "SELECT * FROM text_analysis WHERE user_id = ?";
-		List<TextAnalysis> analyses = new ArrayList<>();
+		List<TextAnalysis> textAnalyses = new ArrayList<>();
 
 		try (Connection connection = DatabaseConnection.getConnection();
 				PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -71,24 +71,24 @@ public class TextAnalysisDAO {
 
 			try (ResultSet resultSet = statement.executeQuery()) {
 				while (resultSet.next()) {
-					TextAnalysis analysis = new TextAnalysis(
+					TextAnalysis textAnalysis = new TextAnalysis(
 							resultSet.getInt("id"),
 							resultSet.getInt("user_id"),
 							resultSet.getInt("text_id"),
 							resultSet.getString("analysis_data"),
 							resultSet.getTimestamp("created_at").toLocalDateTime());
 
-					analyses.add(analysis);
+					textAnalyses.add(textAnalysis);
 				}
 			}
 		}
 
-		return analyses;
+		return textAnalyses;
 	}
 
 	public List<TextAnalysis> findAllByTextId(int textId) throws SQLException {
 		String sql = "SELECT * FROM text_analysis WHERE text_id = ?";
-		List<TextAnalysis> analyses = new ArrayList<>();
+		List<TextAnalysis> textAnalyses = new ArrayList<>();
 
 		try (Connection connection = DatabaseConnection.getConnection();
 				PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -96,28 +96,28 @@ public class TextAnalysisDAO {
 
 			try (ResultSet resultSet = statement.executeQuery()) {
 				while (resultSet.next()) {
-					TextAnalysis analysis = new TextAnalysis(
+					TextAnalysis textAnalysis = new TextAnalysis(
 							resultSet.getInt("id"),
 							resultSet.getInt("user_id"),
 							resultSet.getInt("text_id"),
 							resultSet.getString("analysis_data"),
 							resultSet.getTimestamp("created_at").toLocalDateTime());
 
-					analyses.add(analysis);
+					textAnalyses.add(textAnalysis);
 				}
 			}
 		}
 
-		return analyses;
+		return textAnalyses;
 	}
 
-	public boolean update(TextAnalysis analysis) throws SQLException {
+	public boolean update(TextAnalysis textAnalysis) throws SQLException {
 		String sql = "UPDATE text_analysis SET analysis_data = ? WHERE id = ?";
 
 		try (Connection connection = DatabaseConnection.getConnection();
 				PreparedStatement statement = connection.prepareStatement(sql)) {
-			statement.setString(1, analysis.getAnalysisData());
-			statement.setInt(2, analysis.getId());
+			statement.setString(1, textAnalysis.getAnalysisData());
+			statement.setInt(2, textAnalysis.getId());
 
 			int updatedRows = statement.executeUpdate();
 

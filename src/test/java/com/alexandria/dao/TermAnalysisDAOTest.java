@@ -24,7 +24,7 @@ public class TermAnalysisDAOTest {
 
 	private User user;
 	private Text text;
-	private TermAnalysis analysis;
+	private TermAnalysis termAnalysis;
 
 	@Before
 	public void setup() throws SQLException {
@@ -50,12 +50,12 @@ public class TermAnalysisDAOTest {
 
 		text = textDAO.create(text);
 
-		analysis = new TermAnalysis(user.getId(), text.getId(), "test", "{\"occurrences\":1}");
-		analysis = termAnalysisDAO.create(analysis);
+		termAnalysis = new TermAnalysis(user.getId(), text.getId(), "test", "{\"occurrences\":1}");
+		termAnalysis = termAnalysisDAO.create(termAnalysis);
 
-		TermAnalysis secondAnalysis = new TermAnalysis(
+		TermAnalysis secondTermAnalysis = new TermAnalysis(
 				user.getId(), text.getId(), "text", "{\"occurrences\":1}");
-		termAnalysisDAO.create(secondAnalysis);
+		termAnalysisDAO.create(secondTermAnalysis);
 	}
 
 	@After
@@ -67,46 +67,46 @@ public class TermAnalysisDAOTest {
 
 	@Test
 	public void createsTermAnalysis() {
-		assertNotNull(analysis.getId());
+		assertNotNull(termAnalysis.getId());
 	}
 
 	@Test
 	public void findsTermAnalysisById() throws SQLException {
-		TermAnalysis foundAnalysis = termAnalysisDAO.findById(analysis.getId());
+		TermAnalysis foundTermAnalysis = termAnalysisDAO.findById(termAnalysis.getId());
 
-		assertNotNull(foundAnalysis);
-		assertEquals(analysis.getId(), foundAnalysis.getId());
+		assertNotNull(foundTermAnalysis);
+		assertEquals(termAnalysis.getId(), foundTermAnalysis.getId());
 	}
 
 	@Test
 	public void findsTermAnalysesByUserId() throws SQLException {
-		List<TermAnalysis> analyses = termAnalysisDAO.findAllByUserId(user.getId());
+		List<TermAnalysis> termAnalyses = termAnalysisDAO.findAllByUserId(user.getId());
 
-		assertEquals(2, analyses.size());
+		assertEquals(2, termAnalyses.size());
 	}
 
 	@Test
 	public void findsTermAnalysesByTextId() throws SQLException {
-		List<TermAnalysis> analyses = termAnalysisDAO.findAllByTextId(text.getId());
+		List<TermAnalysis> termAnalyses = termAnalysisDAO.findAllByTextId(text.getId());
 
-		assertEquals(2, analyses.size());
+		assertEquals(2, termAnalyses.size());
 	}
 
 	@Test
 	public void updatesTermAnalysis() throws SQLException {
-		analysis.setTerm("updated");
-		analysis.setAnalysisData("{\"occurrences\":2}");
+		termAnalysis.setTerm("updated");
+		termAnalysis.setAnalysisData("{\"occurrences\":2}");
 
-		assertTrue(termAnalysisDAO.update(analysis));
+		assertTrue(termAnalysisDAO.update(termAnalysis));
 
-		TermAnalysis foundAnalysis = termAnalysisDAO.findById(analysis.getId());
-		assertEquals("updated", foundAnalysis.getTerm());
-		assertEquals("{\"occurrences\":2}", foundAnalysis.getAnalysisData());
+		TermAnalysis foundTermAnalysis = termAnalysisDAO.findById(termAnalysis.getId());
+		assertEquals("updated", foundTermAnalysis.getTerm());
+		assertEquals("{\"occurrences\":2}", foundTermAnalysis.getAnalysisData());
 	}
 
 	@Test
 	public void deletesTermAnalysis() throws SQLException {
-		assertTrue(termAnalysisDAO.delete(analysis.getId()));
-		assertNull(termAnalysisDAO.findById(analysis.getId()));
+		assertTrue(termAnalysisDAO.delete(termAnalysis.getId()));
+		assertNull(termAnalysisDAO.findById(termAnalysis.getId()));
 	}
 }

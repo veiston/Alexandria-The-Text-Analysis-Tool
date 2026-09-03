@@ -17,24 +17,24 @@ import java.util.List;
  * Manages a comparison of two or more texts, including common frequently used words.
  */
 public class TextComparisonDAO {
-	public TextComparison create(TextComparison comparison) throws SQLException {
+	public TextComparison create(TextComparison textComparison) throws SQLException {
 		String sql = "INSERT INTO text_comparisons (user_id, comparison_data) VALUES (?, ?)";
 
 		try (Connection connection = DatabaseConnection.getConnection();
 				PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-			statement.setInt(1, comparison.getUserId());
-			statement.setString(2, comparison.getComparisonData());
+			statement.setInt(1, textComparison.getUserId());
+			statement.setString(2, textComparison.getComparisonData());
 			
 			statement.executeUpdate();
 
 			try (ResultSet keys = statement.getGeneratedKeys()) {
 				if (keys.next()) {
-					comparison.setId(keys.getInt(1));
+					textComparison.setId(keys.getInt(1));
 				}
 			}
 		}
 
-		return comparison;
+		return textComparison;
 	}
 
 	public TextComparison findById(int id) throws SQLException {
@@ -60,7 +60,7 @@ public class TextComparisonDAO {
 
 	public List<TextComparison> findAllByUserId(int userId) throws SQLException {
 		String sql = "SELECT * FROM text_comparisons WHERE user_id = ?";
-		List<TextComparison> comparisons = new ArrayList<>();
+		List<TextComparison> textComparisons = new ArrayList<>();
 
 		try (Connection connection = DatabaseConnection.getConnection();
 				PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -68,27 +68,27 @@ public class TextComparisonDAO {
 
 			try (ResultSet resultSet = statement.executeQuery()) {
 				while (resultSet.next()) {
-					TextComparison comparison = new TextComparison(
+					TextComparison textComparison = new TextComparison(
 							resultSet.getInt("id"),
 							resultSet.getInt("user_id"),
 							resultSet.getString("comparison_data"),
 							resultSet.getTimestamp("created_at").toLocalDateTime());
 
-					comparisons.add(comparison);
+					textComparisons.add(textComparison);
 				}
 			}
 		}
 
-		return comparisons;
+		return textComparisons;
 	}
 
-	public boolean update(TextComparison comparison) throws SQLException {
+	public boolean update(TextComparison textComparison) throws SQLException {
 		String sql = "UPDATE text_comparisons SET comparison_data = ? WHERE id = ?";
 
 		try (Connection connection = DatabaseConnection.getConnection();
 				PreparedStatement statement = connection.prepareStatement(sql)) {
-			statement.setString(1, comparison.getComparisonData());
-			statement.setInt(2, comparison.getId());
+			statement.setString(1, textComparison.getComparisonData());
+			statement.setInt(2, textComparison.getId());
 
 			int updatedRows = statement.executeUpdate();
 

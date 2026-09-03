@@ -18,25 +18,25 @@ import java.util.List;
  * including its total occurrences.
  */
 public class TermComparisonDAO {
-	public TermComparison create(TermComparison comparison) throws SQLException {
+	public TermComparison create(TermComparison termComparison) throws SQLException {
 		String sql = "INSERT INTO term_comparisons (user_id, term, comparison_data) VALUES (?, ?, ?)";
 
 		try (Connection connection = DatabaseConnection.getConnection();
 				PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-			statement.setInt(1, comparison.getUserId());
-			statement.setString(2, comparison.getTerm());
-			statement.setString(3, comparison.getComparisonData());
+			statement.setInt(1, termComparison.getUserId());
+			statement.setString(2, termComparison.getTerm());
+			statement.setString(3, termComparison.getComparisonData());
 
 			statement.executeUpdate();
 
 			try (ResultSet keys = statement.getGeneratedKeys()) {
 				if (keys.next()) {
-					comparison.setId(keys.getInt(1));
+					termComparison.setId(keys.getInt(1));
 				}
 			}
 		}
 
-		return comparison;
+		return termComparison;
 	}
 
 	public TermComparison findById(int id) throws SQLException {
@@ -63,7 +63,7 @@ public class TermComparisonDAO {
 
 	public List<TermComparison> findAllByUserId(int userId) throws SQLException {
 		String sql = "SELECT * FROM term_comparisons WHERE user_id = ?";
-		List<TermComparison> comparisons = new ArrayList<>();
+		List<TermComparison> termComparisons = new ArrayList<>();
 
 		try (Connection connection = DatabaseConnection.getConnection();
 				PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -71,29 +71,29 @@ public class TermComparisonDAO {
 
 			try (ResultSet resultSet = statement.executeQuery()) {
 				while (resultSet.next()) {
-					TermComparison comparison = new TermComparison(
+					TermComparison termComparison = new TermComparison(
 							resultSet.getInt("id"),
 							resultSet.getInt("user_id"),
 							resultSet.getString("term"),
 							resultSet.getString("comparison_data"),
 							resultSet.getTimestamp("created_at").toLocalDateTime());
 
-					comparisons.add(comparison);
+					termComparisons.add(termComparison);
 				}
 			}
 		}
 
-		return comparisons;
+		return termComparisons;
 	}
 
-	public boolean update(TermComparison comparison) throws SQLException {
+	public boolean update(TermComparison termComparison) throws SQLException {
 		String sql = "UPDATE term_comparisons SET term = ?, comparison_data = ? WHERE id = ?";
 
 		try (Connection connection = DatabaseConnection.getConnection();
 				PreparedStatement statement = connection.prepareStatement(sql)) {
-			statement.setString(1, comparison.getTerm());
-			statement.setString(2, comparison.getComparisonData());
-			statement.setInt(3, comparison.getId());
+			statement.setString(1, termComparison.getTerm());
+			statement.setString(2, termComparison.getComparisonData());
+			statement.setInt(3, termComparison.getId());
 
 			int updatedRows = statement.executeUpdate();
 
