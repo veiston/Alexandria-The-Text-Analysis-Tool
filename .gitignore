@@ -23,3 +23,8 @@
 target/
 hs_err_pid*
 replay_pid*
+
+.DS_Store
+
+# Personal VS Code settings
+.vscode/settings.json
