@@ -9,24 +9,24 @@ public class TextAnalysis {
 	private Integer id;
 	private Integer userId;
 	private Integer textId;
-	private String statisticsData;
+	private String analysisData;
 	private LocalDateTime createdAt;
 
 	public TextAnalysis() {
 	}
 
-	public TextAnalysis(Integer userId, Integer textId, String statisticsData) {
+	public TextAnalysis(Integer userId, Integer textId, String analysisData) {
 		this.userId = userId;
 		this.textId = textId;
-		this.statisticsData = statisticsData;
+		this.analysisData = analysisData;
 	}
 
 	public TextAnalysis(Integer id, Integer userId, Integer textId,
-			String statisticsData, LocalDateTime createdAt) {
+			String analysisData, LocalDateTime createdAt) {
 		this.id = id;
 		this.userId = userId;
 		this.textId = textId;
-		this.statisticsData = statisticsData;
+		this.analysisData = analysisData;
 		this.createdAt = createdAt;
 	}
 
@@ -54,12 +54,12 @@ public class TextAnalysis {
 		this.textId = textId;
 	}
 
-	public String getStatisticsData() {
-		return statisticsData;
+	public String getAnalysisData() {
+		return analysisData;
 	}
 
-	public void setStatisticsData(String statisticsData) {
-		this.statisticsData = statisticsData;
+	public void setAnalysisData(String analysisData) {
+		this.analysisData = analysisData;
 	}
 
 	public LocalDateTime getCreatedAt() {

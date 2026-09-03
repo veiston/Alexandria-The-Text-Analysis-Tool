@@ -36,11 +36,11 @@ CREATE TABLE IF NOT EXISTS search_results (
     FOREIGN KEY (text_id) REFERENCES texts(id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS text_statistics (
+CREATE TABLE IF NOT EXISTS text_analysis (
     id INT NOT NULL AUTO_INCREMENT,
     user_id INT NOT NULL,
     text_id INT NOT NULL,
-    statistics_data JSON NOT NULL,
+    analysis_data JSON NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id),
