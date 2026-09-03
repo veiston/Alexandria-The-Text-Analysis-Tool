@@ -14,6 +14,15 @@ public class User {
 	public User() {
 	}
 
+	public User(String name, String email, String photo,
+			String organization, String password) {
+		this.name = name;
+		this.email = email;
+		this.photo = photo;
+		this.organization = organization;
+		this.password = password;
+	}
+
 	public User(Integer id, String name, String email,
 			String photo, String organization, String password) {
 		this.id = id;
