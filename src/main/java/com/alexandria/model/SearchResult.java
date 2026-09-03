@@ -19,6 +19,13 @@ public class SearchResult {
 	public SearchResult() {
 	}
 
+	public SearchResult(Integer userId, Integer textId, String query, String resultsData) {
+		this.userId = userId;
+		this.textId = textId;
+		this.query = query;
+		this.resultsData = resultsData;
+	}
+
 	public SearchResult(Integer id, Integer userId, Integer textId, String query,
 			String resultsData, LocalDateTime createdAt) {
 		this.id = id;
