@@ -14,6 +14,11 @@ public class TextComparison {
 	public TextComparison() {
 	}
 
+	public TextComparison(Integer userId, String comparisonData) {
+		this.userId = userId;
+		this.comparisonData = comparisonData;
+	}
+
 	public TextComparison(Integer id, Integer userId, String comparisonData,
 			LocalDateTime createdAt) {
 		this.id = id;
