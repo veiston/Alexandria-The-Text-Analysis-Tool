@@ -11,7 +11,7 @@ import java.sql.Statement;
 
 public class UserDAO {
 
-	public void create(User user) throws SQLException {
+	public User create(User user) throws SQLException {
 		String sql = "INSERT INTO users (name, email, photo, organization, password) VALUES (?, ?, ?, ?, ?)";
 
 		try (Connection connection = DatabaseConnection.getConnection();
@@ -30,6 +30,8 @@ public class UserDAO {
 				}
 			}
 		}
+
+		return user;
 	}
 
 	public User findById(int id) throws SQLException {

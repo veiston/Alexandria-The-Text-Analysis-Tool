@@ -28,7 +28,7 @@ public class UserDAOTest {
         );
 
 		userDAO = new UserDAO();
-        userDAO.create(user);
+		user = userDAO.create(user);
     }
 
     @After
