@@ -9,7 +9,7 @@ public class User {
 	private String email;
 	private String photo;
 	private String organization;
-	private String password;
+	private String password; // ONLY HASHED PASSWORDS!
 
 	public User() {
 	}
@@ -21,7 +21,7 @@ public class User {
 		this.email = email;
 		this.photo = photo;
 		this.organization = organization;
-		this.password = password;
+		this.password = password; // ONLY HASHED PASSWORDS!
 	}
 
 	public Integer getId() {
