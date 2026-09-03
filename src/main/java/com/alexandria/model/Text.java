@@ -17,6 +17,15 @@ public class Text {
 	public Text() {
 	}
 
+	public Text(Integer userId, String title, String fileName,
+			FileType fileType, String content) {
+		this.userId = userId;
+		this.title = title;
+		this.fileName = fileName;
+		this.fileType = fileType;
+		this.content = content;
+	}
+
 	public Text(Integer id, Integer userId, String title, String fileName,
 			FileType fileType, String content, LocalDateTime createdAt) {
 		this.id = id;
