@@ -20,6 +20,13 @@ public class TermAnalysis {
 	public TermAnalysis() {
 	}
 
+	public TermAnalysis(Integer userId, Integer textId, String term, String analysisData) {
+		this.userId = userId;
+		this.textId = textId;
+		this.term = term;
+		this.analysisData = analysisData;
+	}
+
 	public TermAnalysis(Integer id, Integer userId, Integer textId, String term,
 			String analysisData, LocalDateTime createdAt) {
 		this.id = id;
