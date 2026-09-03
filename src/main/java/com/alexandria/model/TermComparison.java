@@ -18,6 +18,12 @@ public class TermComparison {
 	public TermComparison() {
 	}
 
+	public TermComparison(Integer userId, String term, String comparisonData) {
+		this.userId = userId;
+		this.term = term;
+		this.comparisonData = comparisonData;
+	}
+
 	public TermComparison(Integer id, Integer userId, String term,
 			String comparisonData, LocalDateTime createdAt) {
 		this.id = id;
