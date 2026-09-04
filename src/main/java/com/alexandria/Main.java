@@ -1,31 +1,23 @@
 package com.alexandria;
 
+import com.alexandria.view.MainView;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.io.IOException;
-
 public class Main extends Application {
 
-    private static Scene scene;
-
     @Override
-    public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("main"), 640, 480);
+    public void start(Stage stage) {
+        MainView mainView = new MainView();
+
+        Scene scene = new Scene(mainView, 1200, 600);
+        scene.getStylesheets().add(
+                getClass().getResource("/styles/index.css").toExternalForm());
+
+        stage.setTitle("Alexandria - Text Analysis Tool");
         stage.setScene(scene);
         stage.show();
-    }
-
-    static void setRoot(String fxml) throws IOException {
-        scene.setRoot(loadFXML(fxml));
-    }
-
-    private static Parent loadFXML(String fxml) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/fxml/" + fxml + ".fxml"));
-        return fxmlLoader.load();
     }
 
     public static void main(String[] args) {
