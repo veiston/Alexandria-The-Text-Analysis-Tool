@@ -1,0 +1,173 @@
+/* Global */
+
+.root {
+    -fx-background-color: -fx-background;
+    -fx-font-family: -fx-font-sans;
+    -fx-text-fill: -fx-foreground;
+}
+.label {
+    -fx-text-fill: -fx-foreground;
+    -fx-font-family: -fx-font-sans;
+}
+.text-muted {
+    -fx-text-fill: -fx-foreground-muted;
+    -fx-font-size: 11px;
+}
+
+/* Headings */
+.heading-xl {
+    -fx-font-family: -fx-font-sans-bold;
+    -fx-font-size: 24px;
+    -fx-text-fill: -fx-foreground;
+}
+.heading-lg {
+    -fx-font-family: -fx-font-sans-bold;
+    -fx-font-size: 16px;
+    -fx-text-fill: -fx-foreground;
+}
+.heading-md {
+    -fx-font-family: -fx-font-sans-bold;
+    -fx-font-size: 13px;
+    -fx-text-fill: -fx-foreground;
+}
+.heading-sm {
+    -fx-font-family: -fx-font-sans-bold;
+    -fx-font-size: 13px;
+    -fx-text-fill: -fx-foreground;
+}
+
+/* Reading text */
+.body-text {
+    -fx-font-family: -fx-font-serif;
+    -fx-font-size: 13px;
+    -fx-line-spacing: 4px;
+    -fx-text-fill: -fx-foreground;
+}
+
+/* Buttons */
+.button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-cursor: hand;
+    -fx-font-family: -fx-font-sans;
+}
+
+/* Primary button */
+.button.primary {
+    -fx-background-color: -fx-foreground;
+    -fx-text-fill: -fx-surface;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-padding: 8px 16px;
+    -fx-font-family: -fx-font-sans-bold;
+    -fx-font-size: 12px;
+    -fx-alignment: CENTER;
+    -fx-cursor: hand;
+}
+.button.primary:hover {
+    -fx-opacity: 0.92;
+}
+.button.primary:pressed {
+    -fx-opacity: 0.82;
+}
+
+/* Secondary button */
+.button.secondary {
+    -fx-background-color: -fx-surface;
+    -fx-border-color: -fx-border-subtle;
+    -fx-border-width: 1px;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-padding: 8px 16px;
+    -fx-text-fill: -fx-foreground;
+}
+.button.secondary:hover {
+    -fx-background-color: -fx-surface-hover;
+}
+
+/* Pill toggle group */
+.toggle-button.pill {
+    -fx-background-color: -fx-surface;
+    -fx-border-color: -fx-border-subtle;
+    -fx-border-width: 1px;
+    -fx-background-radius: 999px;
+    -fx-border-radius: 999px;
+    -fx-padding: 4px 16px;
+    -fx-text-fill: -fx-foreground-muted;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+}
+.toggle-button.pill:selected {
+    -fx-background-color: -fx-foreground;
+    -fx-text-fill: -fx-surface;
+    -fx-border-color: -fx-foreground;
+}
+
+/* Cards */
+.card {
+    -fx-background-color: -fx-surface;
+    -fx-border-color: -fx-border-subtle;
+    -fx-border-width: 1px;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-effect: -fx-card-shadow;
+    -fx-padding: 16px;
+}
+
+/* Tags */
+.tags {
+    -fx-background-color: -fx-accent-soft;
+    -fx-text-fill: -fx-accent;
+    -fx-background-radius: 4px;
+    -fx-padding: 2px 8px;
+    -fx-font-size: 11px;
+}
+
+/* Highlighted text */
+.text-highlight {
+    -fx-background-color: -fx-highlight-soft;
+    -fx-background-radius: 4px;
+}
+
+/* Inputs */
+.text-field,
+.text-area {
+    -fx-font-family: -fx-font-sans;
+    -fx-background-color: -fx-surface;
+    -fx-border-color: -fx-border-subtle;
+    -fx-border-width: 1px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-text-fill: -fx-foreground;
+    -fx-prompt-text-fill: -fx-foreground-faint;
+    -fx-padding: 8px;
+}
+
+/* Hyperlinks */
+.hyperlink {
+    -fx-text-fill: -fx-foreground-muted;
+    -fx-underline: false;
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+}
+.hyperlink:hover {
+    -fx-text-fill: -fx-accent;
+}
+
+/* Frequency bars */
+.frequency-bar > .bar {
+    -fx-background-color: -fx-accent;
+    -fx-background-radius: 4px;
+}
+.frequency-bar > .track {
+    -fx-background-color: -fx-border-subtle;
+    -fx-background-radius: 4px;
+}
+
+/* Separators */
+.separator *.line {
+    -fx-border-color: -fx-border-subtle;
+    -fx-border-width: 1px 0 0 0;
+}
