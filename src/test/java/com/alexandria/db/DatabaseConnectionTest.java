@@ -1,6 +1,5 @@
-package com.alexandria.integration;
+package com.alexandria.db;
 
-import com.alexandria.db.DatabaseConnection;
 import org.junit.Test;
 
 import java.sql.Connection;

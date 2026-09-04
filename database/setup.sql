@@ -23,7 +23,7 @@ DROP TABLE IF EXISTS quotations;
 DROP TABLE IF EXISTS term_comparisons;
 DROP TABLE IF EXISTS text_comparisons;
 DROP TABLE IF EXISTS term_analysis;
-DROP TABLE IF EXISTS text_statistics;
+DROP TABLE IF EXISTS text_analysis;
 DROP TABLE IF EXISTS search_results;
 DROP TABLE IF EXISTS texts;
 DROP TABLE IF EXISTS users;

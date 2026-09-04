@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS texts (
     user_id INT NOT NULL,
     title VARCHAR(255) NOT NULL,
     file_name VARCHAR(255),
-    file_type VARCHAR(20),
+    file_type VARCHAR(20) NOT NULL,
     content LONGTEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -36,11 +36,11 @@ CREATE TABLE IF NOT EXISTS search_results (
     FOREIGN KEY (text_id) REFERENCES texts(id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS text_statistics (
+CREATE TABLE IF NOT EXISTS text_analysis (
     id INT NOT NULL AUTO_INCREMENT,
     user_id INT NOT NULL,
     text_id INT NOT NULL,
-    statistics_data JSON NOT NULL,
+    analysis_data JSON NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id),
