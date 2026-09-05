@@ -146,20 +146,5 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-        
-<<<<<<< HEAD
-=======
-         <plugins>
-            <!-- JavaFX -->
-            <plugin>
-                <groupId>org.openjfx</groupId>
-                <artifactId>javafx-maven-plugin</artifactId>
-                <version>0.0.8</version>
-                <configuration>
-                    <mainClass>com.alexandria.Main</mainClass>
-                </configuration>
-            </plugin>
-        </plugins>
->>>>>>> 5f7e8cb7c25bbc3c9c3a452a8c183adb484ace92
     </build>
 </project>
