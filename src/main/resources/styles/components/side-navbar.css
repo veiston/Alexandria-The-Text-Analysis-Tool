@@ -1,0 +1,42 @@
+/* Side Navbar */
+.side-navbar {
+    -fx-background-color: -fx-surface;
+    -fx-border-color:
+        transparent
+        -fx-border-subtle
+        transparent
+        transparent;
+    -fx-border-width: 0 1px 0 0;
+    -fx-pref-width: 220px;
+    -fx-min-width: 220px;
+    -fx-max-width: 220px;
+}
+
+/* Brand */
+.brand-icon-bg {
+    -fx-background-color: -fx-foreground;
+    -fx-background-radius: 6px;
+}
+
+/* Navigation Items */
+.nav-item {
+    -fx-background-color: transparent;
+    -fx-background-radius: 6px;
+    -fx-padding: 8px;
+    -fx-text-fill: -fx-foreground-muted;
+    -fx-graphic-text-gap: 10px;
+    -fx-font-family: -fx-font-sans;
+    -fx-font-size: 13px;
+    -fx-border-color: transparent;
+    -fx-border-width: 0 3px 0 0;
+    -fx-cursor: hand;
+}
+.nav-item:hover {
+    -fx-background-color: -fx-surface-hover;
+}
+.nav-item:selected {
+    -fx-background-color: -fx-surface-hover;
+    -fx-text-fill: -fx-foreground;
+    -fx-font-family: -fx-font-sans-bold;
+    -fx-border-color: -fx-foreground;
+}

@@ -1,0 +1,38 @@
+/* JavaFX Base Reset */
+
+.root {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+/* Buttons */
+.button,
+.toggle-button {
+    -fx-background-insets: 0;
+    -fx-border-insets: 0;
+    -fx-padding: 0;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+}
+
+/* Labels */
+.label {
+    -fx-padding: 0;
+}
+
+/* Text inputs */
+.text-field,
+.text-area {
+    -fx-background-insets: 0;
+}
+
+/* Focus outline */
+.button:focused,
+.toggle-button:focused,
+.text-field:focused,
+.text-area:focused {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
