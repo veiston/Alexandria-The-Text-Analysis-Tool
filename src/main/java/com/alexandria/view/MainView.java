@@ -5,9 +5,9 @@ import com.alexandria.view.router.Route;
 import com.alexandria.view.router.ViewRouter;
 
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 
-public class MainView extends BorderPane {
-
+public class MainView extends StackPane {
     private final SideNavbar sideNavbar;
     private final ViewRouter viewRouter;
 
@@ -15,30 +15,20 @@ public class MainView extends BorderPane {
         sideNavbar = new SideNavbar();
         viewRouter = new ViewRouter();
 
-        setLeft(sideNavbar);
-        setCenter(viewRouter);
+        BorderPane shell = new BorderPane();
+        shell.setLeft(sideNavbar);
+        shell.setCenter(viewRouter);
+        getChildren().add(shell);
 
         configureNavigation();
-
-        // Initial screen
         navigateTo(Route.LIBRARY);
     }
 
     private void configureNavigation() {
-
-        // Main navigation
-        sideNavbar.setOnNavigate(id -> {
-            navigateTo(Route.fromId(id));
-        });
-
-        // Footer navigation
-        sideNavbar.setOnFooterNavigate(id -> {
-            navigateTo(Route.fromId(id));
-        });
-
-        // New project action
+        sideNavbar.setOnNavigate(id -> navigateTo(Route.fromId(id)));
+        sideNavbar.setOnFooterNavigate(id -> navigateTo(Route.fromId(id)));
         sideNavbar.setOnNewProject(() -> {
-            // TODO: Implement the logic to open the new project dialog/screen
+            // TODO
         });
     }
 
