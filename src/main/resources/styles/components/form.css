@@ -1,0 +1,30 @@
+.form {
+    -fx-max-width: 340px;
+}
+
+.form-label {
+    -fx-font-family: -fx-font-sans;
+    -fx-font-size: 11px;
+    -fx-text-fill: -fx-foreground-muted;
+}
+
+.form-input {
+    -fx-background-color: -fx-surface;
+    -fx-border-color: -fx-border-subtle;
+    -fx-border-width: 1px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 8px;
+    -fx-font-family: -fx-font-sans;
+    -fx-font-size: 13px;
+    -fx-text-fill: -fx-foreground;
+}
+
+.form-input:focused {
+    -fx-border-color: -fx-accent;
+}
+
+.form-error {
+    -fx-text-fill: -fx-danger;
+    -fx-font-size: 11px;
+}

@@ -87,6 +87,21 @@
     -fx-background-color: -fx-surface-hover;
 }
 
+/* Danger button */
+.button.danger {
+    -fx-background-color: transparent;
+    -fx-text-fill: -fx-danger;
+    -fx-border-color: -fx-danger;
+    -fx-border-width: -fx-border-width-thin;
+    -fx-border-radius: -fx-radius-md;
+    -fx-background-radius: -fx-radius-md;
+    -fx-padding: -fx-space-sm -fx-space-md;
+}
+.button.danger:hover {
+    -fx-background-color: -fx-danger;
+    -fx-text-fill: -fx-surface;
+}
+
 /* Pill toggle group */
 .toggle-button.pill {
     -fx-background-color: -fx-surface;
