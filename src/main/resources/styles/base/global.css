@@ -92,10 +92,10 @@
     -fx-background-color: transparent;
     -fx-text-fill: -fx-danger;
     -fx-border-color: -fx-danger;
-    -fx-border-width: -fx-border-width-thin;
-    -fx-border-radius: -fx-radius-md;
-    -fx-background-radius: -fx-radius-md;
-    -fx-padding: -fx-space-sm -fx-space-md;
+    -fx-border-radius: 6px;
+    -fx-spacing: 8px;
+    -fx-min-width: 120px;
+    -fx-padding: 7px 12px;
 }
 .button.danger:hover {
     -fx-background-color: -fx-danger;

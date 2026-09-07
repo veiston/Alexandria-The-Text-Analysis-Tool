@@ -68,19 +68,3 @@
     -fx-text-fill: -fx-foreground;
     -fx-min-width: 150px;
 }
-
-/* Buttons */
-.settings-action-button {
-    -fx-padding: 6px 12px;
-    -fx-font-size: 11px;
-    -fx-min-width: 110px;
-}
-
-/* Danger Zone */
-.danger-actions {
-    -fx-spacing: 8px;
-}
-.danger-action-button {
-    -fx-min-width: 120px;
-    -fx-padding: 7px 12px;
-}
