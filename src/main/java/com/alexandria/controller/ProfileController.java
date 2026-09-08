@@ -19,7 +19,7 @@ public class ProfileController {
     private final UserSessionController session = UserSessionController.getInstance();
 
     /*
-     * Constructor used for testing purposes, allow DAO to be testes without screen
+     * Constructor used for testing purposes, allow DAO to be tested without screen
      */
     ProfileController(UserDAO userDAO) {
         this.userDAO = userDAO;
