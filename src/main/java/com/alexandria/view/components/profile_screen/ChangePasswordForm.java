@@ -1,21 +1,19 @@
 package com.alexandria.view.components.profile_screen;
 
 import java.util.function.Consumer;
-
-import com.alexandria.utils.PasswordValidator;
-import com.alexandria.view.components.shared.form.Form;
-import com.alexandria.view.components.shared.form.FormField;
-
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
+import com.alexandria.view.components.shared.form.Form;
+import com.alexandria.view.components.shared.form.FormField;
+
 public class ChangePasswordForm extends VBox {
     private static final double MAX_WIDTH = 380;
     private final Form form;
-    private Consumer<String> onChangePassword = newPassword -> {
+    private Consumer<String> onChangePassword = password -> {
     };
-
+    
     public ChangePasswordForm() {
         getStyleClass().add("modal-card");
         setSpacing(20);
@@ -26,26 +24,24 @@ public class ChangePasswordForm extends VBox {
         title.getStyleClass().add("heading-lg");
 
         form = new Form.Builder()
-                .field("newPassword", "New Password", FormField.Type.PASSWORD, true)
-                .field("confirmPassword", "Confirm Password", FormField.Type.PASSWORD, true)
-                .submitLabel("Change Password")
-                .customValidator(values -> {
-                    String pw = values.get("newPassword");
-                    String confirm = values.get("confirmPassword");
+            .field("newPassword", "New Password", FormField.Type.PASSWORD, true)
+            .field("confirmPassword", "Confirm Password", FormField.Type.PASSWORD, true)
+            
+            .submitLabel("Change Password")
+            .customValidator(values -> {
+                String password = values.get("newPassword");
+                String confirmation = values.get("confirmPassword");
+                if (!password.equals(confirmation)) {
+                    return "Passwords do not match.";
+                }
 
-                    if (!PasswordValidator.isValid(pw)) {
-                        return "Password must be at least 8 characters.";
-                    }
-                    if (!pw.equals(confirm)) {
-                        return "Passwords do not match.";
-                    }
+                return null;
+            }).build();
 
-                    return null;
-                })
-                .build();
+            form.setOnSubmit(values -> onChangePassword.accept(
+                values.get("newPassword")));
 
-        form.setOnSubmit(values -> onChangePassword.accept(values.get("newPassword")));
-        getChildren().addAll(title, form);
+            getChildren().addAll( title, form);
     }
 
     public void setOnChangePassword(Consumer<String> handler) {

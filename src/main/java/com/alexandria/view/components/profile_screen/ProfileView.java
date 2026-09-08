@@ -75,12 +75,10 @@ public class ProfileView extends VBox {
         changePasswordButton.setOnAction(e -> onChangePassword.run());
 
         VBox securitySection = createSection("Security",
-                createSettingRow(
-                        "Password",
-                        changePasswordButton));
+                createSettingRow("Password", changePasswordButton));
 
         logoutButton = new Button("Log Out");
-        logoutButton.getStyleClass().addAll("button", "danger", "danger-action-button");
+        logoutButton.getStyleClass().addAll("button", "danger");
         logoutButton.setOnAction(e -> onLogout.run());
 
         deleteAccountButton = new Button("Delete Account");
@@ -99,7 +97,6 @@ public class ProfileView extends VBox {
     }
 
     private VBox createSection(String title, Node... content) {
-
         Label titleLabel = new Label(title);
         titleLabel.getStyleClass().add("settings-section-title");
 
@@ -112,12 +109,10 @@ public class ProfileView extends VBox {
     }
 
     private HBox createSettingRow(String name, Node control) {
-
         Label nameLabel = new Label(name);
         nameLabel.getStyleClass().add("settings-name");
 
         HBox.setHgrow(nameLabel, Priority.ALWAYS);
-
         HBox row = new HBox(nameLabel, control);
         row.setAlignment(Pos.CENTER_LEFT);
         row.getStyleClass().add("settings-row");
@@ -165,6 +160,8 @@ public class ProfileView extends VBox {
 
         avatar.setViewport(new Rectangle2D(x, y, size, size));
     }
+
+    /* Actioin callbacks */
 
     public void setOnEdit(Runnable action) {
         this.onEdit = action;
