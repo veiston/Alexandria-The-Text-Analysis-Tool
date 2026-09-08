@@ -10,12 +10,14 @@ import javafx.scene.layout.VBox;
 import com.alexandria.model.User;
 import com.alexandria.view.components.shared.form.Form;
 import com.alexandria.view.components.shared.form.FormField;
+import com.alexandria.view.components.shared.form.validation.EmailValidator;
+import com.alexandria.view.components.shared.form.validation.FileValidator;
+import com.alexandria.view.components.shared.form.validation.TextValidator;
 
 public class EditProfileForm extends VBox {
     private static final double MAX_WIDTH = 380;
     private final Form form;
-    private Consumer<Map<String, String>> onSave = values -> {
-    };
+    private Consumer<Map<String, String>> onSave = values -> {};
 
     public EditProfileForm() {
         getStyleClass().add("modal-card");
@@ -27,15 +29,13 @@ public class EditProfileForm extends VBox {
         title.getStyleClass().add("heading-lg");
 
         form = new Form.Builder()
-                .field("name", "Username", FormField.Type.TEXT, false)
-                .field("email", "Email", FormField.Type.EMAIL, false)
-                .field("organization", "Organization", FormField.Type.TEXT, false)
-                .field("photo", "Profile Photo", FormField.Type.FILE, false)
-
+                .field("name", "Username", FormField.Type.TEXT, false, new TextValidator())
+                .field("email", "Email", FormField.Type.TEXT, false, new EmailValidator())
+                .field("organization", "Organization", FormField.Type.TEXT, false, new TextValidator())
+                .field("photo", "Profile Photo", FormField.Type.IMG_FILE, false, new FileValidator())
                 .submitLabel("Save Changes")
                 .customValidator(values -> {
-                    boolean anyFilled = values.values()
-                            .stream()
+                    boolean anyFilled = values.values().stream()
                             .anyMatch(v -> v != null && !v.isBlank());
 
                     return anyFilled ? null : "Change at least one field.";
@@ -47,8 +47,7 @@ public class EditProfileForm extends VBox {
     }
 
     public void prefill(User user) {
-        if (user == null)
-            return;
+        if (user == null) return;
 
         form.setValue("name", user.getName());
         form.setValue("email", user.getEmail());
@@ -67,3 +66,4 @@ public class EditProfileForm extends VBox {
         form.reset();
     }
 }
+
