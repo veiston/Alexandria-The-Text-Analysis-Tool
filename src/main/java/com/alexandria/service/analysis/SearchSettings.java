@@ -1,0 +1,12 @@
+package com.alexandria.service.analysis;
+
+/** 
+ * Independent search toggles — not mutually exclusive, unlike a single "mode". 
+ * caseSensitive = Exact match, fuzzy = Syninoums, wholeWordsOnly = RegEx
+*/
+public record SearchSettings(boolean caseSensitive, boolean fuzzy, boolean wholeWordsOnly) {
+
+    public static SearchSettings defaults() {
+        return new SearchSettings(false, false, false);
+    }
+}

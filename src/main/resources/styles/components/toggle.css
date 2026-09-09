@@ -1,0 +1,30 @@
+/* Shared Toggle */
+.toggle {
+    -fx-spacing: 4px;
+}
+
+/* Toggle Options */
+.toggle-option {
+    -fx-background-color: -fx-background;
+    -fx-text-fill: -fx-foreground-muted;
+    -fx-background-radius: 6px;
+    -fx-padding: 10px 12px;
+    -fx-font-family: -fx-font-sans;
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+}
+
+/* Selected tab */
+.toggle-option:selected {
+    -fx-background-color: -fx-foreground;
+    -fx-text-fill: -fx-surface;
+    -fx-font-family: -fx-font-sans-bold;
+}
+
+/* Hover */
+.toggle-option:hover {
+    -fx-background-color: -fx-surface-hover;
+}
+.toggle-option:selected:hover {
+    -fx-background-color: -fx-foreground;
+}

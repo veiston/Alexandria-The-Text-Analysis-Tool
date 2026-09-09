@@ -3,3 +3,8 @@
 @import "base/global.css";
 
 @import "components/side-navbar.css";
+@import "components/form.css";
+@import "components/modal.css";
+@import "components/toggle.css";
+
+@import "screens/profile-screen.css";

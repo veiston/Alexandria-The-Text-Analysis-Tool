@@ -8,13 +8,10 @@ public class ViewRouter extends StackPane {
     private Route currentRoute;
 
     public void navigateTo(Route route) {
-        if (route == null) {
+        if (route == null)
             return;
-        }
-
-        if (route == currentRoute) {
+        if (route == currentRoute)
             return;
-        }
 
         currentRoute = route;
 

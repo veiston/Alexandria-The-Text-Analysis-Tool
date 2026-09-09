@@ -87,6 +87,21 @@
     -fx-background-color: -fx-surface-hover;
 }
 
+/* Danger button */
+.button.danger {
+    -fx-background-color: transparent;
+    -fx-text-fill: -fx-danger;
+    -fx-border-color: -fx-danger;
+    -fx-border-radius: 6px;
+    -fx-spacing: 8px;
+    -fx-min-width: 120px;
+    -fx-padding: 7px 12px;
+}
+.button.danger:hover {
+    -fx-background-color: -fx-danger;
+    -fx-text-fill: -fx-surface;
+}
+
 /* Pill toggle group */
 .toggle-button.pill {
     -fx-background-color: -fx-surface;

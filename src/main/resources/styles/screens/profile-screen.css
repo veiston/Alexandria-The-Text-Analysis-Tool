@@ -1,0 +1,70 @@
+/* Profile Screen */
+.profile-screen {
+    -fx-background-color: -fx-background;
+}
+.profile-content {
+    -fx-padding: 40px;
+}
+.auth-view {
+    -fx-max-width: 380px;
+}
+.profile-auth-button {
+    -fx-min-width: 220px;
+}
+
+/* Profile View */
+.profile-card {
+    -fx-background-color: -fx-surface;
+    -fx-border-color: -fx-border-subtle;
+    -fx-border-width: 1px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-padding: 20px;
+}
+.profile-header {
+    -fx-spacing: 16px;
+}
+.profile-info {
+    -fx-spacing: 4px;
+}
+.profile-avatar {
+    -fx-background-color: -fx-surface-hover;
+    -fx-background-radius: 999px;
+}
+.profile-edit-button {
+    -fx-min-width: 110px;
+    -fx-padding: 8px 14px;
+}
+.settings-list {
+    -fx-spacing: 0;
+}
+
+/* Settings Sections */
+.settings-section {
+    -fx-spacing: 10px;
+    -fx-border-color:
+        -fx-border-subtle
+        transparent
+        -fx-border-subtle
+        transparent;
+    -fx-border-width: 1px 0 1px 0;
+    -fx-padding: 14px 0 14px 0;
+}
+.settings-section-title {
+    -fx-font-family: -fx-font-sans-bold;
+    -fx-font-size: 13px;
+    -fx-text-fill: -fx-foreground;
+    -fx-padding: 0 0 4px 0;
+}
+
+/* Settings Rows */
+.settings-row {
+    -fx-min-height: 36px;
+    -fx-spacing: 20px;
+}
+.settings-name {
+    -fx-font-family: -fx-font-sans;
+    -fx-font-size: 12px;
+    -fx-text-fill: -fx-foreground;
+    -fx-min-width: 150px;
+}

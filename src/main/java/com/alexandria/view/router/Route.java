@@ -16,6 +16,7 @@ public enum Route {
 
     private final String id;
     private final Supplier<Node> screenFactory;
+    private Node cachedScreen;
 
     Route(String id, Supplier<Node> screenFactory) {
         this.id = id;
@@ -27,7 +28,10 @@ public enum Route {
     }
 
     public Node createScreen() {
-        return screenFactory.get();
+        if (cachedScreen == null) {
+            cachedScreen = screenFactory.get();
+        }
+        return cachedScreen;
     }
 
     public static Route fromId(String id) {
