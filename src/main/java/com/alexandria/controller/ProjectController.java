@@ -7,16 +7,22 @@ import com.alexandria.dao.TextDAO;
 import com.alexandria.model.FileType;
 import com.alexandria.model.Text;
 import com.alexandria.model.User;
-import com.alexandria.utils.PdfTextExtraction;
+import com.alexandria.service.PdfService;
 import com.alexandria.view.components.side_navbar.new_project.NewProjectModal;
 
 public class ProjectController {
 
     private final TextDAO textDAO;
+    private final PdfService pdfService;
+
     private final UserSessionController session = UserSessionController.getInstance();
 
-    public ProjectController(TextDAO textDAO) {
+    public ProjectController(
+            TextDAO textDAO,
+            PdfService pdfService) {
+
         this.textDAO = textDAO;
+        this.pdfService = pdfService;
     }
 
     public Result createProject(
@@ -77,8 +83,7 @@ public class ProjectController {
         String name = file.getName().toLowerCase();
 
         if (name.endsWith(".pdf")) {
-            return PdfTextExtraction.extractText(
-                    file.getAbsolutePath());
+            return pdfService.extractText(file);
         }
 
         if (name.endsWith(".txt")) {

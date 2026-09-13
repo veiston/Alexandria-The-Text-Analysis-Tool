@@ -3,6 +3,7 @@ package com.alexandria.controller;
 import com.alexandria.dao.TextDAO;
 import com.alexandria.dao.UserDAO;
 import com.alexandria.model.Text;
+import com.alexandria.service.PdfService;
 import com.alexandria.view.MainView;
 import com.alexandria.view.router.Route;
 import com.alexandria.view.screens.ProfileScreen;
@@ -39,7 +40,7 @@ public class MainController {
     }
 
     private void configureProject() {
-        ProjectController projectController = new ProjectController(new TextDAO());
+        ProjectController projectController = new ProjectController(new TextDAO(), new PdfService());
 
         mainView.setOnProjectCreated(created -> {
             mainView.setNewProjectLoading(true);
