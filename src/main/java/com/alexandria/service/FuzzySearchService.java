@@ -32,7 +32,14 @@ public class FuzzySearchService {
         }
 
         // Typo budget. Amount of allowed letter differences
-        int k = (m >= 8) ? 2 : (m >= 4 ? 1 : 0);
+        int k;
+        if (m >= 8) {
+            k = 2;
+        } else if (m >= 4) {
+            k = 1;
+        } else {
+            k = 0;
+        }
 
         // Build character masks
         long[] mask = new long[65536];
@@ -72,19 +79,12 @@ public class FuzzySearchService {
 
             // Check if top bit has flipped to 0! Boom: (match found!)
             if ((R[k] & matchBit) == 0L) {
-                int actualErrors = k;
-                for (int d = 0; d <= k; d++) {
-                    if ((R[d] & matchBit) == 0L) {
-                        actualErrors = d;
-                        break;
-                    }
-                }
-
                 int start = Math.max(0, i - m + 1);
                 int end = i + 1;
                 String matchedSnippet = text.substring(start, end);
+                String ctx = text.substring(Math.max(0, start - 40), Math.min(text.length(), end + 40)).strip();
 
-                matches.add(new SearchMatch(matchedSnippet, start, end, null, null));
+                matches.add(new SearchMatch(matchedSnippet, start, end, null, null, ctx));
             }
         }
 
