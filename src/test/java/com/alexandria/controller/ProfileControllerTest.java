@@ -208,6 +208,138 @@ public class ProfileControllerTest {
                 verify(userDAO).update(user);
         }
 
+        @Test
+        public void editProfileUpdatesProvidedTextFields() throws SQLException {
+                User user = new User(
+                                1,
+                                "OldName",
+                                "old@example.com",
+                                null,
+                                "OldOrg",
+                                "hash");
+                session.login(user);
+
+                controller = newControllerWithoutScreen();
+
+                ProfileController.Result result = controller.editProfile(Map.of(
+                                "name", "NewName",
+                                "email", "new@example.com",
+                                "organization", "OldOrg",
+                                "photo", ""));
+
+                assertTrue(result.success());
+                assertEquals("NewName", user.getName());
+                assertEquals("new@example.com", user.getEmail());
+                assertEquals("OldOrg", user.getOrganization());
+        }
+
+        @Test
+        public void registerReturnsErrorWhenDaoFails() throws SQLException {
+                when(userDAO.findByEmail("new@example.com"))
+                                .thenThrow(new SQLException("Database unavailable"));
+
+                controller = newControllerWithoutScreen();
+
+                ProfileController.Result result = controller.register(Map.of(
+                                "name", "Lua",
+                                "email", "new@example.com",
+                                "password", "password123",
+                                "organization", "",
+                                "photo", ""));
+
+                assertFalse(result.success());
+                assertTrue(result.message().contains("Registration failed"));
+        }
+
+        @Test
+        public void loginReturnsErrorWhenDaoFails() throws SQLException {
+                when(userDAO.findByEmail("lua@example.com"))
+                                .thenThrow(new SQLException("Database unavailable"));
+
+                controller = newControllerWithoutScreen();
+
+                ProfileController.Result result = controller.login(
+                                "lua@example.com",
+                                "correctPassword");
+
+                assertFalse(result.success());
+                assertTrue(result.message().contains("Login failed"));
+        }
+
+        @Test
+        public void changePasswordUpdatesLoggedInUser() throws SQLException {
+                User user = new User(
+                                1,
+                                "Lua",
+                                "lua@example.com",
+                                null,
+                                null,
+                                com.alexandria.utils.PasswordHasher.hash("correctPassword"));
+                session.login(user);
+
+                controller = newControllerWithoutScreen();
+
+                ProfileController.Result result = controller.changePassword("wrongPassword");
+
+                assertTrue(result.success());
+                assertTrue(com.alexandria.utils.PasswordHasher.matches(
+                                "wrongPassword",
+                                user.getPassword()));
+                verify(userDAO).update(user);
+        }
+
+        @Test
+        public void changePasswordFailsWhenNoUserIsLoggedIn() {
+                controller = newControllerWithoutScreen();
+
+                ProfileController.Result result = controller.changePassword("wrongPassword");
+
+                assertFalse(result.success());
+        }
+
+        @Test
+        public void changePasswordReturnsErrorWhenDaoFails() throws SQLException {
+                User user = new User(
+                                1,
+                                "Lua",
+                                "taken@example.com",
+                                null,
+                                null,
+                                "hash");
+                session.login(user);
+                when(userDAO.update(user))
+                                .thenThrow(new SQLException("Database unavailable"));
+
+                controller = newControllerWithoutScreen();
+
+                ProfileController.Result result = controller.changePassword("wrongPassword");
+
+                assertFalse(result.success());
+                assertTrue(result.message().contains("Password change failed"));
+        }
+
+        @Test
+        public void editProfileReturnsErrorWhenDaoFails() throws SQLException {
+                User user = new User(
+                                1,
+                                "Lua",
+                                "lua@example.com",
+                                null,
+                                null,
+                                "hash");
+                session.login(user);
+                when(userDAO.update(any(User.class)))
+                                .thenThrow(new SQLException("Database unavailable"));
+
+                controller = newControllerWithoutScreen();
+
+                ProfileController.Result result = controller.editProfile(
+                                Map.of("name", "NewName"));
+
+                assertFalse(result.success());
+                assertTrue(result.message().contains("Update failed"));
+        }
+
         private ProfileController newControllerWithoutScreen() {
                 return new ProfileController(userDAO);
         }
