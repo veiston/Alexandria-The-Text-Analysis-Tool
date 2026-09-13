@@ -98,6 +98,10 @@ Our vision is to create a desktop application for quantitative text research usi
 ### Sprint 4
 - To be added
 
+# Running the application:
+ - Run all tests with `mvn test`
+ - Run the application with `mvn javafx:run`
+
 ## Folder Structure
 ```markdown
 Alexandria-The-Text-Analysis-Tool/
@@ -120,7 +124,8 @@ Alexandria-The-Text-Analysis-Tool/
 │   │   │           ├── model/
 │   │   │           ├── service/
 │   │   │           ├── utils/
-│   │   │           ├── Main.java
+│   │   │           ├── view/
+│   │   │           └── Main.java
 │   │   │           └── ParsePdf.java
 │   │   └── resources/
 │   │       ├── fxml/
