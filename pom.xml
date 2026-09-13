@@ -101,6 +101,12 @@
                     <execution>
                         <id>jacoco-report</id>
                         <phase>verify</phase>
+                        <configuration>
+                            <excludes>
+                                <exclude>com/alexandria/Main.class</exclude>
+                                <exclude>com/alexandria/ParsePdf.class</exclude>
+                            </excludes>
+                        </configuration>
                         <goals>
                             <goal>report</goal>
                         </goals>
