@@ -127,7 +127,7 @@ public class ProfileControllerTest {
         public void loginFailsWithWrongPassword() throws SQLException {
                 User stored = new User(
                                 1,
-                                "Existing",
+                                "Lua",
                                 "lua@example.com",
                                 null,
                                 null,
@@ -241,7 +241,7 @@ public class ProfileControllerTest {
                 controller = newControllerWithoutScreen();
 
                 ProfileController.Result result = controller.register(Map.of(
-                                "name", "Existing",
+                                "name", "Lua",
                                 "email", "new@example.com",
                                 "password", "password123",
                                 "organization", "",
@@ -270,7 +270,7 @@ public class ProfileControllerTest {
         public void changePasswordUpdatesLoggedInUser() throws SQLException {
                 User user = new User(
                                 1,
-                                "Existing",
+                                "Lua",
                                 "lua@example.com",
                                 null,
                                 null,
@@ -301,7 +301,7 @@ public class ProfileControllerTest {
         public void changePasswordReturnsErrorWhenDaoFails() throws SQLException {
                 User user = new User(
                                 1,
-                                "Existing",
+                                "Lua",
                                 "taken@example.com",
                                 null,
                                 null,
@@ -322,7 +322,7 @@ public class ProfileControllerTest {
         public void editProfileReturnsErrorWhenDaoFails() throws SQLException {
                 User user = new User(
                                 1,
-                                "Existing",
+                                "Lua",
                                 "lua@example.com",
                                 null,
                                 null,
