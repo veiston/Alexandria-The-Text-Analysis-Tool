@@ -90,7 +90,8 @@ Our vision is to create a desktop application for quantitative text research usi
 - [Sprint 1 Review Report](https://github.com/veiston/Alexandria-The-Text-Analysis-Tool/blob/main/Documents/sprint_reports/sprint_1_review_report.md)
 
 ### Sprint 2
-- To be added
+- [Sprint 2 Planning Report](https://github.com/veiston/Alexandria-The-Text-Analysis-Tool/blob/main/Documents/sprint_reports/sprint_2_planning_report.md)
+- [Sprint 2 Review Report](https://github.com/veiston/Alexandria-The-Text-Analysis-Tool/blob/main/Documents/sprint_reports/sprint_2_review_report.md)
 
 ### Sprint 3
 - To be added
