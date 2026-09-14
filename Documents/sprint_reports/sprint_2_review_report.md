@@ -43,7 +43,7 @@ Changes made to the GitHub repository:
 | Veikka Liukkonen | Analysis and search<br>PDF extraction<br>Comparison services | 10 | Submitted |
 | Kseniia Shlenskaia | Database schema<br>DAOs and unit tests | 14 | Submitted |
 | Luara Moreira Da Silva | JavaFX layout<br>Sidebar<br>CSS<br>Profile views | 26 | Submitted |
-| Unna Postila | Code review<br>Pull request analysis | 8 | Submitted |
+| Unna Postila | Code review<br>Pull request analysis | 8 | Not submitted |
 
 ## Sprint summary
 
