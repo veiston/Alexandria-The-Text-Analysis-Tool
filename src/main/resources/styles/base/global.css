@@ -186,3 +186,27 @@
     -fx-border-color: -fx-border-subtle;
     -fx-border-width: 1px 0 0 0;
 }
+
+/* Thin scrollbars — shared across screens */
+.profile-scroll, .viewer-scroll, .inputed-scroll {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+.profile-scroll > .viewport, .viewer-scroll > .viewport, .inputed-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+.profile-scroll > .scroll-bar:vertical, .viewer-scroll > .scroll-bar:vertical, .inputed-scroll > .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 10px;
+}
+.profile-scroll > .scroll-bar:vertical > .thumb, .viewer-scroll > .scroll-bar:vertical > .thumb, .inputed-scroll > .scroll-bar:vertical > .thumb {
+    -fx-background-color: -fx-border-subtle;
+    -fx-background-radius: 5px;
+}
+.profile-scroll > .scroll-bar:vertical > .thumb:hover, .viewer-scroll > .scroll-bar:vertical > .thumb:hover, .inputed-scroll > .scroll-bar:vertical > .thumb:hover {
+    -fx-background-color: -fx-foreground-faint;
+}
+.profile-scroll > .scroll-bar:horizontal, .viewer-scroll > .scroll-bar:horizontal, .inputed-scroll > .scroll-bar:horizontal {
+    -fx-pref-height: 0;
+    -fx-opacity: 0;
+}
