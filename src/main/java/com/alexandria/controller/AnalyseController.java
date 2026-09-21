@@ -136,7 +136,7 @@ public class AnalyseController {
 
     private void configureTermDetail(AnalyseScreen analyseScreen) {
         analyseScreen.setOnTermDetailRequested(word -> {
-            SearchOutcome outcome = search(word, false, true, false);
+            SearchOutcome outcome = search(word, false, false, false);
 
             if (!outcome.success()) {
                 System.err.println(outcome.message());
