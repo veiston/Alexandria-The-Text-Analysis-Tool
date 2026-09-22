@@ -6,17 +6,20 @@ import com.alexandria.service.analysis.TextAnalysisResult;
 public class ArchiveTextAnalysis {
 	private Integer id;
 	private Integer textId;
-	private String textTitle;
+	private String projectTitle;
+	private String sourceFileName;
 	private LocalDateTime createdAt;
 	private TextAnalysisResult textAnalysisResult;
 
 	public ArchiveTextAnalysis() {
 	}
 
-	public ArchiveTextAnalysis(Integer id, Integer textId, String textTitle, LocalDateTime createdAt, TextAnalysisResult textAnalysisResult) {
+	public ArchiveTextAnalysis(Integer id, Integer textId, String projectTitle,
+			String sourceFileName, LocalDateTime createdAt, TextAnalysisResult textAnalysisResult) {
 		this.id = id;
 		this.textId = textId;
-		this.textTitle = textTitle;
+		this.projectTitle = projectTitle;
+		this.sourceFileName = sourceFileName;
 		this.createdAt = createdAt;
 		this.textAnalysisResult = textAnalysisResult;
 	}
@@ -29,8 +32,12 @@ public class ArchiveTextAnalysis {
 		return textId;
 	}
 
-	public String getTextTitle() {
-		return textTitle;
+	public String getProjectTitle() {
+		return projectTitle;
+	}
+
+	public String getSourceFileName() {
+		return sourceFileName;
 	}
 
 	public LocalDateTime getCreatedAt() {

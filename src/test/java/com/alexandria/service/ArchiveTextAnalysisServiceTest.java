@@ -62,7 +62,8 @@ public class ArchiveTextAnalysisServiceTest {
 
 		ArchiveTextAnalysis archiveTextAnalysis = archiveTextAnalysisService.findById(1);
 
-		assertEquals("Test text", archiveTextAnalysis.getTextTitle());
+		assertEquals("Test text", archiveTextAnalysis.getProjectTitle());
+		assertEquals("test.txt", archiveTextAnalysis.getSourceFileName());
 	}
 
 	@Test

@@ -63,6 +63,7 @@ public class ArchiveTermAnalysisServiceTest {
 		ArchiveTermAnalysis archiveTermAnalysis = archiveTermAnalysisService.findById(1);
 
 		assertEquals("test", archiveTermAnalysis.getTerm());
+		assertEquals("test.txt", archiveTermAnalysis.getSourceFileName());
 	}
 
 	@Test

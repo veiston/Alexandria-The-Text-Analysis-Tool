@@ -70,6 +70,7 @@ public class ArchiveTermAnalysisService {
 				termAnalysis.getId(),
 				termAnalysis.getTextId(),
 				text.getTitle(),
+				text.getFileName(),
 				termAnalysis.getTerm(),
 				termAnalysis.getCreatedAt(),
 				termAnalysisResult);
@@ -92,6 +93,7 @@ public class ArchiveTermAnalysisService {
 					termAnalysis.getId(),
 					termAnalysis.getTextId(),
 					text.getTitle(),
+					text.getFileName(),
 					termAnalysis.getTerm(),
 					termAnalysis.getCreatedAt(),
 					termAnalysisResult);
@@ -119,6 +121,7 @@ public class ArchiveTermAnalysisService {
 					termAnalysis.getId(),
 					termAnalysis.getTextId(),
 					text.getTitle(),
+					text.getFileName(),
 					termAnalysis.getTerm(),
 					termAnalysis.getCreatedAt(),
 					termAnalysisResult);

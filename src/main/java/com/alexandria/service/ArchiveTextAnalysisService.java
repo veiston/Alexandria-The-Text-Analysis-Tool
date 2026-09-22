@@ -68,6 +68,7 @@ public class ArchiveTextAnalysisService {
 				textAnalysis.getId(),
 				textAnalysis.getTextId(),
 				text.getTitle(),
+				text.getFileName(),
 				textAnalysis.getCreatedAt(),
 				textAnalysisResult);
 	}
@@ -89,6 +90,7 @@ public class ArchiveTextAnalysisService {
 					textAnalysis.getId(),
 					textAnalysis.getTextId(),
 					text.getTitle(),
+					text.getFileName(),
 					textAnalysis.getCreatedAt(),
 					textAnalysisResult);
 
@@ -115,6 +117,7 @@ public class ArchiveTextAnalysisService {
 					textAnalysis.getId(),
 					textAnalysis.getTextId(),
 					text.getTitle(),
+					text.getFileName(),
 					textAnalysis.getCreatedAt(),
 					textAnalysisResult);
 
