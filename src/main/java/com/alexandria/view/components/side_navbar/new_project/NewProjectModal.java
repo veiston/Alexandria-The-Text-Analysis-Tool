@@ -32,7 +32,8 @@ public class NewProjectModal extends VBox {
     }
 
     private final Toggle sourceToggle;
-    private final Toggle destinationToggle;
+    private final Toggle uploadDestinationToggle;
+    private final Toggle pasteDestinationToggle;
 
     private final VBox formHost;
 
@@ -48,18 +49,23 @@ public class NewProjectModal extends VBox {
         getStyleClass().add("modal-card");
         setSpacing(20);
         setPadding(new Insets(24));
-        setPrefWidth(420);
+        setPrefWidth(440);
 
         Label heading = new Label("New Project");
         heading.getStyleClass().add("heading-lg");
 
         sourceToggle = new Toggle("Upload File", "Paste Text");
-        destinationToggle = new Toggle("Analyse", "Compare");
+
+        uploadDestinationToggle = createDestinationToggle();
+        pasteDestinationToggle = createDestinationToggle();
 
         formHost = new VBox();
 
-        uploadForm = new UploadPdfForm();
-        pasteForm = new PasteTextForm();
+        uploadForm = new UploadPdfForm(
+                createDestinationBox(uploadDestinationToggle));
+
+        pasteForm = new PasteTextForm(
+                createDestinationBox(pasteDestinationToggle));
 
         progressIndicator = new ProgressIndicator();
         progressIndicator.setVisible(false);
@@ -68,9 +74,7 @@ public class NewProjectModal extends VBox {
 
         configureForms();
         configureSourceToggle();
-
-        Label destinationLabel = new Label("Open In");
-        destinationLabel.getStyleClass().add("form-label");
+        configureDestinationToggles();
 
         StackPane formStack = new StackPane(
                 formHost,
@@ -83,9 +87,23 @@ public class NewProjectModal extends VBox {
         getChildren().addAll(
                 heading,
                 sourceToggle,
-                formStack,
+                formStack);
+    }
+
+    private Toggle createDestinationToggle() {
+        return new Toggle("Analyse", "Compare");
+    }
+
+    private VBox createDestinationBox(Toggle destinationToggle) {
+        Label destinationLabel = new Label("Open In");
+        destinationLabel.getStyleClass().add("form-label");
+
+        VBox destinationBox = new VBox(8);
+        destinationBox.getChildren().addAll(
                 destinationLabel,
                 destinationToggle);
+
+        return destinationBox;
     }
 
     private void configureForms() {
@@ -114,6 +132,14 @@ public class NewProjectModal extends VBox {
         });
     }
 
+    private void configureDestinationToggles() {
+        uploadDestinationToggle.setOnToggle(index ->
+                pasteDestinationToggle.setSelectedIndex(index));
+
+        pasteDestinationToggle.setOnToggle(index ->
+                uploadDestinationToggle.setSelectedIndex(index));
+    }
+
     private void showUpload() {
         uploadForm.reset();
         formHost.getChildren().setAll(uploadForm);
@@ -131,9 +157,10 @@ public class NewProjectModal extends VBox {
             String textContent,
             File file) {
 
-        Destination destination = destinationToggle.getSelectedIndex() == 0
-                ? Destination.ANALYSE
-                : Destination.COMPARE;
+        Destination destination =
+                uploadDestinationToggle.getSelectedIndex() == 0
+                        ? Destination.ANALYSE
+                        : Destination.COMPARE;
 
         CreatedProject project = new CreatedProject(
                 title,
@@ -153,7 +180,8 @@ public class NewProjectModal extends VBox {
     public void setLoading(boolean loading) {
         formHost.setDisable(loading);
         sourceToggle.setDisable(loading);
-        destinationToggle.setDisable(loading);
+        uploadDestinationToggle.setDisable(loading);
+        pasteDestinationToggle.setDisable(loading);
 
         progressIndicator.setVisible(loading);
         progressIndicator.setManaged(loading);
@@ -172,7 +200,8 @@ public class NewProjectModal extends VBox {
         pasteForm.reset();
 
         sourceToggle.setSelectedIndex(0);
-        destinationToggle.setSelectedIndex(0);
+        uploadDestinationToggle.setSelectedIndex(0);
+        pasteDestinationToggle.setSelectedIndex(0);
 
         showUpload();
         setLoading(false);
