@@ -1,0 +1,140 @@
+.archive-screen {
+    -fx-background-color: -fx-background;
+}
+
+.archive-header {
+    -fx-padding: 24px 30px 16px;
+}
+
+.archive-body {
+    -fx-padding: 0 30px 30px;
+}
+
+.archive-section-switcher {
+    -fx-spacing: 8px;
+}
+
+.toggle-button.archive-main-tab {
+    -fx-background-color: -fx-border-subtle;
+    -fx-border-color: -fx-border-subtle;
+    -fx-border-width: 2px;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-padding: 10px 28px;
+    -fx-text-fill: -fx-foreground-secondary;
+    -fx-font-family: -fx-font-sans-bold;
+    -fx-cursor: hand;
+}
+
+.toggle-button.archive-main-tab:selected {
+    -fx-background-color: -fx-foreground;
+    -fx-border-color: -fx-foreground;
+    -fx-text-fill: -fx-surface;
+}
+
+.archive-filter-row {
+    -fx-spacing: 8px;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.archive-filter-row .toggle-button.pill {
+    -fx-text-fill: -fx-foreground-secondary;
+}
+
+.archive-filter-row .toggle-button.pill:selected {
+    -fx-text-fill: -fx-surface;
+}
+
+.archive-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+.archive-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.archive-analysis-table {
+    -fx-border-color: -fx-border-subtle;
+    -fx-border-width: 2px;
+}
+
+.archive-term-preview {
+    -fx-text-fill: -fx-foreground-secondary;
+}
+
+.archive-modal-section-title {
+    -fx-font-size: 14px;
+    -fx-font-family: -fx-font-sans;
+}
+
+.archive-modal-title {
+    -fx-font-size: 20px;
+}
+
+.archive-modal-term {
+    -fx-font-size: 18px;
+    -fx-font-family: -fx-font-sans-bold;
+    -fx-text-fill: -fx-foreground;
+}
+
+.archive-fragment {
+    -fx-font-size: 12px;
+    -fx-text-fill: -fx-foreground;
+}
+
+.archive-fragment-divider .line {
+    -fx-border-color: -fx-border-subtle;
+    -fx-border-width: 2px 0 0 0;
+}
+
+.archive-modal-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+}
+
+.archive-modal-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.archive-table-header {
+    -fx-padding: 8px;
+    -fx-font-family: -fx-font-sans-bold;
+    -fx-text-fill: -fx-foreground-secondary;
+    -fx-background-color: -fx-surface-hover;
+}
+
+.archive-table-cell {
+    -fx-padding: 8px;
+    -fx-border-color: -fx-border-subtle transparent transparent transparent;
+    -fx-border-width: 2px 0 0 0;
+}
+
+.archive-neighboring-word {
+    -fx-font-style: italic;
+}
+
+.archive-icon-button {
+    -fx-padding: 8px 10px;
+}
+
+.archive-icon-button .ikonli-font-icon {
+    -fx-icon-color: -fx-danger;
+}
+
+.archive-icon-button:hover {
+    -fx-background-color: -fx-surface-hover;
+}
+
+.archive-empty {
+    -fx-text-fill: -fx-foreground-muted;
+    -fx-font-size: 12px;
+}
+
+.archive-sign-in-message {
+    -fx-text-fill: -fx-foreground-secondary;
+    -fx-font-size: 16px;
+}
