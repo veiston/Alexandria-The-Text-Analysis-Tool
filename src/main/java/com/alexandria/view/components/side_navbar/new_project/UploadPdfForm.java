@@ -6,18 +6,20 @@ import java.util.function.Consumer;
 import com.alexandria.view.components.shared.form.Form;
 import com.alexandria.view.components.shared.form.FormField;
 
+import javafx.scene.Node;
 import javafx.scene.layout.VBox;
 
 public class UploadPdfForm extends VBox {
-    
+
     public record UploadData(String title, String fileName, File file) {
     }
 
     private final Form form;
+
     private Consumer<UploadData> onSubmit = data -> {
     };
 
-    public UploadPdfForm() {
+    public UploadPdfForm(Node customContent) {
         getStyleClass().add("upload-pdf-form");
 
         form = new Form.Builder()
@@ -26,6 +28,8 @@ public class UploadPdfForm extends VBox {
                 .field("file", "Document", FormField.Type.DOCUMENT_FILE, true)
                 .submitLabel("Create Project")
                 .build();
+
+        form.addCustomContent(customContent);
 
         form.setOnSubmit(values -> onSubmit.accept(new UploadData(
                 values.get("title"),

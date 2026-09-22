@@ -64,7 +64,8 @@ public final class FormRenderer {
 
     private HBox buildFilePicker(VBox container, FormField field) {
         Label fileLabel = new Label("No file selected");
-        fileLabel.getStyleClass().add("text-muted");
+        fileLabel.getStyleClass().add("file-name");
+
 
         Button chooseButton = new Button("Choose File");
         chooseButton.getStyleClass().addAll("button", "secondary");
@@ -83,19 +84,30 @@ public final class FormRenderer {
 
         switch (field.type()) {
             case IMG_FILE -> chooser.getExtensionFilters().add(
-                    new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg"));
+                    new FileChooser.ExtensionFilter(
+                            "Images", "*.png", "*.jpg", "*.jpeg"));
+
             case DOCUMENT_FILE -> chooser.getExtensionFilters().add(
-                    new FileChooser.ExtensionFilter("Documents", "*.pdf", "*.txt"));
-            default -> { return; }
+                    new FileChooser.ExtensionFilter(
+                            "Documents", "*.pdf", "*.txt"));
+
+            default -> {
+                return;
+            }
         }
 
-        File selectedFile = chooser.showOpenDialog(container.getScene().getWindow());
+        File selectedFile = chooser.showOpenDialog(
+                container.getScene().getWindow());
+
         if (selectedFile == null) {
             return;
         }
 
         files.put(field.key(), selectedFile);
         fileLabel.setText(selectedFile.getName());
+
+        fileLabel.getStyleClass().remove("file-name");
+        fileLabel.getStyleClass().add("file-name-selected");
     }
 
     public Map<String, String> getValues() {

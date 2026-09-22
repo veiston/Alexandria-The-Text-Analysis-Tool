@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
@@ -19,7 +20,8 @@ public class Form extends VBox {
     private final Label errorLabel;
     private final Button submitButton;
 
-    private Consumer<Map<String, String>> onSubmit = values -> {};
+    private Consumer<Map<String, String>> onSubmit = values -> {
+    };
 
     private Form(Builder builder) {
         this.fields = new ArrayList<>(builder.fields);
@@ -56,20 +58,33 @@ public class Form extends VBox {
 
     private void handleSubmit() {
         String error = validator.validate(fields, renderer);
+
         if (error != null) {
             showError(error);
             return;
         }
+
         clearError();
         onSubmit.accept(renderer.getValues());
     }
 
-    public Map<String, String> getValues() { return renderer.getValues(); }
-    public File getFile(String key) { return renderer.getFile(key); }
-    public void setValue(String key, String value) { renderer.setValue(key, value); }
+    public Map<String, String> getValues() {
+        return renderer.getValues();
+    }
+
+    public File getFile(String key) {
+        return renderer.getFile(key);
+    }
+
+    public void setValue(String key, String value) {
+        renderer.setValue(key, value);
+    }
 
     public void setOnSubmit(Consumer<Map<String, String>> handler) {
-        this.onSubmit = handler == null ? values -> {} : handler;
+        this.onSubmit = handler == null
+                ? values -> {
+                }
+                : handler;
     }
 
     public void showError(String message) {
@@ -84,6 +99,18 @@ public class Form extends VBox {
         errorLabel.setManaged(false);
     }
 
+    public void addCustomContent(Node node) {
+        if (node == null) {
+            return;
+        }
+
+        int submitIndex = getChildren().indexOf(submitButton);
+
+        if (submitIndex >= 0) {
+            getChildren().add(submitIndex, node);
+        }
+    }
+
     public void reset() {
         renderer.reset();
         clearError();
@@ -95,26 +122,52 @@ public class Form extends VBox {
         private String submitLabel = "Submit";
         private Function<Map<String, String>, String> customValidator;
 
-        public Builder field(String key, String label, FormField.Type type, boolean required) {
-            fields.add(new FormField(key, label, type, required, List.of()));
+        public Builder field(
+                String key,
+                String label,
+                FormField.Type type,
+                boolean required) {
+
+            fields.add(new FormField(
+                    key,
+                    label,
+                    type,
+                    required,
+                    List.of()));
+
             return this;
         }
 
-        public Builder field(String key, String label, FormField.Type type, boolean required, FieldValidator... validators) {
-            fields.add(new FormField(key, label, type, required,List.of(validators)));
+        public Builder field(
+                String key,
+                String label,
+                FormField.Type type,
+                boolean required,
+                FieldValidator... validators) {
+
+            fields.add(new FormField(
+                    key,
+                    label,
+                    type,
+                    required,
+                    List.of(validators)));
+
             return this;
         }
 
         public Builder submitLabel(String label) {
             if (label == null || label.isBlank()) {
-                throw new IllegalArgumentException("Submit label must not be blank.");
+                throw new IllegalArgumentException(
+                        "Submit label must not be blank.");
             }
 
             this.submitLabel = label;
             return this;
         }
 
-        public Builder customValidator(Function<Map<String, String>, String> validator) {
+        public Builder customValidator(
+                Function<Map<String, String>, String> validator) {
+
             this.customValidator = validator;
             return this;
         }

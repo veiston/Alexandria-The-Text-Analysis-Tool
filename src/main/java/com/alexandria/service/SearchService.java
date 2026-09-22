@@ -10,12 +10,9 @@ import static com.alexandria.service.AnalysisUtils.*;
 public class SearchService implements SearchServiceINT {
 
     @Override
-    public List<SearchMatch> search(String content, String term, SearchSettings setting) {
-        return search(content, term, setting, Collections.emptyList());
-    }
-
     public List<SearchMatch> search(String content, String term, SearchSettings setting, List<Integer> pageOffsets) {
-        if (content == null || content.isBlank() || term == null || term.isBlank()) return Collections.emptyList();
+        if (content == null || content.isBlank() || term == null || term.isBlank())
+            return Collections.emptyList();
 
         if (setting.fuzzy()) {
             return new FuzzySearchService().findWithFuzzy(content, term);
@@ -37,7 +34,8 @@ public class SearchService implements SearchServiceINT {
 
         return Pattern.compile(query, flags).matcher(content).results()
                 .map(m -> {
-                    String ctx = content.substring(Math.max(0, m.start() - 40), Math.min(content.length(), m.end() + 40)).strip();
+                    String ctx = content
+                            .substring(Math.max(0, m.start() - 40), Math.min(content.length(), m.end() + 40)).strip();
                     Integer page = resolvePage(m.start(), pageOffsets);
                     return new SearchMatch(content.substring(m.start(), m.end()), m.start(), m.end(), page, null, ctx);
                 })

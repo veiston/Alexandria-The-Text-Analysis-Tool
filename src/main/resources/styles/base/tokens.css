@@ -1,6 +1,7 @@
 .root {
     /* Colors — neutrals */
     -fx-background: #f7f8fa;
+    -fx-document-background: #eef0f3;
     -fx-surface: #ffffff;
     -fx-surface-hover: #f0f1f3;
     -fx-border-subtle: #e5e7eb;

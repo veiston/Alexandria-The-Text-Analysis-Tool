@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 import com.alexandria.view.components.shared.form.Form;
 import com.alexandria.view.components.shared.form.FormField;
 
+import javafx.scene.Node;
 import javafx.scene.layout.VBox;
 
 public class PasteTextForm extends VBox {
@@ -13,10 +14,11 @@ public class PasteTextForm extends VBox {
     }
 
     private final Form form;
+
     private Consumer<PasteData> onSubmit = data -> {
     };
 
-    public PasteTextForm() {
+    public PasteTextForm(Node customContent) {
         getStyleClass().add("paste-text-form");
 
         form = new Form.Builder()
@@ -25,6 +27,8 @@ public class PasteTextForm extends VBox {
                 .field("content", "Text", FormField.Type.TEXT_AREA, true)
                 .submitLabel("Create Project")
                 .build();
+
+        form.addCustomContent(customContent);
 
         form.setOnSubmit(values -> onSubmit.accept(new PasteData(
                 values.get("title"),
