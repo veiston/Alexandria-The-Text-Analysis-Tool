@@ -8,6 +8,18 @@
     -fx-text-fill: -fx-foreground-muted;
 }
 
+.file-name {
+    -fx-font-family: -fx-font-sans;
+    -fx-font-size: 11px;
+    -fx-text-fill: -fx-foreground-muted;
+}
+
+.file-name-selected {
+    -fx-font-family: -fx-font-sans-bold;
+    -fx-font-size: 14px;
+    -fx-text-fill: -fx-foreground;
+}
+
 .form-input {
     -fx-background-color: -fx-surface;
     -fx-border-color: -fx-border-subtle;
