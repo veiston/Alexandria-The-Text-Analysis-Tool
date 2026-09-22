@@ -37,7 +37,7 @@ public class ArchiveController {
         session.addListener(user -> loadAnalyses());
     }
 
-    private void loadAnalyses() {
+    void loadAnalyses() {
         User user = session.getCurrentUser();
 
         if (user == null) {
@@ -57,7 +57,7 @@ public class ArchiveController {
         }
     }
 
-    private void deleteTextAnalysis(Integer id) {
+    void deleteTextAnalysis(Integer id) {
         User user = session.getCurrentUser();
 
         if (user == null) {
@@ -73,7 +73,7 @@ public class ArchiveController {
         }
     }
 
-    private void deleteTermAnalysis(Integer id) {
+    void deleteTermAnalysis(Integer id) {
         User user = session.getCurrentUser();
 
         if (user == null) {

@@ -1,0 +1,122 @@
+package com.alexandria.view.screens;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import com.alexandria.model.ArchiveTermAnalysis;
+import com.alexandria.model.ArchiveTextAnalysis;
+import com.alexandria.service.analysis.TermAnalysisResult;
+import com.alexandria.service.analysis.TextAnalysisResult;
+
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import javafx.application.Platform;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+
+import java.util.List;
+
+public class ArchiveScreenTest {
+
+    @BeforeClass
+    public static void startJavaFx() {
+        try {
+            Platform.startup(() -> {
+            });
+        } catch (IllegalStateException ignored) {
+        }
+    }
+
+    @Test
+    public void emptyArchiveShowsMessage() {
+        ArchiveScreen screen = new ArchiveScreen();
+        VBox statistics = statistics(screen);
+        StackPane statisticsArea = (StackPane) statistics.getChildren().get(1);
+
+        assertEquals("No saved text statistics yet", ((Label) statisticsArea.getChildren().get(0)).getText());
+    }
+
+    @Test
+    public void textAnalysisShowsCard() {
+        ArchiveScreen screen = new ArchiveScreen();
+        screen.setTextAnalyses(List.of(textAnalysis()));
+
+        assertEquals(1, cards(screen).getChildren().size());
+    }
+
+    @Test
+    public void termAnalysisShowsCard() {
+        ArchiveScreen screen = new ArchiveScreen();
+        screen.setTermAnalyses(List.of(termAnalysis()));
+
+        HBox filters = (HBox) statistics(screen).getChildren().get(0);
+        ToggleButton termButton = (ToggleButton) filters.getChildren().get(1);
+        termButton.fire();
+
+        assertEquals(1, cards(screen).getChildren().size());
+    }
+
+    @Test
+    public void quotationsShowEmptyMessage() {
+        ArchiveScreen screen = new ArchiveScreen();
+        BorderPane layout = layout(screen);
+        VBox body = (VBox) layout.getCenter();
+        HBox tabs = (HBox) body.getChildren().get(0);
+        ToggleButton quotationsButton = (ToggleButton) tabs.getChildren().get(1);
+
+        quotationsButton.fire();
+
+        StackPane contentArea = (StackPane) body.getChildren().get(1);
+        assertEquals("No saved quotations yet", ((Label) contentArea.getChildren().get(0)).getText());
+    }
+
+    @Test
+    public void signInMessageShowsButton() {
+        ArchiveScreen screen = new ArchiveScreen();
+        boolean[] clicked = { false };
+        screen.setOnSignIn(() -> clicked[0] = true);
+
+        screen.showSignInMessage();
+
+        VBox signInMessage = (VBox) layout(screen).getCenter();
+        Button signInButton = (Button) signInMessage.getChildren().get(1);
+        signInButton.fire();
+
+        assertTrue(clicked[0]);
+    }
+
+    private BorderPane layout(ArchiveScreen screen) {
+        return (BorderPane) screen.getChildren().get(0);
+    }
+
+    private VBox statistics(ArchiveScreen screen) {
+        VBox body = (VBox) layout(screen).getCenter();
+        StackPane contentArea = (StackPane) body.getChildren().get(1);
+        return (VBox) contentArea.getChildren().get(0);
+    }
+
+    private FlowPane cards(ArchiveScreen screen) {
+        VBox statistics = statistics(screen);
+        StackPane statisticsArea = (StackPane) statistics.getChildren().get(1);
+        ScrollPane scroll = (ScrollPane) statisticsArea.getChildren().get(0);
+        return (FlowPane) scroll.getContent();
+    }
+
+    private ArchiveTextAnalysis textAnalysis() {
+        TextAnalysisResult result = new TextAnalysisResult(10, 8, 2, 1, List.of(), List.of());
+        return new ArchiveTextAnalysis(1, 1, "Climate", "climate.pdf", null, result);
+    }
+
+    private ArchiveTermAnalysis termAnalysis() {
+        TermAnalysisResult result = new TermAnalysisResult("climate", 2, 200.0, 2, 1, List.of());
+        return new ArchiveTermAnalysis(1, 1, "Climate", "climate.pdf", "climate", null, result);
+    }
+}
