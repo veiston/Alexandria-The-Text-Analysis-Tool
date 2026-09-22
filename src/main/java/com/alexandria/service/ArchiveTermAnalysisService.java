@@ -51,11 +51,15 @@ public class ArchiveTermAnalysisService {
 		return savedTermAnalysis;
 	}
 
-	public ArchiveTermAnalysis findById(int id) throws SQLException {
+	public ArchiveTermAnalysis findById(int id, int userId) throws SQLException {
 		TermAnalysis termAnalysis = termAnalysisDAO.findById(id);
 
 		if (termAnalysis == null) {
 			throw new IllegalArgumentException("Term analysis with the provided ID was not found.");
+		}
+
+		if (!Integer.valueOf(userId).equals(termAnalysis.getUserId())) {
+			throw new IllegalArgumentException("Term analysis does not belong to the provided user.");
 		}
 
 		Text text = textDAO.findById(termAnalysis.getTextId());
@@ -104,15 +108,23 @@ public class ArchiveTermAnalysisService {
 		return archiveTermAnalyses;
 	}
 
-	public List<ArchiveTermAnalysis> findAllByTextId(int textId) throws SQLException {
+	public List<ArchiveTermAnalysis> findAllByTextId(int textId, int userId) throws SQLException {
+		Text text = textDAO.findById(textId);
+
+		if (text == null) {
+			throw new IllegalArgumentException("Text with the provided ID was not found.");
+		}
+
+		if (!Integer.valueOf(userId).equals(text.getUserId())) {
+			throw new IllegalArgumentException("Text does not belong to the provided user.");
+		}
+
 		List<TermAnalysis> termAnalyses = termAnalysisDAO.findAllByTextId(textId);
 		List<ArchiveTermAnalysis> archiveTermAnalyses = new ArrayList<>();
 
 		for (TermAnalysis termAnalysis : termAnalyses) {
-			Text text = textDAO.findById(termAnalysis.getTextId());
-
-			if (text == null) {
-				throw new IllegalStateException("Text for the saved analysis was not found.");
+			if (!Integer.valueOf(userId).equals(termAnalysis.getUserId())) {
+				throw new IllegalArgumentException("Term analysis does not belong to the provided user.");
 			}
 
 			TermAnalysisResult termAnalysisResult = JsonMapper.fromJson(termAnalysis.getAnalysisData(), TermAnalysisResult.class);
@@ -132,7 +144,17 @@ public class ArchiveTermAnalysisService {
 		return archiveTermAnalyses;
 	}
 
-	public boolean deleteById(Integer id) throws SQLException {
+	public boolean deleteById(Integer id, int userId) throws SQLException {
+		TermAnalysis termAnalysis = termAnalysisDAO.findById(id);
+
+		if (termAnalysis == null) {
+			throw new IllegalArgumentException("Term analysis with the provided ID was not found.");
+		}
+
+		if (!Integer.valueOf(userId).equals(termAnalysis.getUserId())) {
+			throw new IllegalArgumentException("Term analysis does not belong to the provided user.");
+		}
+
 		return termAnalysisDAO.delete(id);
 	}
 }

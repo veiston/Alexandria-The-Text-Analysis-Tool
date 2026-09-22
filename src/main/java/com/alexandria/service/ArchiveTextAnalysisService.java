@@ -49,11 +49,15 @@ public class ArchiveTextAnalysisService {
 		return saveTextAnalysis;
 	}
 
-	public ArchiveTextAnalysis findById(int id) throws SQLException {
+	public ArchiveTextAnalysis findById(int id, int userId) throws SQLException {
 		TextAnalysis textAnalysis = textAnalysisDAO.findById(id);
 
 		if (textAnalysis == null) {
 			throw new IllegalArgumentException("Text analysis with the provided ID was not found.");
+		}
+
+		if (!Integer.valueOf(userId).equals(textAnalysis.getUserId())) {
+			throw new IllegalArgumentException("Text analysis does not belong to the provided user.");
 		}
 
 		Text text = textDAO.findById(textAnalysis.getTextId());
@@ -100,15 +104,23 @@ public class ArchiveTextAnalysisService {
 		return archiveTextAnalyses;
 	}
 
-	public List<ArchiveTextAnalysis> findAllByTextId(int textId) throws SQLException {
+	public List<ArchiveTextAnalysis> findAllByTextId(int textId, int userId) throws SQLException {
+		Text text = textDAO.findById(textId);
+
+		if (text == null) {
+			throw new IllegalArgumentException("Text with the provided ID was not found.");
+		}
+
+		if (!Integer.valueOf(userId).equals(text.getUserId())) {
+			throw new IllegalArgumentException("Text does not belong to the provided user.");
+		}
+
 		List<TextAnalysis> textAnalyses = textAnalysisDAO.findAllByTextId(textId);
 		List<ArchiveTextAnalysis> archiveTextAnalyses = new ArrayList<>();
 
 		for (TextAnalysis textAnalysis : textAnalyses) {
-			Text text = textDAO.findById(textAnalysis.getTextId());
-
-			if (text == null) {
-				throw new IllegalStateException("Text for the saved analysis was not found.");
+			if (!Integer.valueOf(userId).equals(textAnalysis.getUserId())) {
+				throw new IllegalArgumentException("Text analysis does not belong to the provided user.");
 			}
 
 			TextAnalysisResult textAnalysisResult = JsonMapper.fromJson(textAnalysis.getAnalysisData(), TextAnalysisResult.class);
@@ -127,7 +139,17 @@ public class ArchiveTextAnalysisService {
 		return archiveTextAnalyses;
 	}
 
-	public boolean deleteById(Integer id) throws SQLException {
+	public boolean deleteById(Integer id, int userId) throws SQLException {
+		TextAnalysis textAnalysis = textAnalysisDAO.findById(id);
+
+		if (textAnalysis == null) {
+			throw new IllegalArgumentException("Text analysis with the provided ID was not found.");
+		}
+
+		if (!Integer.valueOf(userId).equals(textAnalysis.getUserId())) {
+			throw new IllegalArgumentException("Text analysis does not belong to the provided user.");
+		}
+
 		return textAnalysisDAO.delete(id);
 	}
 }

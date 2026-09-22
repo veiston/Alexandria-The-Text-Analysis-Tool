@@ -60,7 +60,7 @@ public class ArchiveTextAnalysisServiceTest {
 		when(textAnalysisDAO.findById(1)).thenReturn(textAnalysis);
 		when(textDAO.findById(1)).thenReturn(text());
 
-		ArchiveTextAnalysis archiveTextAnalysis = archiveTextAnalysisService.findById(1);
+		ArchiveTextAnalysis archiveTextAnalysis = archiveTextAnalysisService.findById(1, 1);
 
 		assertEquals("Test text", archiveTextAnalysis.getProjectTitle());
 		assertEquals("test.txt", archiveTextAnalysis.getSourceFileName());
@@ -81,16 +81,17 @@ public class ArchiveTextAnalysisServiceTest {
 		when(textAnalysisDAO.findAllByTextId(1)).thenReturn(List.of(savedTextAnalysis()));
 		when(textDAO.findById(1)).thenReturn(text());
 
-		List<ArchiveTextAnalysis> archiveTextAnalyses = archiveTextAnalysisService.findAllByTextId(1);
+		List<ArchiveTextAnalysis> archiveTextAnalyses = archiveTextAnalysisService.findAllByTextId(1, 1);
 
 		assertEquals(1, archiveTextAnalyses.size());
 	}
 
 	@Test
 	public void deletesTextAnalysis() throws SQLException {
+		when(textAnalysisDAO.findById(1)).thenReturn(savedTextAnalysis());
 		when(textAnalysisDAO.delete(1)).thenReturn(true);
 
-		boolean deleted = archiveTextAnalysisService.deleteById(1);
+		boolean deleted = archiveTextAnalysisService.deleteById(1, 1);
 
 		assertEquals(true, deleted);
 	}
