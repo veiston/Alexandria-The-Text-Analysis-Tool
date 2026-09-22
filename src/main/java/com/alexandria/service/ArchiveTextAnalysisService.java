@@ -10,7 +10,9 @@ import com.alexandria.utils.JsonMapper;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ArchiveTextAnalysisService {
 	private final TextAnalysisDAO textAnalysisDAO;
@@ -79,10 +81,17 @@ public class ArchiveTextAnalysisService {
 
 	public List<ArchiveTextAnalysis> findAllByUserId(int userId) throws SQLException {
 		List<TextAnalysis> textAnalyses = textAnalysisDAO.findAllByUserId(userId);
+		List<Text> texts = textDAO.findAllByUserId(userId);
+		Map<Integer, Text> textsById = new HashMap<>();
+
+		for (Text text : texts) {
+			textsById.put(text.getId(), text);
+		}
+
 		List<ArchiveTextAnalysis> archiveTextAnalyses = new ArrayList<>();
 
 		for (TextAnalysis textAnalysis : textAnalyses) {
-			Text text = textDAO.findById(textAnalysis.getTextId());
+			Text text = textsById.get(textAnalysis.getTextId());
 
 			if (text == null) {
 				throw new IllegalStateException("Text for the saved analysis was not found.");

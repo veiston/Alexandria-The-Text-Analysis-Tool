@@ -62,18 +62,29 @@ public class ArchiveTermAnalysisServiceTest {
 
 		ArchiveTermAnalysis archiveTermAnalysis = archiveTermAnalysisService.findById(1, 1);
 
+		assertEquals(Integer.valueOf(1), archiveTermAnalysis.getId());
+		assertEquals(Integer.valueOf(1), archiveTermAnalysis.getTextId());
 		assertEquals("test", archiveTermAnalysis.getTerm());
 		assertEquals("test.txt", archiveTermAnalysis.getSourceFileName());
+		assertEquals(1, archiveTermAnalysis.getTermAnalysisResult().totalOccurrences());
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void doesNotFindOtherUsersTermAnalysis() throws SQLException {
+		when(termAnalysisDAO.findById(1)).thenReturn(savedTermAnalysis());
+
+		archiveTermAnalysisService.findById(1, 2);
 	}
 
 	@Test
 	public void findsTermAnalysesByUser() throws SQLException {
 		when(termAnalysisDAO.findAllByUserId(1)).thenReturn(List.of(savedTermAnalysis()));
-		when(textDAO.findById(1)).thenReturn(text());
+		when(textDAO.findAllByUserId(1)).thenReturn(List.of(text()));
 
 		List<ArchiveTermAnalysis> archiveTermAnalyses = archiveTermAnalysisService.findAllByUserId(1);
 
 		assertEquals(1, archiveTermAnalyses.size());
+		assertEquals("test", archiveTermAnalyses.get(0).getTerm());
 	}
 
 	@Test
@@ -84,6 +95,14 @@ public class ArchiveTermAnalysisServiceTest {
 		List<ArchiveTermAnalysis> archiveTermAnalyses = archiveTermAnalysisService.findAllByTextId(1, 1);
 
 		assertEquals(1, archiveTermAnalyses.size());
+		assertEquals("test.txt", archiveTermAnalyses.get(0).getSourceFileName());
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void doesNotFindTermAnalysesForOtherUser() throws SQLException {
+		when(textDAO.findById(1)).thenReturn(text());
+
+		archiveTermAnalysisService.findAllByTextId(1, 2);
 	}
 
 	@Test
@@ -94,6 +113,13 @@ public class ArchiveTermAnalysisServiceTest {
 		boolean deleted = archiveTermAnalysisService.deleteById(1, 1);
 
 		assertEquals(true, deleted);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void doesNotDeleteOtherUsersTermAnalysis() throws SQLException {
+		when(termAnalysisDAO.findById(1)).thenReturn(savedTermAnalysis());
+
+		archiveTermAnalysisService.deleteById(1, 2);
 	}
 
 	private Text text() {
