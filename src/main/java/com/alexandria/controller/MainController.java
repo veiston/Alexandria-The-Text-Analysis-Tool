@@ -7,6 +7,7 @@ import com.alexandria.service.PdfService;
 import com.alexandria.view.MainView;
 import com.alexandria.view.router.Route;
 import com.alexandria.view.screens.ProfileScreen;
+import com.alexandria.view.screens.ArchiveScreen;
 import com.alexandria.view.components.side_navbar.new_project.NewProjectModal.Destination;
 
 import javafx.concurrent.Task;
@@ -23,6 +24,7 @@ public class MainController {
 
         mainView = new MainView();
         configureProfile();
+        configureArchive();
         configureProject();
     }
 
@@ -75,6 +77,14 @@ public class MainController {
             worker.setDaemon(true);
             worker.start();
         });
+    }
+
+    private void configureArchive() {
+        ArchiveScreen archiveScreen = (ArchiveScreen) Route.ARCHIVE.createScreen();
+
+        archiveScreen.setOnSignIn(() -> mainView.navigateTo(Route.PROFILE));
+		
+        new ArchiveController(archiveScreen);
     }
 
     private void routeToDestination(Text text, Destination destination) {
