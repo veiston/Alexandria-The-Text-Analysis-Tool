@@ -33,7 +33,7 @@ public class TermDetailModal extends VBox {
         getStyleClass().add("modal-card");
         setSpacing(16);
         setPadding(new Insets(24));
-        setMaxWidth(460);
+        setPrefWidth(460);
         setMaxHeight(560);
 
         titleLabel.getStyleClass().add("heading-lg");

@@ -48,7 +48,7 @@ public class NewProjectModal extends VBox {
         getStyleClass().add("modal-card");
         setSpacing(20);
         setPadding(new Insets(24));
-        setMaxWidth(420);
+        setPrefWidth(420);
 
         Label heading = new Label("New Project");
         heading.getStyleClass().add("heading-lg");

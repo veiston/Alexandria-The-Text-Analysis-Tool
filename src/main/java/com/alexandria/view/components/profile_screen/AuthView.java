@@ -22,6 +22,7 @@ public class AuthView extends VBox {
     public AuthView() {
         getStyleClass().add("auth-view");
         getStyleClass().add("modal-card");
+        setPrefWidth(420);
         setSpacing(20);
         setPadding(new Insets(24));
 

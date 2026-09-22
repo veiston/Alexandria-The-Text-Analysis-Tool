@@ -17,3 +17,26 @@
 .modal-card .heading-lg {
     -fx-text-fill: -fx-foreground;
 }
+
+/* Modal close (x) button */
+.modal-close-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-background-radius: 999px;
+    -fx-border-radius: 999px;
+    -fx-padding: 6px;
+    -fx-min-width: 28px;
+    -fx-min-height: 28px;
+    -fx-cursor: hand;
+}
+.modal-close-button:hover {
+    -fx-background-color: -fx-border-subtle;
+}
+.modal-close-button:pressed {
+    -fx-background-color: -fx-border-subtle;
+    -fx-opacity: 0.8;
+}
+.modal-close-icon {
+    -fx-icon-color: -fx-foreground;
+    -fx-icon-size: 14;
+}
