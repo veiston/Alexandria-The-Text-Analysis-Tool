@@ -92,23 +92,36 @@ public class TermDetailModal extends VBox {
     }
 
     private HBox buildOccurrenceRow(int index, SearchMatch match, IntConsumer onJumpToMatch) {
+
         VBox textBox = new VBox(2);
-        Label pageLabel = new Label(formatPageLabel(match.page(), match.paragraph()));
+        textBox.setMinWidth(0);
+        HBox.setHgrow(textBox, javafx.scene.layout.Priority.ALWAYS);
+
+        Label pageLabel = new Label(
+                formatPageLabel(match.page(), match.paragraph()));
         pageLabel.getStyleClass().add("context-match-page");
+
         Label snippet = new Label(match.context());
         snippet.setWrapText(true);
+        snippet.setMaxWidth(Double.MAX_VALUE);
         snippet.getStyleClass().add("context-match-snippet");
+
         textBox.getChildren().addAll(pageLabel, snippet);
 
         Button goToButton = new Button("Go to →");
         goToButton.getStyleClass().addAll("button", "secondary");
+        goToButton.setMinWidth(90);
+        goToButton.setMaxWidth(100);
         goToButton.setOnAction(e -> onJumpToMatch.accept(index));
 
         HBox row = new HBox(10, textBox, goToButton);
-        row.setAlignment(Pos.CENTER_LEFT);
+        row.setAlignment(Pos.TOP_LEFT);
+        row.setFillHeight(true);
         row.getStyleClass().add("context-match-card");
+
         return row;
     }
+
 
     private Label mutedLabel(String text) {
         Label label = new Label(text);
