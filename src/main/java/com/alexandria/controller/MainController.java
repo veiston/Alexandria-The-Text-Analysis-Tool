@@ -4,23 +4,36 @@ import com.alexandria.dao.TextDAO;
 import com.alexandria.dao.UserDAO;
 import com.alexandria.model.Text;
 import com.alexandria.service.PdfService;
+import com.alexandria.service.SearchService;
+import com.alexandria.service.TermAnalysisService;
+import com.alexandria.service.TextAnalysisService;
 import com.alexandria.view.MainView;
+import com.alexandria.view.components.side_navbar.new_project.NewProjectModal;
 import com.alexandria.view.router.Route;
-import com.alexandria.view.screens.ProfileScreen;
+import com.alexandria.view.screens.AnalyseScreen;
 import com.alexandria.view.screens.ArchiveScreen;
-import com.alexandria.view.components.side_navbar.new_project.NewProjectModal.Destination;
+import com.alexandria.view.screens.ProfileScreen;
 
 import javafx.concurrent.Task;
 
+import java.io.File;
+import java.util.List;
+
 public class MainController {
+
     private final MainView mainView;
     private final UserDAO userDAO;
-
     private final UserSessionController session = UserSessionController.getInstance();
+    private final AnalyseController analyseController;
 
     public MainController() {
         userDAO = new UserDAO();
         restoreSession();
+
+        analyseController = new AnalyseController(
+                new SearchService(),
+                new TermAnalysisService(),
+                new TextAnalysisService());
 
         mainView = new MainView();
         configureProfile();
@@ -56,6 +69,7 @@ public class MainController {
 
             task.setOnSucceeded(e -> {
                 mainView.setNewProjectLoading(false);
+
                 ProjectController.Result result = task.getValue();
 
                 if (!result.success()) {
@@ -64,13 +78,20 @@ public class MainController {
                 }
 
                 mainView.closeProjectModal();
-                routeToDestination(result.text(), created.destination());
+                routeToDestination(
+                        result.text(),
+                        result.pageOffsets(),
+                        result.sourceFile(),
+                        created.destination());
             });
 
             task.setOnFailed(e -> {
                 mainView.setNewProjectLoading(false);
+
                 Throwable error = task.getException();
-                mainView.showProjectError("Unexpected error: " + (error != null ? error.getMessage() : "unknown"));
+                mainView.showProjectError(
+                        "Unexpected error: "
+                                + (error != null ? error.getMessage() : "unknown"));
             });
 
             Thread worker = new Thread(task, "new-project-worker");
@@ -81,26 +102,40 @@ public class MainController {
 
     private void configureArchive() {
         ArchiveScreen archiveScreen = (ArchiveScreen) Route.ARCHIVE.createScreen();
-
         archiveScreen.setOnSignIn(() -> mainView.navigateTo(Route.PROFILE));
-
         new ArchiveController(archiveScreen);
     }
 
-    private void routeToDestination(Text text, Destination destination) {
+    private void routeToDestination(
+            Text text,
+            List<Integer> pageOffsets,
+            File sourceFile,
+            NewProjectModal.Destination destination) {
         switch (destination) {
-            case ANALYSE -> {
-                // TODO: once AnalyseController is wired here, call
-                // analyseController.openText(text) BEFORE navigating, so the
-                // screen shows the text that was just created.
-                mainView.navigateTo(Route.ANALYZE);
-            }
-            case COMPARE -> {
-                // TODO: CompareController once built, needs the same pattern — hand `text` to
-                // the compare controller before navigating.
-                mainView.navigateTo(Route.COMPARE);
-            }
+            case ANALYSE -> openAnalysis(text, pageOffsets, sourceFile);
+            case COMPARE -> mainView.navigateTo(Route.COMPARE);
         }
+    }
+
+    private void openAnalysis(
+            Text text,
+            List<Integer> pageOffsets,
+            File sourceFile) {
+
+        AnalyseScreen analyseScreen = (AnalyseScreen) Route.ANALYZE.createScreen();
+
+        analyseController.configureScreen(
+                analyseScreen,
+                text,
+                pageOffsets,
+                sourceFile);
+
+        analyseScreen.setOnSaveAnalysis(() -> {
+            // TODO: saving preview + confirm submission.
+            // No persistence concept for the final analysis exists yet.
+        });
+
+        mainView.navigateTo(Route.ANALYZE);
     }
 
     public MainView getView() {

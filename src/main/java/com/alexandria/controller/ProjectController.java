@@ -2,6 +2,7 @@ package com.alexandria.controller;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.util.List;
 
 import com.alexandria.dao.TextDAO;
 import com.alexandria.model.FileType;
@@ -14,139 +15,94 @@ public class ProjectController {
 
     private final TextDAO textDAO;
     private final PdfService pdfService;
-
     private final UserSessionController session = UserSessionController.getInstance();
 
-    public ProjectController(
-            TextDAO textDAO,
-            PdfService pdfService) {
-
+    public ProjectController(TextDAO textDAO, PdfService pdfService) {
         this.textDAO = textDAO;
         this.pdfService = pdfService;
     }
 
-    public Result createProject(
-            NewProjectModal.CreatedProject created) {
-
+    public Result createProject(NewProjectModal.CreatedProject created) {
         try {
-            String content = extractContent(created);
+            String content;
+            List<Integer> pageOffsets = List.of();
+            File sourceFile = null;
+
+            if (created.sourceType() == NewProjectModal.SourceType.PASTE) {
+                content = created.textContent();
+            } else {
+                File file = created.file();
+                if (file == null)
+                    throw new IllegalArgumentException("No file was selected.");
+
+                sourceFile = file;
+                String name = file.getName().toLowerCase();
+
+                if (name.endsWith(".pdf")) {
+                    PdfService.PagedText pagedText = pdfService.extractTextWithPageBoundaries(file);
+                    content = pagedText.content();
+                    pageOffsets = pagedText.pageOffsets();
+                } else if (name.endsWith(".txt")) {
+                    content = Files.readString(file.toPath());
+                } else {
+                    throw new IllegalArgumentException("Unsupported file type. Please upload a PDF or TXT file.");
+                }
+            }
+
             FileType fileType = resolveFileType(created);
             String fileName = resolveFileName(created);
-
             User user = session.getCurrentUser();
 
             // Guest: keep project in memory.
             if (user == null) {
-                Text text = new Text(
-                        null,
-                        created.title(),
-                        fileName,
-                        fileType,
-                        content);
-
-                return Result.ok(text);
+                Text text = new Text(null, created.title(), fileName, fileType, content);
+                return Result.ok(text, pageOffsets, sourceFile);
             }
 
             // Logged-in user: persist project.
-            Text text = new Text(
-                    user.getId(),
-                    created.title(),
-                    fileName,
-                    fileType,
-                    content);
-
+            Text text = new Text(user.getId(), created.title(), fileName, fileType, content);
             Text persisted = textDAO.create(text);
 
-            return Result.ok(persisted);
+            return Result.ok(persisted, pageOffsets, sourceFile);
 
         } catch (Exception e) {
-            return Result.error(
-                    "Could not create project: " + e.getMessage());
+            return Result.error("Could not create project: " + e.getMessage());
         }
     }
 
-    private String extractContent(
-            NewProjectModal.CreatedProject created)
-            throws Exception {
-
-        if (created.sourceType() == NewProjectModal.SourceType.PASTE) {
-            return created.textContent();
-        }
-
-        File file = created.file();
-
-        if (file == null) {
-            throw new IllegalArgumentException(
-                    "No file was selected.");
-        }
-
-        String name = file.getName().toLowerCase();
-
-        if (name.endsWith(".pdf")) {
-            return pdfService.extractText(file);
-        }
-
-        if (name.endsWith(".txt")) {
-            return Files.readString(file.toPath());
-        }
-
-        throw new IllegalArgumentException(
-                "Unsupported file type. Please upload a PDF or TXT file.");
-    }
-
-    private FileType resolveFileType(
-            NewProjectModal.CreatedProject created) {
-
-        if (created.sourceType() == NewProjectModal.SourceType.PASTE) {
+    private FileType resolveFileType(NewProjectModal.CreatedProject created) {
+        if (created.sourceType() == NewProjectModal.SourceType.PASTE)
             return FileType.MANUAL;
-        }
 
         File file = created.file();
-
-        if (file == null) {
-            throw new IllegalArgumentException(
-                    "No file was selected.");
-        }
+        if (file == null)
+            throw new IllegalArgumentException("No file was selected.");
 
         String name = file.getName().toLowerCase();
-
-        if (name.endsWith(".pdf")) {
+        if (name.endsWith(".pdf"))
             return FileType.PDF;
-        }
-
-        if (name.endsWith(".txt")) {
+        if (name.endsWith(".txt"))
             return FileType.TXT;
-        }
 
-        throw new IllegalArgumentException(
-                "Unsupported file type.");
+        throw new IllegalArgumentException("Unsupported file type.");
     }
 
-    private String resolveFileName(
-            NewProjectModal.CreatedProject created) {
-
-        if (created.sourceType() == NewProjectModal.SourceType.PASTE) {
+    private String resolveFileName(NewProjectModal.CreatedProject created) {
+        if (created.sourceType() == NewProjectModal.SourceType.PASTE)
             return created.fileName();
-        }
 
         String provided = created.fileName();
-
-        return provided != null && !provided.isBlank()
-                ? provided
-                : created.file().getName();
+        return provided != null && !provided.isBlank() ? provided : created.file().getName();
     }
 
-    public record Result(
-            boolean success,
-            String message,
-            Text text) {
+    public record Result(boolean success, String message, Text text, List<Integer> pageOffsets, File sourceFile) {
 
-        public static Result ok(Text text) {
-            return new Result(true, null, text);
+        public static Result ok(Text text, List<Integer> pageOffsets, File sourceFile) {
+            return new Result(true, null, text, pageOffsets, sourceFile);
         }
 
         public static Result error(String message) {
-            return new Result(false, message, null);
+            return new Result(false, message, null, List.of(), null);
         }
     }
 }

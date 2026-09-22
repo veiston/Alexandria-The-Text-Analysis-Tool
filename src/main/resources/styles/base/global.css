@@ -1,42 +1,49 @@
-/* Global */
+/* global */
 
 .root {
     -fx-background-color: -fx-background;
     -fx-font-family: -fx-font-sans;
     -fx-text-fill: -fx-foreground;
 }
+
 .label {
     -fx-text-fill: -fx-foreground;
     -fx-font-family: -fx-font-sans;
 }
+
 .text-muted {
     -fx-text-fill: -fx-foreground-muted;
     -fx-font-size: 11px;
 }
 
-/* Headings */
+/* headings */
+
 .heading-xl {
     -fx-font-family: -fx-font-sans-bold;
     -fx-font-size: 24px;
     -fx-text-fill: -fx-foreground;
 }
+
 .heading-lg {
     -fx-font-family: -fx-font-sans-bold;
     -fx-font-size: 16px;
     -fx-text-fill: -fx-foreground;
 }
+
 .heading-md {
     -fx-font-family: -fx-font-sans-bold;
     -fx-font-size: 13px;
     -fx-text-fill: -fx-foreground;
 }
+
 .heading-sm {
     -fx-font-family: -fx-font-sans-bold;
-    -fx-font-size: 13px;
+    -fx-font-size: 12px;
     -fx-text-fill: -fx-foreground;
 }
 
-/* Reading text */
+/* reading text */
+
 .body-text {
     -fx-font-family: -fx-font-serif;
     -fx-font-size: 13px;
@@ -44,7 +51,8 @@
     -fx-text-fill: -fx-foreground;
 }
 
-/* Buttons */
+/* buttons */
+
 .button {
     -fx-background-color: transparent;
     -fx-border-color: transparent;
@@ -54,7 +62,6 @@
     -fx-font-family: -fx-font-sans;
 }
 
-/* Primary button */
 .button.primary {
     -fx-background-color: -fx-foreground;
     -fx-text-fill: -fx-surface;
@@ -66,14 +73,15 @@
     -fx-alignment: CENTER;
     -fx-cursor: hand;
 }
+
 .button.primary:hover {
     -fx-opacity: 0.92;
 }
+
 .button.primary:pressed {
     -fx-opacity: 0.82;
 }
 
-/* Secondary button */
 .button.secondary {
     -fx-background-color: -fx-surface;
     -fx-border-color: -fx-border-subtle;
@@ -83,11 +91,11 @@
     -fx-padding: 8px 16px;
     -fx-text-fill: -fx-foreground;
 }
+
 .button.secondary:hover {
     -fx-background-color: -fx-surface-hover;
 }
 
-/* Danger button */
 .button.danger {
     -fx-background-color: transparent;
     -fx-text-fill: -fx-danger;
@@ -97,12 +105,14 @@
     -fx-min-width: 120px;
     -fx-padding: 7px 12px;
 }
+
 .button.danger:hover {
     -fx-background-color: -fx-danger;
     -fx-text-fill: -fx-surface;
 }
 
-/* Pill toggle group */
+/* pill toggle */
+
 .toggle-button.pill {
     -fx-background-color: -fx-surface;
     -fx-border-color: -fx-border-subtle;
@@ -114,13 +124,15 @@
     -fx-font-size: 13px;
     -fx-cursor: hand;
 }
+
 .toggle-button.pill:selected {
     -fx-background-color: -fx-foreground;
     -fx-text-fill: -fx-surface;
     -fx-border-color: -fx-foreground;
 }
 
-/* Cards */
+/* cards */
+
 .card {
     -fx-background-color: -fx-surface;
     -fx-border-color: -fx-border-subtle;
@@ -131,7 +143,8 @@
     -fx-padding: 16px;
 }
 
-/* Tags */
+/* tags */
+
 .tags {
     -fx-background-color: -fx-accent-soft;
     -fx-text-fill: -fx-accent;
@@ -140,13 +153,15 @@
     -fx-font-size: 11px;
 }
 
-/* Highlighted text */
+/* highlighted text */
+
 .text-highlight {
     -fx-background-color: -fx-highlight-soft;
     -fx-background-radius: 4px;
 }
 
-/* Inputs */
+/* inputs */
+
 .text-field,
 .text-area {
     -fx-font-family: -fx-font-sans;
@@ -160,29 +175,132 @@
     -fx-padding: 8px;
 }
 
-/* Hyperlinks */
+.text-field:focused,
+.text-area:focused {
+    -fx-border-color: -fx-accent;
+}
+
+/* form inputs */
+
+.form-input {
+    -fx-font-family: -fx-font-sans;
+    -fx-background-color: -fx-surface;
+    -fx-border-color: -fx-border-subtle;
+    -fx-border-width: 1px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 8px;
+    -fx-font-size: 13px;
+    -fx-text-fill: -fx-foreground;
+}
+
+.form-input:focused {
+    -fx-border-color: -fx-accent;
+}
+
+.form-label {
+    -fx-font-family: -fx-font-sans;
+    -fx-font-size: 11px;
+    -fx-text-fill: -fx-foreground-muted;
+}
+
+.form-error {
+    -fx-text-fill: -fx-danger;
+    -fx-font-size: 11px;
+}
+
+/* hyperlinks */
+
 .hyperlink {
     -fx-text-fill: -fx-foreground-muted;
     -fx-underline: false;
     -fx-border-color: transparent;
     -fx-cursor: hand;
 }
+
 .hyperlink:hover {
     -fx-text-fill: -fx-accent;
 }
 
-/* Frequency bars */
+/* frequency bars */
+
 .frequency-bar > .bar {
     -fx-background-color: -fx-accent;
     -fx-background-radius: 4px;
 }
+
 .frequency-bar > .track {
     -fx-background-color: -fx-border-subtle;
     -fx-background-radius: 4px;
 }
 
-/* Separators */
+/* separators */
+
 .separator *.line {
     -fx-border-color: -fx-border-subtle;
     -fx-border-width: 1px 0 0 0;
+}
+
+/* shared scroll panes */
+
+.profile-scroll,
+.viewer-scroll,
+.inputed-scroll {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.profile-scroll > .viewport,
+.viewer-scroll > .viewport,
+.inputed-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+/* vertical scrollbars */
+
+.profile-scroll > .scroll-bar:vertical,
+.viewer-scroll > .scroll-bar:vertical,
+.inputed-scroll > .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 10px;
+}
+
+.profile-scroll > .scroll-bar:vertical > .thumb,
+.viewer-scroll > .scroll-bar:vertical > .thumb,
+.inputed-scroll > .scroll-bar:vertical > .thumb {
+    -fx-background-color: -fx-border-subtle;
+    -fx-background-radius: 5px;
+}
+
+.profile-scroll > .scroll-bar:vertical > .thumb:hover,
+.viewer-scroll > .scroll-bar:vertical > .thumb:hover,
+.inputed-scroll > .scroll-bar:vertical > .thumb:hover {
+    -fx-background-color: -fx-foreground-faint;
+}
+
+/* horizontal scrollbars */
+
+.profile-scroll > .scroll-bar:horizontal,
+.inputed-scroll > .scroll-bar:horizontal {
+    -fx-pref-height: 0;
+    -fx-opacity: 0;
+}
+
+/*
+ * The document viewer keeps horizontal scrolling enabled because
+ * zoomed PDF and text documents can become wider than the viewport.
+ */
+
+.viewer-scroll > .scroll-bar:horizontal {
+    -fx-background-color: transparent;
+    -fx-pref-height: 10px;
+}
+
+.viewer-scroll > .scroll-bar:horizontal > .thumb {
+    -fx-background-color: -fx-border-subtle;
+    -fx-background-radius: 5px;
+}
+
+.viewer-scroll > .scroll-bar:horizontal > .thumb:hover {
+    -fx-background-color: -fx-foreground-faint;
 }
