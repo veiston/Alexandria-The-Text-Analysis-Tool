@@ -83,7 +83,7 @@ public class MainController {
         ArchiveScreen archiveScreen = (ArchiveScreen) Route.ARCHIVE.createScreen();
 
         archiveScreen.setOnSignIn(() -> mainView.navigateTo(Route.PROFILE));
-		
+
         new ArchiveController(archiveScreen);
     }
 
