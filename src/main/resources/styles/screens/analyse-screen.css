@@ -166,7 +166,7 @@
 
 .frequency-row {
     -fx-cursor: hand;
-    -fx-padding: 0 1px;
+    -fx-padding: 0 5px;
     -fx-background-color: transparent;
     -fx-background-radius: 4px;
     -fx-border-color: transparent;
@@ -175,8 +175,7 @@
 }
 
 .frequency-row:hover {
-    -fx-padding: 6px 8px;
-    -fx-background-color: transparent;
+    -fx-background-color: -fx-surface-hover;
     -fx-border-color: -fx-border-subtle;
 }
 
@@ -262,6 +261,7 @@
 
 .context-match-card:hover {
     -fx-background-color: -fx-surface-hover;
+    -fx-border-color: -fx-border-subtle;
 }
 
 .context-match-page {
