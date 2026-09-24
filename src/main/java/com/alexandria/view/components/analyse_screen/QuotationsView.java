@@ -24,7 +24,7 @@ public class QuotationsView extends VBox {
 
         ScrollPane scroll = new ScrollPane(placeholderLabel);
         scroll.setFitToWidth(true);
-        scroll.getStyleClass().add("profile-scroll");
+        scroll.getStyleClass().add("shared-scroll");
 
         getChildren().add(scroll);
     }

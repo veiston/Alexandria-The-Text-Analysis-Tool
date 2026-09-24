@@ -45,17 +45,6 @@
     -fx-text-fill: -fx-surface;
 }
 
-.archive-scroll {
-    -fx-background-color: transparent;
-    -fx-background: transparent;
-    -fx-border-color: transparent;
-    -fx-padding: 0;
-}
-
-.archive-scroll > .viewport {
-    -fx-background-color: transparent;
-}
-
 .archive-analysis-table {
     -fx-border-color: -fx-border-subtle;
     -fx-border-width: 2px;
@@ -88,16 +77,6 @@
 .archive-fragment-divider .line {
     -fx-border-color: -fx-border-subtle;
     -fx-border-width: 2px 0 0 0;
-}
-
-.archive-modal-scroll {
-    -fx-background-color: transparent;
-    -fx-background: transparent;
-    -fx-border-color: transparent;
-}
-
-.archive-modal-scroll > .viewport {
-    -fx-background-color: transparent;
 }
 
 .archive-table-header {

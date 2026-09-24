@@ -191,7 +191,7 @@ public class ArchiveScreen extends StackPane {
             StackPane.setAlignment(empty, Pos.CENTER);
         } else {
             ScrollPane cardsScroll = new ScrollPane(analysisCards);
-            cardsScroll.getStyleClass().add("archive-scroll");
+            cardsScroll.getStyleClass().add("shared-scroll");
             cardsScroll.setFitToWidth(true);
             cardsScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
             cardsScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);

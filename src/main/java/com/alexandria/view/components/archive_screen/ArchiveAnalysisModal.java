@@ -152,7 +152,7 @@ public class ArchiveAnalysisModal extends Modal {
 
     private void showAnalysis(VBox content) {
         ScrollPane scroll = new ScrollPane(content);
-        scroll.getStyleClass().add("archive-modal-scroll");
+        scroll.getStyleClass().add("shared-scroll");
         scroll.setFitToWidth(true);
         scroll.setPrefViewportHeight(520);
         scroll.setMaxWidth(Double.MAX_VALUE);
