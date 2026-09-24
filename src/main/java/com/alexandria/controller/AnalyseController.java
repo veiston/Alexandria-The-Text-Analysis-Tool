@@ -18,6 +18,7 @@ public class AnalyseController {
     private final SearchServiceINT searchService;
     private final TermAnalysisServiceINT termAnalysisService;
     private final TextAnalysisServiceINT textAnalysisService;
+    private final QuotationController quotationController;
 
     private Text currentText;
     private List<Integer> currentPageOffsets = List.of();
@@ -30,6 +31,7 @@ public class AnalyseController {
         this.searchService = searchService;
         this.termAnalysisService = termAnalysisService;
         this.textAnalysisService = textAnalysisService;
+        this.quotationController = new QuotationController();
     }
 
     public TextAnalysisOutcome openText(Text text, List<Integer> pageOffsets) {
@@ -38,6 +40,11 @@ public class AnalyseController {
 
         currentText = text;
         currentPageOffsets = pageOffsets == null ? List.of() : List.copyOf(pageOffsets);
+
+        // TODO: pass the real signed-in user id and a persisted text id
+        // once those exist. For now quotations are just tracked in memory
+        // for whichever text is currently open.
+        quotationController.openText(null, null);
 
         try {
             return TextAnalysisOutcome.ok(computeTextAnalysis());
@@ -75,6 +82,7 @@ public class AnalyseController {
                 analysis.importantFragments());
 
         configureTermDetail(analyseScreen);
+        configureQuotations(analyseScreen);
     }
 
     public SearchOutcome search(
@@ -148,6 +156,14 @@ public class AnalyseController {
                     outcome.termAnalysis(),
                     outcome.matches());
         });
+    }
+
+    private void configureQuotations(AnalyseScreen analyseScreen) {
+        // The quotations screen/card and its persistence are being built
+        // separately (see QuotationsView placeholder). For now, any
+        // selection the user marks as a quotation is just tracked in
+        // memory and logged by QuotationController.
+        analyseScreen.setOnQuotationRequested(quotationController::addQuotation);
     }
 
     public record TextAnalysisOutcome(
