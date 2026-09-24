@@ -1,0 +1,73 @@
+.user-guide-screen {
+    -fx-background-color: -fx-background;
+    -fx-padding: 30px;
+}
+
+.user-guide-header {
+    -fx-padding: 4px 0 0 0;
+}
+
+.user-guide-subtitle {
+    -fx-font-size: 12px;
+}
+
+.user-guide-tabs {
+    -fx-alignment: center-left;
+}
+
+.user-guide-content {
+    -fx-padding: 8px 0 30px 0;
+    -fx-spacing: 18px;
+    -fx-max-width: 860px;
+}
+
+.user-guide-description {
+    -fx-font-family: -fx-font-sans;
+    -fx-font-size: 14px;
+    -fx-line-spacing: 2px;
+    -fx-text-fill: -fx-foreground;
+}
+
+.user-guide-description-text {
+    -fx-font-family: -fx-font-sans;
+    -fx-font-size: 14px;
+    -fx-fill: -fx-foreground;
+}
+
+.user-guide-step {
+    -fx-padding: 2px 0;
+}
+
+.user-guide-elements {
+    -fx-pref-wrap-length: 680px;
+}
+
+.user-guide-element {
+    -fx-pref-width: 200px;
+    -fx-padding: 2px 0;
+}
+
+.user-guide-number {
+    -fx-background-color: -fx-foreground;
+    -fx-text-fill: -fx-accent-soft;
+    -fx-font-family: -fx-font-sans-bold;
+    -fx-font-size: 11px;
+    -fx-alignment: center;
+    -fx-min-width: 24px;
+    -fx-min-height: 24px;
+    -fx-pref-width: 24px;
+    -fx-pref-height: 24px;
+    -fx-background-radius: 6px;
+}
+
+.user-guide-row-text {
+    -fx-font-size: 12px;
+    -fx-text-fill: -fx-foreground;
+    -fx-padding: 4px 0 0 0;
+}
+
+.user-guide-screenshot-placeholder {
+    -fx-font-family: -fx-font-sans-bold;
+    -fx-font-size: 12px;
+    -fx-text-fill: -fx-foreground-muted;
+}
