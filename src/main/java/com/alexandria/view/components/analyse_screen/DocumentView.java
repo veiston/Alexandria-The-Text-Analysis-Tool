@@ -13,299 +13,221 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
 import java.nio.file.Path;
+import java.util.function.BiConsumer;
 
 public class DocumentView extends BorderPane {
 
-    private PdfDocumentRenderer pdfRenderer;
-    private TextDocumentRenderer textRenderer;
+        private PdfDocumentRenderer pdfRenderer;
+        private TextDocumentRenderer textRenderer;
 
-    private boolean showingPdf;
+        private boolean showingPdf;
+        private final Label pageLabel = new Label("Page 1 / 1");
+        private final Button previous = new Button("‹");
+        private final Button next = new Button("›");
+        private final Button zoomOut = new Button("−");
+        private final Button zoomIn = new Button("+");
 
-    private final Label pageLabel =
-            new Label("Page 1 / 1");
+        private int currentPage = 1;
+        private double zoom = 1.0;
 
-    private final Button previous =
-            new Button("‹");
+        private BiConsumer<String, String> onQuotationRequested = (quotationText, location) -> {
+        };
 
-    private final Button next =
-            new Button("›");
-
-    private final Button zoomOut =
-            new Button("−");
-
-    private final Button zoomIn =
-            new Button("+");
-
-    private int currentPage = 1;
-    private double zoom = 1.0;
-
-    public DocumentView() {
-        getStyleClass().add("document-view");
-
-        configureToolbar();
-
-        setMinSize(0, 0);
-        setMaxSize(
-                Double.MAX_VALUE,
-                Double.MAX_VALUE);
-    }
-
-    private void configureToolbar() {
-        previous.getStyleClass()
-                .add("viewer-nav-button");
-
-        next.getStyleClass()
-                .add("viewer-nav-button");
-
-        zoomOut.getStyleClass()
-                .add("viewer-nav-button");
-
-        zoomIn.getStyleClass()
-                .add("viewer-nav-button");
-
-        pageLabel.getStyleClass()
-                .add("viewer-page-label");
-
-        previous.setOnAction(
-                e -> previousPage());
-
-        next.setOnAction(
-                e -> nextPage());
-
-        zoomOut.setOnAction(
-                e -> setZoom(zoom - 0.1));
-
-        zoomIn.setOnAction(
-                e -> setZoom(zoom + 0.1));
-
-        previous.setDisable(true);
-        next.setDisable(true);
-
-        HBox zoomControls =
-                new HBox(
-                        8,
-                        zoomOut,
-                        zoomIn);
-
-        HBox pageControls =
-                new HBox(
-                        8,
-                        previous,
-                        pageLabel,
-                        next);
-
-        pageControls.setAlignment(Pos.CENTER);
-
-        HBox leftSpacer = spacer();
-        HBox rightSpacer = spacer();
-
-        HBox toolbarContent =
-                new HBox(
-                        12,
-                        zoomControls,
-                        leftSpacer,
-                        pageControls,
-                        rightSpacer);
-
-        toolbarContent.setAlignment(Pos.CENTER);
-
-        ToolBar toolbar =
-                new ToolBar(toolbarContent);
-
-        toolbar.getStyleClass()
-                .add("viewer-toolbar");
-
-        setBottom(toolbar);
-    }
-
-    private HBox spacer() {
-        HBox box = new HBox();
-
-        HBox.setHgrow(
-                box,
-                Priority.ALWAYS);
-
-        return box;
-    }
-
-    public void loadDocument(
-            String content,
-            FileType fileType,
-            Path sourcePath) {
-
-        dispose();
-
-        currentPage = 1;
-        zoom = 1.0;
-
-        showingPdf =
-                fileType == FileType.PDF
-                        && sourcePath != null;
-
-        if (showingPdf) {
-            pdfRenderer =
-                    new PdfDocumentRenderer();
-
-            pdfRenderer.setPdf(sourcePath);
-
-            pdfRenderer.setOnVisiblePageChanged(
-                    this::onPageChanged);
-
-            setCenter(
-                    pdfRenderer.getNode());
-
-        } else {
-            textRenderer =
-                    new TextDocumentRenderer(content);
-
-            textRenderer.setOnVisiblePageChanged(
-                    this::onPageChanged);
-
-            setCenter(
-                    textRenderer.getNode());
+        public DocumentView() {
+                getStyleClass().add("document-view");
+                configureToolbar();
+                setMinSize(0, 0);
+                setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         }
 
-        BorderPane.setAlignment(
-                getCenter(),
-                Pos.CENTER);
+        private void configureToolbar() {
+                previous.getStyleClass().add("viewer-nav-button");
+                next.getStyleClass().add("viewer-nav-button");
+                zoomOut.getStyleClass().add("viewer-nav-button");
+                zoomIn.getStyleClass().add("viewer-nav-button");
+                pageLabel.getStyleClass().add("viewer-page-label");
+                previous.setOnAction(e -> previousPage());
+                next.setOnAction(e -> nextPage());
+                zoomOut.setOnAction(e -> setZoom(zoom - 0.1));
+                zoomIn.setOnAction(e -> setZoom(zoom + 0.1));
+                previous.setDisable(true);
+                next.setDisable(true);
 
-        setZoom(zoom);
-        updatePageInformation();
-    }
+                HBox zoomControls = new HBox(8, zoomOut, zoomIn);
+                HBox pageControls = new HBox(8, previous, pageLabel, next);
 
-    private void onPageChanged(int page) {
-        currentPage = Math.max(1, page);
-        updatePageInformation();
-    }
+                pageControls.setAlignment(Pos.CENTER);
 
-    private void previousPage() {
-        int total = getPageCount();
+                HBox leftSpacer = spacer();
+                HBox rightSpacer = spacer();
 
-        if (total <= 0) {
-            return;
+                HBox toolbarContent = new HBox(
+                                12,
+                                zoomControls,
+                                leftSpacer,
+                                pageControls,
+                                rightSpacer);
+
+                toolbarContent.setAlignment(Pos.CENTER);
+                ToolBar toolbar = new ToolBar(toolbarContent);
+                toolbar.getStyleClass().add("viewer-toolbar");
+                setBottom(toolbar);
         }
 
-        int target =
-                Math.max(
-                        1,
-                        currentPage - 1);
-
-        if (target != currentPage) {
-            goToPage(target, null);
-        }
-    }
-
-    private void nextPage() {
-        int total = getPageCount();
-
-        if (total <= 0) {
-            return;
+        private HBox spacer() {
+                HBox box = new HBox();
+                HBox.setHgrow(box, Priority.ALWAYS);
+                return box;
         }
 
-        int target =
-                Math.min(
-                        total,
-                        currentPage + 1);
+        public void loadDocument(String content, FileType fileType, Path sourcePath) {
+                dispose();
+                currentPage = 1;
+                zoom = 1.0;
+                showingPdf = fileType == FileType.PDF && sourcePath != null;
 
-        if (target != currentPage) {
-            goToPage(target, null);
-        }
-    }
+                if (showingPdf) {
+                        pdfRenderer = new PdfDocumentRenderer();
+                        pdfRenderer.setOnVisiblePageChanged(this::onPageChanged);
+                        pdfRenderer.setOnQuotationRequested(onQuotationRequested);
+                        pdfRenderer.setPdf(sourcePath);
+                        setCenter(pdfRenderer.getNode());
+                } else {
+                        textRenderer = new TextDocumentRenderer(content);
+                        textRenderer.setOnVisiblePageChanged(this::onPageChanged);
+                        textRenderer.setOnQuotationRequested(onQuotationRequested);
+                        setCenter(textRenderer.getNode());
+                }
 
-    public void goToPage(
-            Integer page,
-            Integer paragraph) {
+                BorderPane.setAlignment(getCenter(),Pos.CENTER);
 
-        if (showingPdf
-                && pdfRenderer != null) {
-
-            pdfRenderer.goToPage(
-                    page,
-                    paragraph);
-
-        } else if (textRenderer != null) {
-
-            textRenderer.goToPage(
-                    page,
-                    paragraph);
-        }
-    }
-
-    private void setZoom(double value) {
-        zoom = Math.max(
-                0.75,
-                Math.min(2.0, value));
-
-        if (showingPdf
-                && pdfRenderer != null) {
-
-            pdfRenderer.setZoom(zoom);
-
-        } else if (textRenderer != null) {
-
-            textRenderer.setZoom(zoom);
-        }
-    }
-
-    private int getPageCount() {
-        if (showingPdf
-                && pdfRenderer != null) {
-
-            return pdfRenderer.getPageCount();
+                setZoom(zoom);
+                updatePageInformation();
         }
 
-        if (textRenderer != null) {
-            return textRenderer.getPageCount();
+        private void onPageChanged(int page) {
+                currentPage = Math.max(1, page);
+                updatePageInformation();
         }
 
-        return 0;
-    }
+        private void previousPage() {
+                int total = getPageCount();
 
-    private void updatePageInformation() {
-        int total =
-                Math.max(1, getPageCount());
+                if (total <= 0) {
+                        return;
+                }
 
-        currentPage =
-                Math.max(
-                        1,
-                        Math.min(
-                                currentPage,
-                                total));
+                int target = Math.max(1, currentPage - 1);
 
-        pageLabel.setText(
-                "Page "
-                        + currentPage
-                        + " / "
-                        + total);
-
-        previous.setDisable(
-                total <= 1
-                        || currentPage <= 1);
-
-        next.setDisable(
-                total <= 1
-                        || currentPage >= total);
-    }
-
-    public void dispose() {
-        if (pdfRenderer != null) {
-            pdfRenderer.dispose();
-            pdfRenderer = null;
+                if (target != currentPage) {
+                        goToPage(target, null);
+                }
         }
 
-        if (textRenderer != null) {
-            textRenderer.dispose();
-            textRenderer = null;
+        private void nextPage() {
+                int total = getPageCount();
+
+                if (total <= 0) {
+                        return;
+                }
+
+                int target = Math.min(total, currentPage + 1);
+                if (target != currentPage) {
+                        goToPage(target, null);
+                }
         }
 
-        setCenter(null);
+        public void goToPage(Integer page, Integer paragraph) {
+                if (showingPdf && pdfRenderer != null) {
+                        pdfRenderer.goToPage(page, paragraph);
+                } else if (textRenderer != null) {
+                        textRenderer.goToPage(page, paragraph);
+                }
+        }
 
-        currentPage = 1;
-        zoom = 1.0;
+        private void setZoom(double value) {
+                zoom = Math.max(0.75, Math.min(2.0, value));
+                if (showingPdf && pdfRenderer != null) {
+                        pdfRenderer.setZoom(zoom);
+                } else if (textRenderer != null) {
+                        textRenderer.setZoom(zoom);
+                }
+        }
 
-        pageLabel.setText("Page 1 / 1");
+        private int getPageCount() {
+                if (showingPdf && pdfRenderer != null) {
+                        return pdfRenderer.getPageCount();
+                }
 
-        previous.setDisable(true);
-        next.setDisable(true);
-    }
+                if (textRenderer != null) {
+                        return textRenderer.getPageCount();
+                }
+
+                return 0;
+        }
+
+        private void updatePageInformation() {
+                int total = Math.max(1, getPageCount());
+                currentPage = Math.max(1, Math.min(currentPage, total));
+
+                pageLabel.setText("Page " + currentPage + " / " + total);
+                previous.setDisable(total <= 1 || currentPage <= 1);
+                next.setDisable(total <= 1 || currentPage >= total);
+        }
+
+        public void highlightPdfSearch(String searchTerm) {
+                if (showingPdf && pdfRenderer != null) {
+                        pdfRenderer.highlightSearch(searchTerm);
+                }
+        }
+
+        public void highlightPdfQuotation(String quotedText) {
+                if (showingPdf && pdfRenderer != null) {
+                        pdfRenderer.highlightQuotation(quotedText);
+                }
+        }
+
+        public void clearPdfHighlights() {
+                if (showingPdf && pdfRenderer != null) {
+                        pdfRenderer.clearHighlights();
+                }
+        }
+
+        public void setOnQuotationRequested(BiConsumer<String, String> handler) {
+                onQuotationRequested = handler == null
+                                ? (quotationText, location) -> {
+                                }
+                                : handler;
+
+                if (pdfRenderer != null) {
+                        pdfRenderer.setOnQuotationRequested(onQuotationRequested);
+                }
+
+                if (textRenderer != null) {
+                        textRenderer.setOnQuotationRequested(onQuotationRequested);
+                }
+        }
+
+        public void dispose() {
+                if (pdfRenderer != null) {
+                        pdfRenderer.dispose();
+                        pdfRenderer = null;
+                }
+
+                if (textRenderer != null) {
+                        textRenderer.dispose();
+                        textRenderer = null;
+                }
+
+                setCenter(null);
+
+                showingPdf = false;
+                currentPage = 1;
+                zoom = 1.0;
+
+                pageLabel.setText("Page 1 / 1");
+
+                previous.setDisable(true);
+                next.setDisable(true);
+        }
 }
