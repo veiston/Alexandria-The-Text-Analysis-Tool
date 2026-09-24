@@ -201,6 +201,25 @@
     -fx-border-color: -fx-accent;
 }
 
+.search-input {
+    -fx-background-color: -fx-surface;
+    -fx-border-color: -fx-border-subtle;
+    -fx-border-width: 1px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 0 8px;
+}
+
+.search-input-field {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 8px 0;
+}
+
+.search-input-field:focused {
+    -fx-border-color: transparent;
+}
+
 /* form inputs */
 
 .form-input {

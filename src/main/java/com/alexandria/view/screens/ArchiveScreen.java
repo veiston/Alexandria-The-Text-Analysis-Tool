@@ -5,6 +5,7 @@ import com.alexandria.model.ArchiveTextAnalysis;
 import com.alexandria.view.components.archive_screen.ArchiveAnalysisCard;
 import com.alexandria.view.components.archive_screen.ArchiveAnalysisModal;
 import com.alexandria.view.components.shared.EmptyState;
+import com.alexandria.view.components.shared.SearchInput;
 import com.alexandria.view.components.shared.toggle.Toggle;
 
 import javafx.geometry.Pos;
@@ -23,6 +24,7 @@ public class ArchiveScreen extends StackPane {
 
     private final Toggle analysisFilter = new Toggle(
             "Text analysis", "Term analysis", "Text comparisons");
+    private final SearchInput searchInput = new SearchInput("Search archive...");
     private final FlowPane analysisCards = new FlowPane(16, 16);
     private final StackPane contentArea = new StackPane();
     private final BorderPane archiveLayout = new BorderPane();
@@ -38,6 +40,7 @@ public class ArchiveScreen extends StackPane {
 
     public ArchiveScreen() {
         getStyleClass().add("archive-screen");
+        searchInput.setMaxWidth(Double.MAX_VALUE);
 
         archiveLayout.setTop(buildHeader());
         archiveLayout.setCenter(archiveBody);
@@ -81,6 +84,7 @@ public class ArchiveScreen extends StackPane {
 
     private void configureActions() {
         analysisFilter.setOnToggle(index -> showStatistics());
+        searchInput.textProperty().addListener((observable, oldText, newText) -> showStatistics());
     }
 
     public void setTextAnalyses(List<ArchiveTextAnalysis> textAnalyses) {
@@ -120,19 +124,28 @@ public class ArchiveScreen extends StackPane {
 
         if (analysisFilter.getSelectedIndex() == 0) {
             for (ArchiveTextAnalysis analysis : textAnalyses) {
-                ArchiveAnalysisCard card = new ArchiveAnalysisCard(analysis);
-                card.getDeleteButton().setOnAction(event -> onDeleteTextAnalysis.accept(analysis.getId()));
-                card.getOpenButton().setOnAction(event -> analysisModal.showTextAnalysis(analysis));
-                analysisCards.getChildren().add(card);
+                if (matchesSearch(
+                        analysis.getProjectTitle(),
+                        analysis.getSourceFileName())) {
+                    ArchiveAnalysisCard card = new ArchiveAnalysisCard(analysis);
+                    card.getDeleteButton().setOnAction(event -> onDeleteTextAnalysis.accept(analysis.getId()));
+                    card.getOpenButton().setOnAction(event -> analysisModal.showTextAnalysis(analysis));
+                    analysisCards.getChildren().add(card);
+                }
             }
         }
 
         if (analysisFilter.getSelectedIndex() == 1) {
             for (ArchiveTermAnalysis analysis : termAnalyses) {
-                ArchiveAnalysisCard card = new ArchiveAnalysisCard(analysis);
-                card.getDeleteButton().setOnAction(event -> onDeleteTermAnalysis.accept(analysis.getId()));
-                card.getOpenButton().setOnAction(event -> analysisModal.showTermAnalysis(analysis));
-                analysisCards.getChildren().add(card);
+                if (matchesSearch(
+                        analysis.getProjectTitle(),
+                        analysis.getSourceFileName(),
+                        analysis.getTerm())) {
+                    ArchiveAnalysisCard card = new ArchiveAnalysisCard(analysis);
+                    card.getDeleteButton().setOnAction(event -> onDeleteTermAnalysis.accept(analysis.getId()));
+                    card.getOpenButton().setOnAction(event -> analysisModal.showTermAnalysis(analysis));
+                    analysisCards.getChildren().add(card);
+                }
             }
         }
 
@@ -154,13 +167,17 @@ public class ArchiveScreen extends StackPane {
             statisticsContent.getChildren().add(cardsScroll);
         }
 
-        VBox statistics = new VBox(18, analysisFilter, statisticsContent);
+        VBox statistics = new VBox(18, analysisFilter, searchInput, statisticsContent);
         VBox.setVgrow(statisticsContent, Priority.ALWAYS);
 
         contentArea.getChildren().setAll(statistics);
     }
 
     private String emptyStatisticsMessage() {
+        if (!searchInput.getText().isBlank()) {
+            return "Nothing found";
+        }
+
         if (analysisFilter.getSelectedIndex() == 1) {
             return "No saved term analyses yet";
         }
@@ -171,10 +188,30 @@ public class ArchiveScreen extends StackPane {
     }
 
     private String emptyStatisticsSubtitle() {
+        if (!searchInput.getText().isBlank()) {
+            return "Try changing your search query";
+        }
+
         if (analysisFilter.getSelectedIndex() == 2) {
             return "Run a text comparison and save it to view it here";
         }
         return "Run an analysis and save it to view it here";
+    }
+
+    private boolean matchesSearch(String... values) {
+        String searchText = searchInput.getText().trim().toLowerCase();
+
+        if (searchText.isEmpty()) {
+            return true;
+        }
+
+        for (String value : values) {
+            if (value != null && value.toLowerCase().contains(searchText)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }

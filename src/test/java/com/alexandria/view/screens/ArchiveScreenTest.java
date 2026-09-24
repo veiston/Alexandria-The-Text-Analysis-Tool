@@ -8,6 +8,7 @@ import com.alexandria.model.ArchiveTextAnalysis;
 import com.alexandria.service.analysis.TermAnalysisResult;
 import com.alexandria.service.analysis.TextAnalysisResult;
 import com.alexandria.view.components.shared.EmptyState;
+import com.alexandria.view.components.shared.SearchInput;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -39,7 +40,7 @@ public class ArchiveScreenTest {
     public void emptyArchiveShowsMessage() {
         ArchiveScreen screen = new ArchiveScreen();
         VBox statistics = statistics(screen);
-        StackPane statisticsArea = (StackPane) statistics.getChildren().get(1);
+        StackPane statisticsArea = (StackPane) statistics.getChildren().get(2);
 
         assertEquals("No saved text analyses yet", title((EmptyState) statisticsArea.getChildren().get(0)));
     }
@@ -65,6 +66,18 @@ public class ArchiveScreenTest {
     }
 
     @Test
+    public void searchHidesCardsWithoutMatches() {
+        ArchiveScreen screen = new ArchiveScreen();
+        screen.setTextAnalyses(List.of(textAnalysis()));
+
+        SearchInput searchInput = (SearchInput) statistics(screen).getChildren().get(1);
+        searchInput.textProperty().set("unknown");
+
+        StackPane statisticsArea = (StackPane) statistics(screen).getChildren().get(2);
+        assertEquals("Nothing found", title((EmptyState) statisticsArea.getChildren().get(0)));
+    }
+
+    @Test
     public void signInMessageShowsText() {
         ArchiveScreen screen = new ArchiveScreen();
         screen.showSignInMessage();
@@ -86,7 +99,7 @@ public class ArchiveScreenTest {
 
     private FlowPane cards(ArchiveScreen screen) {
         VBox statistics = statistics(screen);
-        StackPane statisticsArea = (StackPane) statistics.getChildren().get(1);
+        StackPane statisticsArea = (StackPane) statistics.getChildren().get(2);
         ScrollPane scroll = (ScrollPane) statisticsArea.getChildren().get(0);
         return (FlowPane) scroll.getContent();
     }
