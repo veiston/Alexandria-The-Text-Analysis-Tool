@@ -64,20 +64,6 @@ public class ArchiveScreenTest {
         assertEquals(1, cards(screen).getChildren().size());
     }
 
-    // @Test
-    // public void quotationsShowEmptyMessage() {
-    //     ArchiveScreen screen = new ArchiveScreen();
-    //     BorderPane layout = layout(screen);
-    //     VBox body = (VBox) layout.getCenter();
-    //     HBox tabs = (HBox) body.getChildren().get(0);
-    //     ToggleButton quotationsButton = (ToggleButton) tabs.getChildren().get(1);
-
-    //     quotationsButton.fire();
-
-    //     StackPane contentArea = (StackPane) body.getChildren().get(1);
-    //     assertEquals("No saved quotations yet", title((EmptyState) contentArea.getChildren().get(0)));
-    // }
-
     @Test
     public void signInMessageShowsText() {
         ArchiveScreen screen = new ArchiveScreen();
@@ -85,7 +71,7 @@ public class ArchiveScreenTest {
 
         EmptyState signInMessage = (EmptyState) layout(screen).getCenter();
 
-        assertEquals("Sign in or create an account", title(signInMessage));
+        assertEquals("Sign in to view your archive", title(signInMessage));
     }
 
     private BorderPane layout(ArchiveScreen screen) {
@@ -94,7 +80,7 @@ public class ArchiveScreenTest {
 
     private VBox statistics(ArchiveScreen screen) {
         VBox body = (VBox) layout(screen).getCenter();
-        StackPane contentArea = (StackPane) body.getChildren().get(1);
+        StackPane contentArea = (StackPane) body.getChildren().get(0);
         return (VBox) contentArea.getChildren().get(0);
     }
 

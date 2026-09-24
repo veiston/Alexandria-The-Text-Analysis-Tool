@@ -5,8 +5,8 @@
 
 /* Toggle Options */
 .toggle-option {
-    -fx-background-color: -fx-background;
-    -fx-text-fill: -fx-foreground-muted;
+    -fx-background-color: -fx-border-subtle;
+    -fx-text-fill: -fx-foreground-secondary;
     -fx-background-radius: 6px;
     -fx-padding: 10px 12px;
     -fx-font-family: -fx-font-sans;
@@ -23,7 +23,7 @@
 
 /* Hover */
 .toggle-option:hover {
-    -fx-background-color: -fx-surface-hover;
+    -fx-background-color: derive(-fx-border-subtle, -6%);
 }
 .toggle-option:selected:hover {
     -fx-background-color: -fx-foreground;

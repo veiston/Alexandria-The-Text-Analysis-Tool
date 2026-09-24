@@ -5,15 +5,13 @@ import com.alexandria.model.ArchiveTextAnalysis;
 import com.alexandria.view.components.archive_screen.ArchiveAnalysisCard;
 import com.alexandria.view.components.archive_screen.ArchiveAnalysisModal;
 import com.alexandria.view.components.shared.EmptyState;
+import com.alexandria.view.components.shared.toggle.Toggle;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -23,11 +21,8 @@ import java.util.function.Consumer;
 
 public class ArchiveScreen extends StackPane {
 
-    // private final ToggleButton statisticsButton = new ToggleButton("Statistics");
-    // private final ToggleButton quotationsButton = new ToggleButton("Quotations");
-    private final ToggleButton textFilterButton = new ToggleButton("Text analysis");
-    private final ToggleButton termFilterButton = new ToggleButton("Term analysis");
-    private final ToggleButton textComparisonFilterButton = new ToggleButton("Text comparisons");
+    private final Toggle analysisFilter = new Toggle(
+            "Text analysis", "Term analysis", "Text comparisons");
     private final FlowPane analysisCards = new FlowPane(16, 16);
     private final StackPane contentArea = new StackPane();
     private final BorderPane archiveLayout = new BorderPane();
@@ -78,20 +73,6 @@ public class ArchiveScreen extends StackPane {
     }
 
     private VBox buildBody() {
-        // ToggleGroup sectionGroup = new ToggleGroup();
-        // statisticsButton.setToggleGroup(sectionGroup);
-        // statisticsButton.getStyleClass().add("archive-main-tab");
-        // quotationsButton.setToggleGroup(sectionGroup);
-        // quotationsButton.getStyleClass().add("archive-main-tab");
-        // statisticsButton.setSelected(true);
-        // statisticsButton.setMaxWidth(Double.MAX_VALUE);
-        // quotationsButton.setMaxWidth(Double.MAX_VALUE);
-        // HBox.setHgrow(statisticsButton, Priority.ALWAYS);
-        // HBox.setHgrow(quotationsButton, Priority.ALWAYS);
-        // HBox sectionSwitcher = new HBox(statisticsButton, quotationsButton);
-        // sectionSwitcher.getStyleClass().add("archive-section-switcher");
-
-        // VBox archiveBody = new VBox(18, sectionSwitcher, contentArea);
         VBox archiveBody = new VBox(contentArea);
         archiveBody.getStyleClass().add("archive-body");
         VBox.setVgrow(contentArea, Priority.ALWAYS);
@@ -99,20 +80,7 @@ public class ArchiveScreen extends StackPane {
     }
 
     private void configureActions() {
-        // statisticsButton.setOnAction(event -> showStatistics());
-        // quotationsButton.setOnAction(event -> showQuotations());
-
-        ToggleGroup filterGroup = new ToggleGroup();
-        textFilterButton.setToggleGroup(filterGroup);
-        textFilterButton.getStyleClass().add("pill");
-        textFilterButton.setOnAction(event -> showStatistics());
-        termFilterButton.setToggleGroup(filterGroup);
-        termFilterButton.getStyleClass().add("pill");
-        termFilterButton.setOnAction(event -> showStatistics());
-        textComparisonFilterButton.setToggleGroup(filterGroup);
-        textComparisonFilterButton.getStyleClass().add("pill");
-        textComparisonFilterButton.setOnAction(event -> showStatistics());
-        textFilterButton.setSelected(true);
+        analysisFilter.setOnToggle(index -> showStatistics());
     }
 
     public void setTextAnalyses(List<ArchiveTextAnalysis> textAnalyses) {
@@ -146,15 +114,11 @@ public class ArchiveScreen extends StackPane {
     }
 
     private void showStatistics() {
-        // if (!statisticsButton.isSelected()) {
-        //     return;
-        // }
-
         archiveLayout.setCenter(archiveBody);
 
         analysisCards.getChildren().clear();
 
-        if (textFilterButton.isSelected()) {
+        if (analysisFilter.getSelectedIndex() == 0) {
             for (ArchiveTextAnalysis analysis : textAnalyses) {
                 ArchiveAnalysisCard card = new ArchiveAnalysisCard(analysis);
                 card.getDeleteButton().setOnAction(event -> onDeleteTextAnalysis.accept(analysis.getId()));
@@ -163,7 +127,7 @@ public class ArchiveScreen extends StackPane {
             }
         }
 
-        if (termFilterButton.isSelected()) {
+        if (analysisFilter.getSelectedIndex() == 1) {
             for (ArchiveTermAnalysis analysis : termAnalyses) {
                 ArchiveAnalysisCard card = new ArchiveAnalysisCard(analysis);
                 card.getDeleteButton().setOnAction(event -> onDeleteTermAnalysis.accept(analysis.getId()));
@@ -190,43 +154,24 @@ public class ArchiveScreen extends StackPane {
             statisticsContent.getChildren().add(cardsScroll);
         }
 
-        HBox filterRow = new HBox(textFilterButton, termFilterButton, textComparisonFilterButton);
-        filterRow.getStyleClass().add("archive-filter-row");
-
-        VBox statistics = new VBox(18, filterRow, statisticsContent);
+        VBox statistics = new VBox(18, analysisFilter, statisticsContent);
         VBox.setVgrow(statisticsContent, Priority.ALWAYS);
 
         contentArea.getChildren().setAll(statistics);
     }
 
-    // private void showQuotations() {
-    //     if (!quotationsButton.isSelected()) {
-    //         return;
-    //     }
-    // 
-    //     archiveLayout.setCenter(archiveBody);
-    //     showEmpty("No saved quotations yet", "Save quotations from your text to view them here.");
-    // }
-    // 
-    // private void showEmpty(String title, String subtitle) {
-    //     EmptyState empty = new EmptyState(title, subtitle);
-    // 
-    //     contentArea.getChildren().setAll(empty);
-    //     StackPane.setAlignment(empty, Pos.CENTER);
-    // }
-
     private String emptyStatisticsMessage() {
-        if (termFilterButton.isSelected()) {
+        if (analysisFilter.getSelectedIndex() == 1) {
             return "No saved term analyses yet";
         }
-        if (textComparisonFilterButton.isSelected()) {
+        if (analysisFilter.getSelectedIndex() == 2) {
             return "No saved text comparisons yet";
         }
         return "No saved text analyses yet";
     }
 
     private String emptyStatisticsSubtitle() {
-        if (textComparisonFilterButton.isSelected()) {
+        if (analysisFilter.getSelectedIndex() == 2) {
             return "Run a text comparison and save it to view it here";
         }
         return "Run an analysis and save it to view it here";
