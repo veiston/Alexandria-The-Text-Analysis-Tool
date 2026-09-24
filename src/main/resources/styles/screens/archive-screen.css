@@ -64,15 +64,3 @@
 .archive-neighboring-word {
     -fx-font-style: italic;
 }
-
-.archive-icon-button {
-    -fx-padding: 8px 10px;
-}
-
-.archive-icon-button .ikonli-font-icon {
-    -fx-icon-color: -fx-danger;
-}
-
-.archive-icon-button:hover {
-    -fx-background-color: -fx-surface-hover;
-}

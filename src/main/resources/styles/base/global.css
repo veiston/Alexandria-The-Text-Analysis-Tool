@@ -152,6 +152,18 @@
     -fx-padding: 16px;
 }
 
+.card-delete-button {
+    -fx-padding: 8px 10px;
+}
+
+.card-delete-button .ikonli-font-icon {
+    -fx-icon-color: -fx-danger;
+}
+
+.card-delete-button:hover {
+    -fx-background-color: -fx-surface-hover;
+}
+
 /* tags */
 
 .tags {
