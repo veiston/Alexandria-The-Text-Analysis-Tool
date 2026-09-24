@@ -6,11 +6,15 @@
     -fx-padding: 24px 30px 16px;
 }
 
+.archive-subtitle {
+    -fx-font-size: 12px;
+}
+
 .archive-body {
     -fx-padding: 0 30px 30px;
 }
 
-.archive-section-switcher {
+/* .archive-section-switcher {
     -fx-spacing: 8px;
 }
 
@@ -30,7 +34,7 @@
     -fx-background-color: -fx-foreground;
     -fx-border-color: -fx-foreground;
     -fx-text-fill: -fx-surface;
-}
+} */
 
 .archive-filter-row {
     -fx-spacing: 8px;

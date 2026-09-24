@@ -18,6 +18,7 @@ public class EmptyState extends VBox {
         if (subtitleText != null && !subtitleText.isBlank()) {
             Label subtitle = new Label(subtitleText);
             subtitle.getStyleClass().add("text-muted");
+            subtitle.getStyleClass().add("empty-state-subtitle");
             getChildren().add(subtitle);
         }
     }

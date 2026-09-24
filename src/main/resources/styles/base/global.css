@@ -21,6 +21,10 @@
     -fx-padding: 60px;
 }
 
+.empty-state-subtitle {
+    -fx-font-size: 12px;
+}
+
 /* headings */
 
 .heading-xl {
