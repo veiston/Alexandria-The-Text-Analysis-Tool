@@ -16,6 +16,11 @@
     -fx-font-size: 11px;
 }
 
+.empty-state {
+    -fx-alignment: center;
+    -fx-padding: 60px;
+}
+
 /* headings */
 
 .heading-xl {

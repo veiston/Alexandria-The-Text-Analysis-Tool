@@ -7,12 +7,12 @@ import com.alexandria.model.ArchiveTermAnalysis;
 import com.alexandria.model.ArchiveTextAnalysis;
 import com.alexandria.service.analysis.TermAnalysisResult;
 import com.alexandria.service.analysis.TextAnalysisResult;
+import com.alexandria.view.components.shared.EmptyState;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javafx.application.Platform;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToggleButton;
@@ -41,7 +41,7 @@ public class ArchiveScreenTest {
         VBox statistics = statistics(screen);
         StackPane statisticsArea = (StackPane) statistics.getChildren().get(1);
 
-        assertEquals("No saved text statistics yet", ((Label) statisticsArea.getChildren().get(0)).getText());
+        assertEquals("No saved text analyses yet", title((EmptyState) statisticsArea.getChildren().get(0)));
     }
 
     @Test
@@ -75,22 +75,17 @@ public class ArchiveScreenTest {
         quotationsButton.fire();
 
         StackPane contentArea = (StackPane) body.getChildren().get(1);
-        assertEquals("No saved quotations yet", ((Label) contentArea.getChildren().get(0)).getText());
+        assertEquals("No saved quotations yet", title((EmptyState) contentArea.getChildren().get(0)));
     }
 
     @Test
-    public void signInMessageShowsButton() {
+    public void signInMessageShowsText() {
         ArchiveScreen screen = new ArchiveScreen();
-        boolean[] clicked = { false };
-        screen.setOnSignIn(() -> clicked[0] = true);
-
         screen.showSignInMessage();
 
-        VBox signInMessage = (VBox) layout(screen).getCenter();
-        Button signInButton = (Button) signInMessage.getChildren().get(1);
-        signInButton.fire();
+        EmptyState signInMessage = (EmptyState) layout(screen).getCenter();
 
-        assertTrue(clicked[0]);
+        assertEquals("Sign in or create an account", title(signInMessage));
     }
 
     private BorderPane layout(ArchiveScreen screen) {
@@ -108,6 +103,10 @@ public class ArchiveScreenTest {
         StackPane statisticsArea = (StackPane) statistics.getChildren().get(1);
         ScrollPane scroll = (ScrollPane) statisticsArea.getChildren().get(0);
         return (FlowPane) scroll.getContent();
+    }
+
+    private String title(EmptyState emptyState) {
+        return ((Label) emptyState.getChildren().get(0)).getText();
     }
 
     private ArchiveTextAnalysis textAnalysis() {

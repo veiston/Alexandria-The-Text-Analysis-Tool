@@ -4,9 +4,9 @@ import com.alexandria.model.ArchiveTermAnalysis;
 import com.alexandria.model.ArchiveTextAnalysis;
 import com.alexandria.view.components.archive_screen.ArchiveAnalysisCard;
 import com.alexandria.view.components.archive_screen.ArchiveAnalysisModal;
+import com.alexandria.view.components.shared.EmptyState;
 
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToggleButton;
@@ -39,7 +39,6 @@ public class ArchiveScreen extends StackPane {
     private Consumer<Integer> onDeleteTextAnalysis = id -> {};
     private Consumer<Integer> onDeleteTermAnalysis = id -> {};
     private Runnable onShown = () -> {};
-    private Runnable onSignIn = () -> {};
 
     public ArchiveScreen() {
         getStyleClass().add("archive-screen");
@@ -134,24 +133,12 @@ public class ArchiveScreen extends StackPane {
         onShown = handler == null ? () -> {} : handler;
     }
 
-    public void setOnSignIn(Runnable handler) {
-        onSignIn = handler == null ? () -> {} : handler;
-    }
-
     public void showSignInMessage() {
-        Label message = new Label(
-                "Sign in or create an account to save and view statistics and quotations here.");
-        message.getStyleClass().add("archive-sign-in-message");
-
-        Button signInButton = new Button("Sign in");
-        signInButton.getStyleClass().addAll("button", "primary");
-        signInButton.setOnAction(event -> onSignIn.run());
-
-        VBox signInContent = new VBox(16, message, signInButton);
-        signInContent.setAlignment(Pos.CENTER);
-
-        archiveLayout.setCenter(signInContent);
-        BorderPane.setAlignment(signInContent, Pos.CENTER);
+        EmptyState emptyState = new EmptyState(
+                "Sign in to view your Archive",
+                "Create an account to save analyses and quotations here.");
+        archiveLayout.setCenter(emptyState);
+        BorderPane.setAlignment(emptyState, Pos.CENTER);
     }
 
     private void showStatistics() {
@@ -185,8 +172,9 @@ public class ArchiveScreen extends StackPane {
         statisticsContent.getStyleClass().add("archive-content");
 
         if (analysisCards.getChildren().isEmpty()) {
-            Label empty = new Label(emptyStatisticsMessage());
-            empty.getStyleClass().add("archive-empty");
+            EmptyState empty = new EmptyState(
+                    emptyStatisticsMessage(),
+                    "Run an analysis and save it to view it here.");
             statisticsContent.getChildren().add(empty);
             StackPane.setAlignment(empty, Pos.CENTER);
         } else {
@@ -213,12 +201,11 @@ public class ArchiveScreen extends StackPane {
         }
 
         archiveLayout.setCenter(archiveBody);
-        showEmpty("No saved quotations yet");
+        showEmpty("No saved quotations yet", "Save quotations from your text to view them here.");
     }
 
-    private void showEmpty(String message) {
-        Label empty = new Label(message);
-        empty.getStyleClass().add("archive-empty");
+    private void showEmpty(String title, String subtitle) {
+        EmptyState empty = new EmptyState(title, subtitle);
 
         contentArea.getChildren().setAll(empty);
         StackPane.setAlignment(empty, Pos.CENTER);
@@ -226,9 +213,9 @@ public class ArchiveScreen extends StackPane {
 
     private String emptyStatisticsMessage() {
         if (termFilterButton.isSelected()) {
-            return "No saved term statistics yet";
+            return "No saved term analyses yet";
         }
-        return "No saved text statistics yet";
+        return "No saved text analyses yet";
     }
 
 }

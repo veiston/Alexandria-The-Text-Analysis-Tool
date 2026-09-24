@@ -107,13 +107,3 @@
 .archive-icon-button:hover {
     -fx-background-color: -fx-surface-hover;
 }
-
-.archive-empty {
-    -fx-text-fill: -fx-foreground-muted;
-    -fx-font-size: 12px;
-}
-
-.archive-sign-in-message {
-    -fx-text-fill: -fx-foreground-secondary;
-    -fx-font-size: 16px;
-}
