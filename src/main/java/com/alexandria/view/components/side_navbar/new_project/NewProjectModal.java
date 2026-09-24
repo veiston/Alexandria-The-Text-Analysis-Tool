@@ -3,12 +3,12 @@ package com.alexandria.view.components.side_navbar.new_project;
 import java.io.File;
 import java.util.function.Consumer;
 
+import com.alexandria.view.components.shared.LoadingIndicator;
 import com.alexandria.view.components.shared.toggle.Toggle;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
@@ -40,7 +40,7 @@ public class NewProjectModal extends VBox {
     private final UploadPdfForm uploadForm;
     private final PasteTextForm pasteForm;
 
-    private final ProgressIndicator progressIndicator;
+    private final LoadingIndicator loadingIndicator;
 
     private Consumer<CreatedProject> onCreated = project -> {
     };
@@ -67,10 +67,8 @@ public class NewProjectModal extends VBox {
         pasteForm = new PasteTextForm(
                 createDestinationBox(pasteDestinationToggle));
 
-        progressIndicator = new ProgressIndicator();
-        progressIndicator.setVisible(false);
-        progressIndicator.setManaged(false);
-        progressIndicator.setMaxSize(28, 28);
+        loadingIndicator = new LoadingIndicator();
+        loadingIndicator.setMaxSize(28, 28);
 
         configureForms();
         configureSourceToggle();
@@ -78,9 +76,9 @@ public class NewProjectModal extends VBox {
 
         StackPane formStack = new StackPane(
                 formHost,
-                progressIndicator);
+                loadingIndicator);
 
-        StackPane.setAlignment(progressIndicator, Pos.CENTER);
+        StackPane.setAlignment(loadingIndicator, Pos.CENTER);
 
         formHost.getChildren().add(uploadForm);
 
@@ -183,8 +181,7 @@ public class NewProjectModal extends VBox {
         uploadDestinationToggle.setDisable(loading);
         pasteDestinationToggle.setDisable(loading);
 
-        progressIndicator.setVisible(loading);
-        progressIndicator.setManaged(loading);
+        loadingIndicator.setLoading(loading);
     }
 
     public void showError(String message) {

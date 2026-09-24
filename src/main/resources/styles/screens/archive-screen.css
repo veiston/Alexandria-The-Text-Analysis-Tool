@@ -1,0 +1,66 @@
+.archive-screen {
+    -fx-background-color: -fx-background;
+}
+
+.archive-header {
+    -fx-padding: 24px 30px 16px;
+}
+
+.archive-subtitle {
+    -fx-font-size: 12px;
+}
+
+.archive-body {
+    -fx-padding: 0 30px 30px;
+}
+
+.archive-analysis-table {
+    -fx-border-color: -fx-border-subtle;
+    -fx-border-width: 2px;
+}
+
+.archive-term-preview {
+    -fx-text-fill: -fx-foreground-secondary;
+}
+
+.archive-modal-section-title {
+    -fx-font-size: 14px;
+    -fx-font-family: -fx-font-sans;
+}
+
+.archive-modal-title {
+    -fx-font-size: 20px;
+}
+
+.archive-modal-term {
+    -fx-font-size: 18px;
+    -fx-font-family: -fx-font-sans-bold;
+    -fx-text-fill: -fx-foreground;
+}
+
+.archive-fragment {
+    -fx-font-size: 12px;
+    -fx-text-fill: -fx-foreground;
+}
+
+.archive-fragment-divider .line {
+    -fx-border-color: -fx-border-subtle;
+    -fx-border-width: 2px 0 0 0;
+}
+
+.archive-table-header {
+    -fx-padding: 8px;
+    -fx-font-family: -fx-font-sans-bold;
+    -fx-text-fill: -fx-foreground-secondary;
+    -fx-background-color: -fx-surface-hover;
+}
+
+.archive-table-cell {
+    -fx-padding: 8px;
+    -fx-border-color: -fx-border-subtle transparent transparent transparent;
+    -fx-border-width: 2px 0 0 0;
+}
+
+.archive-neighboring-word {
+    -fx-font-style: italic;
+}

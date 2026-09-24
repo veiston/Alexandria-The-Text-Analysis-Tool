@@ -11,6 +11,7 @@ import com.alexandria.view.MainView;
 import com.alexandria.view.components.side_navbar.new_project.NewProjectModal;
 import com.alexandria.view.router.Route;
 import com.alexandria.view.screens.AnalyseScreen;
+import com.alexandria.view.screens.ArchiveScreen;
 import com.alexandria.view.screens.ProfileScreen;
 
 import javafx.concurrent.Task;
@@ -36,6 +37,7 @@ public class MainController {
 
         mainView = new MainView();
         configureProfile();
+        configureArchive();
         configureProject();
     }
 
@@ -98,12 +100,16 @@ public class MainController {
         });
     }
 
+    private void configureArchive() {
+        ArchiveScreen archiveScreen = (ArchiveScreen) Route.ARCHIVE.createScreen();
+        new ArchiveController(archiveScreen);
+    }
+
     private void routeToDestination(
             Text text,
             List<Integer> pageOffsets,
             File sourceFile,
             NewProjectModal.Destination destination) {
-
         switch (destination) {
             case ANALYSE -> openAnalysis(text, pageOffsets, sourceFile);
             case COMPARE -> mainView.navigateTo(Route.COMPARE);
