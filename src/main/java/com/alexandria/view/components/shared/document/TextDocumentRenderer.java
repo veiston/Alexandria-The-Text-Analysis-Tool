@@ -1,15 +1,27 @@
 package com.alexandria.view.components.shared.document;
 
+import com.alexandria.view.components.shared.document.highlight.TxtHighlight;
+import com.alexandria.view.components.shared.document.highlight.TxtTextLayout;
+import com.alexandria.view.components.shared.selection.QuotationSelectionPopup;
+
 import javafx.application.Platform;
+import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class TextDocumentRenderer {
@@ -17,8 +29,13 @@ public class TextDocumentRenderer {
     private static final int CHARS_PER_PAGE = 1800;
     private static final double BASE_PAGE_WIDTH = 620.0;
 
+    private static final String LIVE_SELECTION_STYLE_CLASS = "txt-selection-rect";
+
     private final ScrollPane scrollPane = new ScrollPane();
     private final VBox pagesHost = new VBox(24);
+
+    private final Pane selectionOverlay = new Pane();
+    private final StackPane container = new StackPane();
 
     private String content = "";
     private List<Integer> pageStarts = List.of();
@@ -26,7 +43,18 @@ public class TextDocumentRenderer {
     private int currentVisiblePage = 1;
     private double zoom = 1.0;
 
+    private final Map<Integer, List<TxtHighlight.Range>> quotationRangesByPage = new HashMap<>();
+    private final Map<Integer, TextFlow> pageFlows = new HashMap<>();
+    private final Map<Integer, Pane> pageOverlays = new HashMap<>();
+
+    private int activeSelectionPage = -1;
+    private int selectionStartIndex = -1;
+    private QuotationSelectionPopup quotationPopup;
+
     private Consumer<Integer> onVisiblePageChanged = ignored -> {
+    };
+
+    private BiConsumer<String, String> onQuotationRequested = (quotationText, location) -> {
     };
 
     public TextDocumentRenderer(String content) {
@@ -35,27 +63,26 @@ public class TextDocumentRenderer {
 
         scrollPane.setContent(pagesHost);
 
-        /*
-         * Do not force the document to fit the viewport.
-         * This allows horizontal scrolling when zoomed.
-         */
         scrollPane.setFitToWidth(false);
         scrollPane.setFitToHeight(false);
         scrollPane.setPannable(true);
         scrollPane.getStyleClass().add("viewer-scroll");
 
-        scrollPane.vvalueProperty().addListener(
-                (obs, oldValue, newValue) -> updateVisiblePage());
+        scrollPane.vvalueProperty().addListener((obs, oldValue, newValue) -> updateVisiblePage());
+
+        selectionOverlay.setPickOnBounds(false);
+
+        selectionOverlay.prefWidthProperty().bind(container.widthProperty());
+        selectionOverlay.prefHeightProperty().bind(container.heightProperty());
+
+        container.getChildren().addAll(scrollPane, selectionOverlay);
 
         setText(content);
     }
 
     private void setText(String content) {
         this.content = content == null ? "" : content;
-
-        pageStarts = paginate(
-                this.content,
-                CHARS_PER_PAGE);
+        pageStarts = paginate(this.content, CHARS_PER_PAGE);
 
         if (pageStarts.isEmpty()) {
             pageStarts = List.of(0);
@@ -72,10 +99,12 @@ public class TextDocumentRenderer {
 
     private void rebuild() {
         pagesHost.getChildren().clear();
+        pageFlows.clear();
+        pageOverlays.clear();
 
         for (int i = 0; i < pageStarts.size(); i++) {
+            int pageIndex = i;
             int start = pageStarts.get(i);
-
             int end = i + 1 < pageStarts.size()
                     ? pageStarts.get(i + 1)
                     : content.length();
@@ -87,21 +116,31 @@ public class TextDocumentRenderer {
             TextFlow flow = new TextFlow(
                     new Text(pageText));
 
-            flow.getStyleClass().add(
-                    "document-page-text");
+            flow.getStyleClass().add("document-page-text");
+            flow.setCursor(Cursor.TEXT);
 
-            VBox page = new VBox(flow);
-            page.getStyleClass().add(
-                    "document-page");
+            Pane highlightOverlay = new Pane();
+            highlightOverlay.setMouseTransparent(true);
+            highlightOverlay.setPickOnBounds(false);
 
-            pagesHost.getChildren().add(page);
+            StackPane pageStack = new StackPane(highlightOverlay, flow);
+            pageStack.setAlignment(Pos.TOP_LEFT);
+            pageStack.getStyleClass().add("document-page");
+
+            flow.setOnMousePressed(event -> beginSelection(pageIndex, flow, event));
+            flow.setOnMouseDragged(event -> updateSelection(pageIndex, flow, highlightOverlay, event));
+            flow.setOnMouseReleased(event -> endSelection(pageIndex, flow, pageText, highlightOverlay, event));
+
+            pageFlows.put(pageIndex, flow);
+            pageOverlays.put(pageIndex, highlightOverlay);
+
+            applyQuotationHighlights(pageIndex, flow, highlightOverlay);
+
+            pagesHost.getChildren().add(pageStack);
         }
     }
 
-    private static List<Integer> paginate(
-            String content,
-            int charsPerPage) {
-
+    private static List<Integer> paginate(String content, int charsPerPage) {
         List<Integer> offsets = new ArrayList<>();
 
         if (content.isEmpty()) {
@@ -109,18 +148,14 @@ public class TextDocumentRenderer {
         }
 
         offsets.add(0);
-
         int pos = 0;
 
         while (pos + charsPerPage < content.length()) {
             int candidate = pos + charsPerPage;
-
-            int breakPoint =
-                    content.lastIndexOf("\n\n", candidate);
+            int breakPoint = content.lastIndexOf("\n\n", candidate);
 
             if (breakPoint <= pos) {
-                breakPoint =
-                        content.lastIndexOf(' ', candidate);
+                breakPoint = content.lastIndexOf(' ', candidate);
             }
 
             if (breakPoint <= pos) {
@@ -135,43 +170,24 @@ public class TextDocumentRenderer {
     }
 
     private void updatePageSizes() {
-        double pageWidth =
-                BASE_PAGE_WIDTH * zoom;
+        double pageWidth = BASE_PAGE_WIDTH * zoom;
+        double viewportWidth = scrollPane.getViewportBounds().getWidth();
 
-        /*
-         * Give the host enough width for the zoomed pages.
-         * The viewport can still be wider than this when zoomed out.
-         */
-        double viewportWidth =
-                scrollPane.getViewportBounds().getWidth();
+        pagesHost.setPrefWidth( Math.max(pageWidth, viewportWidth));
 
-        pagesHost.setPrefWidth(
-                Math.max(pageWidth, viewportWidth));
-
-        /*
-         * Resize the actual pages rather than scaling the entire
-         * pagesHost. This keeps ScrollPane's layout bounds correct.
-         */
         for (Node node : pagesHost.getChildren()) {
-            if (node instanceof VBox page) {
-                page.setPrefWidth(pageWidth);
-                page.setMinWidth(pageWidth);
-                page.setMaxWidth(pageWidth);
+            if (node instanceof StackPane pageStack) {
+                pageStack.setPrefWidth(pageWidth);
+                pageStack.setMinWidth(pageWidth);
+                pageStack.setMaxWidth(pageWidth);
             }
         }
     }
 
     private void resetScrollPosition() {
-        /*
-         * Always start at the actual beginning of the document.
-         */
         scrollPane.setVvalue(0);
         scrollPane.setHvalue(0);
 
-        /*
-         * If the document is narrower than the viewport, the pagesHost
-         * centers the pages through its alignment.
-         */
         Platform.runLater(() -> {
             scrollPane.setVvalue(0);
             scrollPane.setHvalue(0);
@@ -179,26 +195,18 @@ public class TextDocumentRenderer {
     }
 
     public Node getNode() {
-        return scrollPane;
+        return container;
     }
 
-    public void goToPage(
-            Integer page,
-            Integer paragraph) {
-
-        if (page == null
-                || pagesHost.getChildren().isEmpty()) {
+    public void goToPage(Integer page, Integer paragraph) {
+        if (page == null || pagesHost.getChildren().isEmpty()) {
             return;
         }
 
-        int safe = Math.max(
-                0,
-                Math.min(
-                        page - 1,
-                        pagesHost.getChildren().size() - 1));
+        int safe = Math.max(0,
+                Math.min(page - 1, pagesHost.getChildren().size() - 1));
 
-        Node pageNode =
-                pagesHost.getChildren().get(safe);
+        Node pageNode = pagesHost.getChildren().get(safe);
 
         Platform.runLater(() -> {
             updatePageSizes();
@@ -211,71 +219,27 @@ public class TextDocumentRenderer {
             return;
         }
 
-        double viewportWidth =
-                scrollPane.getViewportBounds().getWidth();
+        double viewportWidth = scrollPane.getViewportBounds().getWidth();
+        double viewportHeight = scrollPane.getViewportBounds().getHeight();
+        double contentWidth = pagesHost.getWidth();
+        double contentHeight = pagesHost.getHeight();
+        double pageX = pageNode.getBoundsInParent().getMinX();
+        double pageY = pageNode.getBoundsInParent().getMinY();
+        double pageWidth = pageNode.getBoundsInParent().getWidth();
+        double pageHeight = pageNode.getBoundsInParent().getHeight();
+        double targetX = pageX + pageWidth / 2.0 - viewportWidth / 2.0;
+        double targetY = pageY + pageHeight / 2.0 - viewportHeight / 2.0;
+        double maxX = Math.max(0, contentWidth - viewportWidth);
+        double maxY = Math.max(0, contentHeight - viewportHeight);
+        double horizontal = maxX == 0 ? 0 : targetX / maxX;
+        double vertical = maxY == 0 ? 0 : targetY / maxY;
 
-        double viewportHeight =
-                scrollPane.getViewportBounds().getHeight();
-
-        double contentWidth =
-                pagesHost.getWidth();
-
-        double contentHeight =
-                pagesHost.getHeight();
-
-        double pageX =
-                pageNode.getBoundsInParent().getMinX();
-
-        double pageY =
-                pageNode.getBoundsInParent().getMinY();
-
-        double pageWidth =
-                pageNode.getBoundsInParent().getWidth();
-
-        double pageHeight =
-                pageNode.getBoundsInParent().getHeight();
-
-        double targetX =
-                pageX
-                        + pageWidth / 2.0
-                        - viewportWidth / 2.0;
-
-        double targetY =
-                pageY
-                        + pageHeight / 2.0
-                        - viewportHeight / 2.0;
-
-        double maxX =
-                Math.max(
-                        0,
-                        contentWidth - viewportWidth);
-
-        double maxY =
-                Math.max(
-                        0,
-                        contentHeight - viewportHeight);
-
-        double horizontal =
-                maxX == 0
-                        ? 0
-                        : targetX / maxX;
-
-        double vertical =
-                maxY == 0
-                        ? 0
-                        : targetY / maxY;
-
-        scrollPane.setHvalue(
-                clamp(horizontal));
-
-        scrollPane.setVvalue(
-                clamp(vertical));
+        scrollPane.setHvalue(clamp(horizontal));
+        scrollPane.setVvalue(clamp(vertical));
     }
 
     private double clamp(double value) {
-        return Math.max(
-                0,
-                Math.min(1, value));
+        return Math.max(0, Math.min(1, value));
     }
 
     private void updateVisiblePage() {
@@ -283,38 +247,22 @@ public class TextDocumentRenderer {
             return;
         }
 
-        double viewportHeight =
-                scrollPane.getViewportBounds().getHeight();
-
-        double scrollableHeight =
-                Math.max(
-                        0,
-                        pagesHost.getHeight()
-                                - viewportHeight);
-
-        double viewportCenter =
-                scrollPane.getVvalue()
+        double viewportHeight = scrollPane.getViewportBounds().getHeight();
+        double scrollableHeight = Math.max(0, pagesHost.getHeight() - viewportHeight);
+        double viewportCenter = scrollPane.getVvalue()
                         * scrollableHeight
                         + viewportHeight / 2.0;
 
         int closest = 0;
         double best = Double.MAX_VALUE;
 
-        for (int i = 0;
-                i < pagesHost.getChildren().size();
-                i++) {
-
-            Node node =
-                    pagesHost.getChildren().get(i);
-
-            double center =
-                    node.getBoundsInParent().getMinY()
+        for (int i = 0; i < pagesHost.getChildren().size(); i++) {
+            Node node = pagesHost.getChildren().get(i);
+            double center = node.getBoundsInParent().getMinY()
                             + node.getBoundsInParent().getHeight()
                             / 2.0;
 
-            double distance =
-                    Math.abs(
-                            center - viewportCenter);
+            double distance = Math.abs(center - viewportCenter);
 
             if (distance < best) {
                 best = distance;
@@ -331,14 +279,11 @@ public class TextDocumentRenderer {
     }
 
     public void setZoom(double zoom) {
-        this.zoom = Math.max(
-                0.75,
-                Math.min(1.5, zoom));
-
+        this.zoom = Math.max(0.75, Math.min(1.5, zoom));
         updatePageSizes();
-
         Platform.runLater(() -> {
             updatePageSizes();
+            refreshAllQuotationHighlights();
             updateVisiblePage();
         });
     }
@@ -350,15 +295,148 @@ public class TextDocumentRenderer {
     public void setOnVisiblePageChanged(
             Consumer<Integer> handler) {
 
-        onVisiblePageChanged =
-                handler == null
-                        ? ignored -> {
-                        }
+        onVisiblePageChanged = handler == null
+                        ? ignored -> {}
                         : handler;
     }
 
+    public void setOnQuotationRequested(BiConsumer<String, String> handler) {
+        onQuotationRequested = handler == null
+                ? (quotationText, location) -> {
+                }
+                : handler;
+    }
+
+    private void applyQuotationHighlights(int pageIndex, TextFlow flow, Pane overlay) {
+        overlay.getChildren().clear();
+
+        for (TxtHighlight.Range range : quotationRangesByPage.getOrDefault(pageIndex, List.of())) {
+            overlay.getChildren().add(
+                    TxtTextLayout.shapeFor(flow, range.start(), range.end(), TxtHighlight.QUOTATION_STYLE_CLASS));
+        }
+    }
+
+    private void refreshAllQuotationHighlights() {
+        for (Map.Entry<Integer, Pane> entry : pageOverlays.entrySet()) {
+            int pageIndex = entry.getKey();
+            TextFlow flow = pageFlows.get(pageIndex);
+
+            if (flow != null) {
+                applyQuotationHighlights(pageIndex, flow, entry.getValue());
+            }
+        }
+    }
+
+    private void beginSelection(int pageIndex, TextFlow flow, MouseEvent event) {
+        hideQuotationPopup();
+
+        scrollPane.setPannable(false);
+        event.consume();
+
+        activeSelectionPage = pageIndex;
+        selectionStartIndex = charIndexAt(flow, event);
+    }
+
+    private void updateSelection(int pageIndex, TextFlow flow, Pane overlay, MouseEvent event) {
+        if (activeSelectionPage != pageIndex || selectionStartIndex < 0) {
+            return;
+        }
+
+        event.consume();
+
+        int current = charIndexAt(flow, event);
+        applyQuotationHighlights(pageIndex, flow, overlay);
+
+        if (current != selectionStartIndex) {
+            overlay.getChildren().add(
+                    TxtTextLayout.shapeFor(flow, selectionStartIndex, current, LIVE_SELECTION_STYLE_CLASS));
+        }
+    }
+
+    private void endSelection(int pageIndex, TextFlow flow, String pageText, Pane overlay, MouseEvent event) {
+        scrollPane.setPannable(true);
+
+        if (activeSelectionPage != pageIndex || selectionStartIndex < 0) {
+            return;
+        }
+
+        event.consume();
+
+        int current = charIndexAt(flow, event);
+        int start = Math.min(selectionStartIndex, current);
+        int end = Math.max(selectionStartIndex, current);
+
+        activeSelectionPage = -1;
+        selectionStartIndex = -1;
+
+        applyQuotationHighlights(pageIndex, flow, overlay);
+
+        if (end <= start) {
+            return;
+        }
+
+        String selectedText = pageText.substring(start, end).strip();
+
+        if (selectedText.isEmpty()) {
+            return;
+        }
+
+        String location = "page:" + (pageIndex + 1) + ";offset:" + start + "-" + end;
+
+        showQuotationPopup(
+                event.getScreenX(),
+                event.getScreenY(),
+                selectedText,
+                location,
+                pageIndex,
+                flow,
+                overlay,
+                start,
+                end);
+    }
+
+    private int charIndexAt(TextFlow flow, MouseEvent event) {
+        return flow.hitTest(new Point2D(event.getX(), event.getY())).getCharIndex();
+    }
+
+    private void showQuotationPopup(
+            double screenX,
+            double screenY,
+            String selectedText,
+            String location,
+            int pageIndex,
+            TextFlow flow,
+            Pane overlay,
+            int start,
+            int end) {
+
+        quotationPopup = new QuotationSelectionPopup(() -> {
+            quotationRangesByPage
+                    .computeIfAbsent(pageIndex, ignored -> new ArrayList<>())
+                    .add(new TxtHighlight.Range(start, end));
+
+            applyQuotationHighlights(pageIndex, flow, overlay);
+
+            onQuotationRequested.accept(selectedText, location);
+
+            hideQuotationPopup();
+        });
+
+        quotationPopup.showAt(selectionOverlay, screenX, screenY);
+    }
+
+    private void hideQuotationPopup() {
+        if (quotationPopup != null) {
+            quotationPopup.hide();
+            quotationPopup = null;
+        }
+    }
+
     public void dispose() {
+        hideQuotationPopup();
+        quotationRangesByPage.clear();
+        pageFlows.clear();
+        pageOverlays.clear();
         pagesHost.getChildren().clear();
     }
 }
-
