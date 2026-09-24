@@ -11,7 +11,7 @@ import java.util.Comparator;
 import java.util.List;
 
 public final class PdfTextLayout {
-    private static final double LINE_HEIGHT_PADDING_RATIO = 1.20;
+    private static final double LINE_HEIGHT_PADDING_RATIO = 1.10;
 
     private record Glyph(
             double x,
