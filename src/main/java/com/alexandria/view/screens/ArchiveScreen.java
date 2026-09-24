@@ -7,6 +7,7 @@ import com.alexandria.view.components.archive_screen.ArchiveAnalysisModal;
 import com.alexandria.view.components.shared.EmptyState;
 import com.alexandria.view.components.shared.SearchInput;
 import com.alexandria.view.components.shared.toggle.Toggle;
+import com.alexandria.view.components.shared.modal.ConfirmationAlert;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -128,7 +129,14 @@ public class ArchiveScreen extends StackPane {
                         analysis.getProjectTitle(),
                         analysis.getSourceFileName())) {
                     ArchiveAnalysisCard card = new ArchiveAnalysisCard(analysis);
-                    card.getDeleteButton().setOnAction(event -> onDeleteTextAnalysis.accept(analysis.getId()));
+                    card.getDeleteButton().setOnAction(event -> {
+                        if (ConfirmationAlert.show(
+                                "Delete Analysis",
+                                "Delete this analysis?",
+                                "This action is permanent and cannot be undone.")) {
+                            onDeleteTextAnalysis.accept(analysis.getId());
+                        }
+                    });
                     card.getOpenButton().setOnAction(event -> analysisModal.showTextAnalysis(analysis));
                     analysisCards.getChildren().add(card);
                 }
@@ -142,7 +150,14 @@ public class ArchiveScreen extends StackPane {
                         analysis.getSourceFileName(),
                         analysis.getTerm())) {
                     ArchiveAnalysisCard card = new ArchiveAnalysisCard(analysis);
-                    card.getDeleteButton().setOnAction(event -> onDeleteTermAnalysis.accept(analysis.getId()));
+                    card.getDeleteButton().setOnAction(event -> {
+                        if (ConfirmationAlert.show(
+                                "Delete Analysis",
+                                "Delete this analysis?",
+                                "This action is permanent and cannot be undone.")) {
+                            onDeleteTermAnalysis.accept(analysis.getId());
+                        }
+                    });
                     card.getOpenButton().setOnAction(event -> analysisModal.showTermAnalysis(analysis));
                     analysisCards.getChildren().add(card);
                 }

@@ -3,12 +3,10 @@ package com.alexandria.controller;
 import java.sql.SQLException;
 import java.util.Map;
 
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-
 import com.alexandria.dao.UserDAO;
 import com.alexandria.model.User;
 import com.alexandria.utils.PasswordHasher;
+import com.alexandria.view.components.shared.modal.ConfirmationAlert;
 import com.alexandria.view.screens.ProfileScreen;
 
 /**
@@ -181,21 +179,19 @@ public class ProfileController {
         if (user == null)
             return;
 
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setTitle("Delete Account");
-        confirm.setHeaderText("Delete your account?");
-        confirm.setContentText("This action is permanent and cannot be undone.");
+        if (!ConfirmationAlert.show(
+                "Delete Account",
+                "Delete your account?",
+                "This action is permanent and cannot be undone.")) {
+            return;
+        }
 
-        confirm.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.OK) {
-                try {
-                    userDAO.delete(user.getId());
-                    session.logout();
-                } catch (SQLException e) {
-                    System.err.println("Delete account failed: " + e.getMessage());
-                }
-            }
-        });
+        try {
+            userDAO.delete(user.getId());
+            session.logout();
+        } catch (SQLException e) {
+            System.err.println("Delete account failed: " + e.getMessage());
+        }
     }
 
     /* Helpers */
