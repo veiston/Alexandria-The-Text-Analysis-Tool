@@ -7,6 +7,8 @@ import com.alexandria.dao.UserDAO;
 import com.alexandria.model.User;
 import com.alexandria.utils.PasswordHasher;
 import com.alexandria.view.components.shared.modal.ConfirmationAlert;
+import com.alexandria.view.components.shared.modal.ErrorAlert;
+import com.alexandria.view.components.shared.modal.SuccessAlert;
 import com.alexandria.view.screens.ProfileScreen;
 
 /**
@@ -50,6 +52,7 @@ public class ProfileController {
 
             if (result.success()) {
                 profileScreen.closeModal();
+                SuccessAlert.show(result.message());
             } else {
                 profileScreen.showEditProfileError(
                         result.message());
@@ -62,6 +65,7 @@ public class ProfileController {
 
             if (result.success()) {
                 profileScreen.closeModal();
+                SuccessAlert.show(result.message());
             } else {
                 profileScreen.showChangePasswordError(
                         result.message());
@@ -191,6 +195,7 @@ public class ProfileController {
             session.logout();
         } catch (SQLException e) {
             System.err.println("Delete account failed: " + e.getMessage());
+            ErrorAlert.show("Could not delete account.");
         }
     }
 
