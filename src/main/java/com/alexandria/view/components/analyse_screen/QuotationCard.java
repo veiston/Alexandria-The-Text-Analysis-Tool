@@ -11,8 +11,11 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+
+import java.util.function.Consumer;
 
 public class QuotationCard extends Card {
     private static final double CARD_HEIGHT = 280;
@@ -20,6 +23,11 @@ public class QuotationCard extends Card {
 
     private final Quotation quotation;
     private final Button editButton = iconButton(FontAwesomeSolid.PEN, "Edit");
+    private final TextArea quoteEditor = new TextArea();
+
+    private boolean editing = false;
+    private Consumer<Quotation> onEdit = quotation -> {
+    };
 
     public QuotationCard(Quotation quotation) {
         super("");
@@ -48,6 +56,15 @@ public class QuotationCard extends Card {
         quoteScroll.setMinHeight(60);
         quoteScroll.setMaxHeight(QUOTE_AREA_HEIGHT);
 
+        quoteEditor.setText(quotation.getQuotationText());
+        quoteEditor.setWrapText(true);
+        quoteEditor.setPrefHeight(QUOTE_AREA_HEIGHT);
+        quoteEditor.setMinHeight(60);
+        quoteEditor.setMaxHeight(QUOTE_AREA_HEIGHT);
+        quoteEditor.getStyleClass().add("quotation-card-editor");
+        quoteEditor.setVisible(false);
+        quoteEditor.setManaged(false);
+
         setExtraContent(quoteScroll);
 
         setActionText("Go to \u2192");
@@ -58,6 +75,8 @@ public class QuotationCard extends Card {
 
         Button copyButton = iconButton(FontAwesomeSolid.COPY, "Copy");
         copyButton.setOnAction(e -> copyQuotationText());
+
+        editButton.setOnAction(e -> toggleEdit(quote, quoteScroll));
 
         setSecondaryActions(copyButton, editButton);
     }
@@ -72,6 +91,61 @@ public class QuotationCard extends Card {
 
     public Button getEditButton() {
         return editButton;
+    }
+
+    public void setOnEdit(Consumer<Quotation> handler) {
+        onEdit = handler == null ? quotation -> {
+        } : handler;
+    }
+
+    private void toggleEdit(Label quote, ScrollPane quoteScroll) {
+        if (!editing) {
+            editing = true;
+
+            quoteEditor.setText(quotation.getQuotationText());
+
+            quoteScroll.setVisible(false);
+            quoteScroll.setManaged(false);
+
+            setExtraContent(quoteEditor);
+
+            quoteEditor.setVisible(true);
+            quoteEditor.setManaged(true);
+
+            editButton.setText("Update");
+
+            FontIcon icon = new FontIcon(FontAwesomeSolid.SAVE);
+            icon.setIconSize(12);
+            editButton.setGraphic(icon);
+
+        } else {
+            String updatedText = quoteEditor.getText();
+
+            if (updatedText != null && !updatedText.isBlank()) {
+                updatedText = updatedText.strip();
+
+                quotation.setQuotationText(updatedText);
+                quote.setText("\u201C" + updatedText + "\u201D");
+
+                onEdit.accept(quotation);
+            }
+
+            editing = false;
+
+            quoteEditor.setVisible(false);
+            quoteEditor.setManaged(false);
+
+            setExtraContent(quoteScroll);
+
+            quoteScroll.setVisible(true);
+            quoteScroll.setManaged(true);
+
+            editButton.setText("Edit");
+
+            FontIcon icon = new FontIcon(FontAwesomeSolid.PEN);
+            icon.setIconSize(12);
+            editButton.setGraphic(icon);
+        }
     }
 
     private void copyQuotationText() {

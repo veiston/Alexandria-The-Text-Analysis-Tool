@@ -45,13 +45,20 @@ public class AnalyseScreen extends StackPane {
     private final BorderPane loadedState = new BorderPane();
     private final StackPane centerSwitcher = new StackPane();
 
-    private Runnable onSaveAnalysis = () -> {};
-    private Consumer<String> onTermDetailRequested = term -> {};
+    private Runnable onSaveAnalysis = () -> {
+    };
+    private Consumer<String> onTermDetailRequested = term -> {
+    };
 
-    /** (quotationText, location) -> new quotation's id, or null if none was created. */
+    /**
+     * (quotationText, location) -> new quotation's id, or null if none was created.
+     */
     private BiFunction<String, String, Integer> onQuotationRequested = (quotationText, location) -> null;
 
-    private Consumer<Quotation> onQuotationDeleteRequested = quotation -> {};
+    private Consumer<Quotation> onQuotationDeleteRequested = quotation -> {
+    };
+    private Consumer<Quotation> onQuotationEditRequested = quotation -> {
+    };
 
     public AnalyseScreen() {
         getStyleClass().add("analyse-screen");
@@ -125,6 +132,7 @@ public class AnalyseScreen extends StackPane {
 
         quotationsView.setOnGoTo(this::goToQuotation);
         quotationsView.setOnDelete(quotation -> onQuotationDeleteRequested.accept(quotation));
+        quotationsView.setOnEdit(quotation -> onQuotationEditRequested.accept(quotation));
     }
 
     private void showView(int index) {
@@ -134,8 +142,12 @@ public class AnalyseScreen extends StackPane {
         }
     }
 
-
-
+    public void setOnQuotationEditRequested(Consumer<Quotation> handler) {
+        onQuotationEditRequested = handler == null
+                ? quotation -> {
+                }
+                : handler;
+    }
 
     private VBox buildEmptyState() {
 
@@ -143,8 +155,7 @@ public class AnalyseScreen extends StackPane {
         title.getStyleClass().add("heading-lg");
 
         Label subtitle = new Label(
-                "Start a new project or open one from your Library to begin analysing."
-        );
+                "Start a new project or open one from your Library to begin analysing.");
         subtitle.getStyleClass().add("text-muted");
 
         VBox box = new VBox(8, title, subtitle);
@@ -160,15 +171,13 @@ public class AnalyseScreen extends StackPane {
             String content,
             FileType fileType,
             Path sourcePath,
-            List<Integer> pageOffsets
-    ) {
+            List<Integer> pageOffsets) {
 
         header.setTitle(
                 projectTitle,
                 fileName + (pageOffsets != null && !pageOffsets.isEmpty()
                         ? " · " + pageOffsets.size() + " Pages"
-                        : "")
-        );
+                        : ""));
 
         header.resetToReader();
 
@@ -193,11 +202,13 @@ public class AnalyseScreen extends StackPane {
     }
 
     public void setOnTermDetailRequested(Consumer<String> handler) {
-        onTermDetailRequested = handler == null ? term -> {} : handler;
+        onTermDetailRequested = handler == null ? term -> {
+        } : handler;
     }
 
     public void setOnSaveAnalysis(Runnable handler) {
-        onSaveAnalysis = handler == null ? () -> {} : handler;
+        onSaveAnalysis = handler == null ? () -> {
+        } : handler;
     }
 
     /**
@@ -215,7 +226,8 @@ public class AnalyseScreen extends StackPane {
      * quotation from the quotations list (its card's delete button).
      */
     public void setOnQuotationDeleteRequested(Consumer<Quotation> handler) {
-        onQuotationDeleteRequested = handler == null ? quotation -> {} : handler;
+        onQuotationDeleteRequested = handler == null ? quotation -> {
+        } : handler;
     }
 
     /** Pushes the current quotation list down to the quotations view. */
@@ -241,17 +253,16 @@ public class AnalyseScreen extends StackPane {
      * to the reader view.
      */
     private void goToQuotation(Quotation quotation) {
-    if (quotation == null) {
-        return;
+        if (quotation == null) {
+            return;
+        }
+
+        header.resetToReader();
+        centerSwitcher.getChildren().setAll(documentView);
+
+        documentView.goToPage(
+                QuotationLocation.parsePage(quotation.getLocation()),
+                QuotationLocation.parseStartOffset(quotation.getLocation()));
     }
-
-    header.resetToReader();
-    centerSwitcher.getChildren().setAll(documentView);
-
-    documentView.goToPage(
-            QuotationLocation.parsePage(quotation.getLocation()),
-            QuotationLocation.parseStartOffset(quotation.getLocation()));
-}
-
 
 }

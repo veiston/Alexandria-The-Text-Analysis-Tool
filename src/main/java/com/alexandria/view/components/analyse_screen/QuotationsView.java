@@ -77,7 +77,7 @@ public class QuotationsView extends VBox {
 
                         card.getGoToButton().setOnAction(event -> onGoTo.accept(quotation));
                         card.getDeleteButton().setOnAction(event -> onDelete.accept(quotation));
-                        card.getEditButton().setOnAction(event -> onEdit.accept(quotation));
+                        card.setOnEdit(onEdit);
 
                         int column = i % 2;
                         int row = i / 2;
