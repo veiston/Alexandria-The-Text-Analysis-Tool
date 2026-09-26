@@ -1,7 +1,5 @@
 package com.alexandria.service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import com.alexandria.service.analysis.SearchMatch;
@@ -32,8 +30,9 @@ public class FuzzySearchService {
         }
 
         // Typo budget. Amount of allowed letter differences
+        // TODO: Add the ability to change the "budget" from the UI?
         int k;
-        if (m >= 8) {
+        if (m >= 5) {
             k = 2;
         } else if (m >= 4) {
             k = 1;
@@ -58,8 +57,21 @@ public class FuzzySearchService {
 
         long matchBit = 1L << (m - 1);
 
-        // Scan text
-        for (int i = 0; i < text.length(); i++) {
+        // Scan text and note word startpoint
+        int wordStart = 0;
+        for (int i = 0; i <= text.length(); i++) {
+            boolean atEnd = (i == text.length() || !Character.isLetterOrDigit(text.charAt(i)));
+            if (atEnd) {
+                if (i > wordStart && Math.abs((i - wordStart) - m) <= k && (R[k] & matchBit) == 0L) {
+                    String matchedSnippet = text.substring(wordStart, i);
+                    String ctx = text.substring(Math.max(0, wordStart - 40), Math.min(text.length(), i + 40)).strip();
+                    matches.add(new SearchMatch(matchedSnippet, wordStart, i, null, null, ctx));
+                }
+                for (int d = 0; d <= k; d++) R[d] = ~0L << d;
+                wordStart = i + 1;
+                continue;
+            }
+
             char c = Character.toLowerCase(text.charAt(i));
             long charMask = mask[c];
 
@@ -75,16 +87,6 @@ public class FuzzySearchService {
 
                 oldR = R[d];
                 R[d] = match & substitute & insert & delete;
-            }
-
-            // Check if top bit has flipped to 0! Boom: (match found!)
-            if ((R[k] & matchBit) == 0L) {
-                int start = Math.max(0, i - m + 1);
-                int end = i + 1;
-                String matchedSnippet = text.substring(start, end);
-                String ctx = text.substring(Math.max(0, start - 40), Math.min(text.length(), end + 40)).strip();
-
-                matches.add(new SearchMatch(matchedSnippet, start, end, null, null, ctx));
             }
         }
 

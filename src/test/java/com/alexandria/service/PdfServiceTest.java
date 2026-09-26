@@ -56,9 +56,15 @@ public class PdfServiceTest {
 			System.out.println("Found " + exactMatches.size() + " matches for 'Marcus'");
 			exactMatches.stream().limit(3).forEach(m -> System.out.println("  -> [" + m.matchStart() + ".." + m.matchEnd() + "]: \"" + m.text() + "\""));
 
+			// Test fuzzy search with the term Marcsu and Grek
 			List<SearchMatch> typoMatches = fuzzyService.findWithFuzzy(text, "Marcsu");
 			assertNotNull(typoMatches);
 			System.out.println("Found " + typoMatches.size() + " fuzzy matches for typo 'Marcsu'");
+			typoMatches.stream().limit(3).forEach(m -> System.out.println("  -> [" + m.matchStart() + ".." + m.matchEnd() + "]: \"" + m.text() + "\""));
+
+			typoMatches = fuzzyService.findWithFuzzy(text, "Grek");
+			assertNotNull(typoMatches);
+			System.out.println("Found " + typoMatches.size() + " fuzzy matches for typo 'Grek'");
 			typoMatches.stream().limit(3).forEach(m -> System.out.println("  -> [" + m.matchStart() + ".." + m.matchEnd() + "]: \"" + m.text() + "\""));
 		}
 	}
