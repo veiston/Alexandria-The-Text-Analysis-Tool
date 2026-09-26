@@ -1,0 +1,74 @@
+.user-guide-screen {
+    -fx-background-color: -fx-background;
+    -fx-padding: 30px;
+}
+
+.user-guide-header {
+    -fx-padding: 4px 0 0 0;
+}
+
+.user-guide-tour-button.button.primary {
+    -fx-background-color: -fx-accent;
+    -fx-padding: 10px 20px;
+    -fx-font-size: 14px;
+    -fx-font-family: -fx-font-sans-bold;
+    -fx-min-height: 38px;
+}
+
+.user-guide-tour-icon {
+    -fx-icon-color: -fx-surface;
+}
+
+.user-guide-subtitle {
+    -fx-font-size: 12px;
+}
+
+.user-guide-tabs {
+    -fx-alignment: center-left;
+}
+
+.user-guide-content {
+    -fx-padding: 8px 0 30px 0;
+    -fx-spacing: 18px;
+
+}
+
+.user-guide-description-text {
+    -fx-font-family: -fx-font-sans;
+    -fx-font-size: 14px;
+    -fx-fill: -fx-foreground;
+}
+
+.user-guide-step {
+    -fx-padding: 2px 0;
+}
+
+.user-guide-number {
+    -fx-background-color: -fx-foreground;
+    -fx-text-fill: -fx-accent-soft;
+    -fx-font-family: -fx-font-sans-bold;
+    -fx-font-size: 10px;
+    -fx-alignment: center;
+    -fx-min-width: 24px;
+    -fx-min-height: 24px;
+    -fx-pref-width: 24px;
+    -fx-pref-height: 24px;
+    -fx-background-radius: 6px;
+}
+
+.user-guide-row-text {
+    -fx-font-size: 12px;
+    -fx-text-fill: -fx-foreground;
+    -fx-padding: 4px 0 0 0;
+}
+
+.user-guide-note {
+    -fx-font-size: 14px;
+}
+
+.user-guide-section-heading {
+    -fx-font-size: 14px;
+    -fx-font-family: -fx-font-sans-bold;
+    -fx-text-fill: -fx-foreground-secondary;
+    -fx-padding: 4px 0 0 0;
+}

@@ -76,6 +76,14 @@ public class Form extends VBox {
         return renderer.getFile(key);
     }
 
+    public Node getFieldNode(String key) {
+        return renderer.getFieldNode(key);
+    }
+
+    public Button getSubmitButton() {
+        return submitButton;
+    }
+
     public void setValue(String key, String value) {
         renderer.setValue(key, value);
     }

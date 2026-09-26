@@ -11,6 +11,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
+import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
@@ -19,10 +20,13 @@ public final class FormRenderer {
 
     private final Map<String, TextInputControl> inputs = new LinkedHashMap<>();
     private final Map<String, File> files = new LinkedHashMap<>();
+    private final Map<String, Node> fieldNodes = new LinkedHashMap<>();
 
     public void render(VBox container, List<FormField> fields) {
         for (FormField field : fields) {
-            container.getChildren().add(buildFieldRow(container, field));
+            Node fieldRow = buildFieldRow(container, field);
+            fieldNodes.put(field.key(), fieldRow);
+            container.getChildren().add(fieldRow);
         }
     }
 
@@ -132,6 +136,10 @@ public final class FormRenderer {
 
     public File getFile(String key) {
         return files.get(key);
+    }
+
+    public Node getFieldNode(String key) {
+        return fieldNodes.get(key);
     }
 
     public boolean isEmpty(FormField field) {

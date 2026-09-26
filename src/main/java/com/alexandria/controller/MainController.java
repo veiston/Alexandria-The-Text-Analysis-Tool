@@ -9,6 +9,8 @@ import com.alexandria.service.TermAnalysisService;
 import com.alexandria.service.TextAnalysisService;
 import com.alexandria.view.MainView;
 import com.alexandria.view.components.side_navbar.new_project.NewProjectModal;
+import com.alexandria.view.components.user_guide.UserGuideTourData;
+import com.alexandria.view.components.user_guide.UserGuideTour;
 import com.alexandria.view.router.Route;
 import com.alexandria.view.screens.AnalyseScreen;
 import com.alexandria.view.screens.ArchiveScreen;
@@ -25,20 +27,23 @@ public class MainController {
     private final UserDAO userDAO;
     private final UserSessionController session = UserSessionController.getInstance();
     private final AnalyseController analyseController;
+    private final ArchiveController archiveController;
 
     public MainController() {
         userDAO = new UserDAO();
         restoreSession();
+
+        mainView = new MainView();
 
         analyseController = new AnalyseController(
                 new SearchService(),
                 new TermAnalysisService(),
                 new TextAnalysisService());
 
-        mainView = new MainView();
         configureProfile();
-        configureArchive();
+        archiveController = configureArchive();
         configureProject();
+        configureUserGuideTour();
     }
 
     private void restoreSession() {
@@ -52,6 +57,31 @@ public class MainController {
     private void configureProfile() {
         ProfileScreen profileScreen = (ProfileScreen) Route.PROFILE.createScreen();
         new ProfileController(userDAO, profileScreen);
+    }
+
+    private ArchiveController configureArchive() {
+        ArchiveScreen archiveScreen = (ArchiveScreen) Route.ARCHIVE.createScreen();
+        return new ArchiveController(archiveScreen);
+    }
+
+    private void configureUserGuideTour() {
+        mainView.addEventHandler(UserGuideTour.OPEN_ANALYSIS_EVENT, event -> {
+            Text tourText = new Text(
+                    null,
+                    UserGuideTourData.PROJECT_TITLE,
+                    UserGuideTourData.FILE_NAME,
+                    UserGuideTourData.FILE_TYPE,
+                    UserGuideTourData.TEXT);
+
+            mainView.closeProjectModal();
+			
+            openAnalysis(tourText, List.of(), null);
+        });
+
+        mainView.addEventHandler(UserGuideTour.CLOSE_ANALYSIS_EVENT,
+                event -> ((AnalyseScreen) Route.ANALYZE.createScreen()).clearAnalysis());
+        mainView.addEventHandler(UserGuideTour.CLOSE_ARCHIVE_EVENT,
+                event -> archiveController.loadAnalyses());
     }
 
     private void configureProject() {
@@ -98,11 +128,6 @@ public class MainController {
             worker.setDaemon(true);
             worker.start();
         });
-    }
-
-    private void configureArchive() {
-        ArchiveScreen archiveScreen = (ArchiveScreen) Route.ARCHIVE.createScreen();
-        new ArchiveController(archiveScreen);
     }
 
     private void routeToDestination(

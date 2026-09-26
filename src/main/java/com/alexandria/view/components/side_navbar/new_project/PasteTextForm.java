@@ -49,4 +49,8 @@ public class PasteTextForm extends VBox {
     public void reset() {
         form.reset();
     }
+
+    public Form getForm() {
+        return form;
+    }
 }
