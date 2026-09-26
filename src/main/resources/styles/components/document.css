@@ -1,0 +1,89 @@
+/* Document selection & highlighting */
+
+/* --- PDF ------------------------------------------------------------ */
+
+/* Temporary PDF selection shape while dragging */
+.pdf-selection-rect {
+    -fx-fill: rgba(40, 120, 255, 0.22);
+    -fx-stroke: #2878ff;
+    -fx-stroke-width: 1.5px;
+    -fx-stroke-dash-array: 5 3;
+}
+
+/* Confirmed quotation highlight on PDF */
+.pdf-quotation-highlight {
+    -fx-fill: rgba(0, 190, 80, 0.30);
+    -fx-stroke: #00a84f;
+    -fx-stroke-width: 2px;
+}
+
+/* PDF search-term highlight */
+.pdf-search-highlight {
+    -fx-fill: rgba(255, 210, 0, 0.30);
+    -fx-stroke: #e0a900;
+    -fx-stroke-width: 1px;
+}
+
+/* --- TXT -------------------------------------------------------------- */
+
+/* Temporary TXT selection shape while dragging */
+.txt-selection-rect {
+    -fx-fill: rgba(40, 120, 255, 0.22);
+    -fx-stroke: #2878ff;
+    -fx-stroke-width: 1.5px;
+    -fx-stroke-dash-array: 5 3;
+}
+
+/* Confirmed quotation highlight on TXT */
+.txt-quotation-highlight {
+    -fx-fill: rgba(0, 190, 80, 0.30);
+    -fx-stroke: #00a84f;
+    -fx-stroke-width: 2px;
+}
+
+/* TXT search-term highlight */
+.txt-search-highlight {
+    -fx-fill: rgba(255, 210, 0, 0.30);
+    -fx-stroke: #e0a900;
+    -fx-stroke-width: 1px;
+}
+
+/* --- Quotation popup --------------------------------------------------- */
+
+/* Floating "Add quotation" popup shown near a selection */
+.selection-popup {
+    -fx-background-color: -fx-control-inner-background;
+    -fx-padding: 4px;
+    -fx-background-radius: 6px;
+    -fx-border-color: rgba(0, 0, 0, 0.15);
+    -fx-border-radius: 6px;
+    -fx-effect: dropshadow(
+        gaussian,
+        rgba(0, 0, 0, 0.25),
+        8,
+        0.2,
+        0,
+        2
+    );
+}
+
+/* Add/remove quotation action inside the selection popup */
+.selection-popup-toggle {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-padding: 7px 10px;
+    -fx-text-fill: -fx-foreground;
+    -fx-font-family: -fx-font-sans;
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+}
+
+.selection-popup-toggle:hover {
+    -fx-background-color: -fx-surface-hover;
+}
+
+.selection-popup-toggle:pressed {
+    -fx-background-color: -fx-border-subtle;
+}
