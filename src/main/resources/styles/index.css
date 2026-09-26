@@ -6,6 +6,7 @@
 @import "components/form.css";
 @import "components/modal.css";
 @import "components/toggle.css";
+@import "components/document.css";
 
 @import "screens/profile-screen.css";
 @import "screens/archive-screen.css";

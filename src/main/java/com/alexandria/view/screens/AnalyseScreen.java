@@ -25,6 +25,7 @@ import javafx.scene.layout.VBox;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class AnalyseScreen extends StackPane {
@@ -42,8 +43,12 @@ public class AnalyseScreen extends StackPane {
     private final BorderPane loadedState = new BorderPane();
     private final StackPane centerSwitcher = new StackPane();
 
-    private Runnable onSaveAnalysis = () -> {};
-    private Consumer<String> onTermDetailRequested = term -> {};
+    private Runnable onSaveAnalysis = () -> {
+    };
+    private Consumer<String> onTermDetailRequested = term -> {
+    };
+    private BiConsumer<String, String> onQuotationRequested = (quotationText, location) -> {
+    };
 
     public AnalyseScreen() {
         getStyleClass().add("analyse-screen");
@@ -107,6 +112,9 @@ public class AnalyseScreen extends StackPane {
 
         textTermFrequencyPanel.setOnRowClick(word -> onTermDetailRequested.accept(word));
         textContextPanel.setOnJump(documentView::goToPage);
+
+        documentView.setOnQuotationRequested(
+                (quotationText, location) -> onQuotationRequested.accept(quotationText, location));
     }
 
     private void showView(int index) {
@@ -122,8 +130,7 @@ public class AnalyseScreen extends StackPane {
         title.getStyleClass().add("heading-lg");
 
         Label subtitle = new Label(
-                "Start a new project or open one from your Library to begin analysing."
-        );
+                "Start a new project or open one from your Library to begin analysing.");
         subtitle.getStyleClass().add("text-muted");
 
         VBox box = new VBox(8, title, subtitle);
@@ -139,15 +146,13 @@ public class AnalyseScreen extends StackPane {
             String content,
             FileType fileType,
             Path sourcePath,
-            List<Integer> pageOffsets
-    ) {
+            List<Integer> pageOffsets) {
 
         header.setTitle(
                 projectTitle,
                 fileName + (pageOffsets != null && !pageOffsets.isEmpty()
                         ? " · " + pageOffsets.size() + " Pages"
-                        : "")
-        );
+                        : ""));
 
         header.resetToReader();
 
@@ -172,11 +177,18 @@ public class AnalyseScreen extends StackPane {
     }
 
     public void setOnTermDetailRequested(Consumer<String> handler) {
-        onTermDetailRequested = handler == null ? term -> {} : handler;
+        onTermDetailRequested = handler == null ? term -> {
+        } : handler;
     }
 
     public void setOnSaveAnalysis(Runnable handler) {
-        onSaveAnalysis = handler == null ? () -> {} : handler;
+        onSaveAnalysis = handler == null ? () -> {
+        } : handler;
+    }
+
+    public void setOnQuotationRequested(BiConsumer<String, String> handler) {
+        onQuotationRequested = handler == null ? (quotationText, location) -> {
+        } : handler;
     }
 
     public void showTermDetail(String term, TermAnalysisResult analysis, List<SearchMatch> matches) {
