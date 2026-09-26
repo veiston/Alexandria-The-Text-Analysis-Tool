@@ -42,6 +42,7 @@ public class AnalyseScreen extends StackPane {
     private final VBox emptyState = buildEmptyState();
     private final BorderPane loadedState = new BorderPane();
     private final StackPane centerSwitcher = new StackPane();
+    private final ScrollPane sidebarScroll = new ScrollPane();
 
     private Runnable onSaveAnalysis = () -> {
     };
@@ -87,7 +88,7 @@ public class AnalyseScreen extends StackPane {
         rightColumn.setMaxWidth(440);
         VBox.setVgrow(textContextPanel, Priority.ALWAYS);
 
-        ScrollPane sidebarScroll = new ScrollPane(rightColumn);
+        sidebarScroll.setContent(rightColumn);
         sidebarScroll.getStyleClass().add("analyse-sidebar-scroll");
         sidebarScroll.setFitToWidth(true);
         sidebarScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
@@ -176,6 +177,15 @@ public class AnalyseScreen extends StackPane {
         textContextPanel.setResults(fragments);
     }
 
+    public void clearAnalysis() {
+        modal.hide();
+        documentView.dispose();
+        loadedState.setVisible(false);
+        loadedState.setManaged(false);
+        emptyState.setVisible(true);
+        emptyState.setManaged(true);
+    }
+
     public void setOnTermDetailRequested(Consumer<String> handler) {
         onTermDetailRequested = handler == null ? term -> {
         } : handler;
@@ -197,5 +207,25 @@ public class AnalyseScreen extends StackPane {
             // navigation + highlighting exists.
         });
         modal.show(termDetailModal);
+    }
+
+    public DocumentView getDocumentView() {
+        return documentView;
+    }
+
+    public TextTermFrequencyPanel getTextTermFrequencyPanel() {
+        return textTermFrequencyPanel;
+    }
+
+    public TextContextPanel getTextContextPanel() {
+        return textContextPanel;
+    }
+
+    public ScrollPane getStatisticsSidebar() {
+        return sidebarScroll;
+    }
+
+    public AnalyseHeader getHeader() {
+        return header;
     }
 }

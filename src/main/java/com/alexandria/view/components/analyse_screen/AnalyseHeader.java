@@ -5,6 +5,7 @@ import com.alexandria.view.components.shared.toggle.Toggle;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -54,4 +55,12 @@ public class AnalyseHeader extends HBox {
     public void setOnViewChange(IntConsumer handler) { this.onViewChange = handler; }
     public void setOnSave(Runnable handler) { this.onSave = handler; }
     public void resetToReader() { viewToggle.setSelectedIndex(0); }  
+
+    public ToggleButton getQuotationsButton() {
+        return viewToggle.getButton(1);
+    }
+
+    public Button getSaveButton() {
+        return saveButton;
+    }
 }

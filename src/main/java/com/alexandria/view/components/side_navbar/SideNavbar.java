@@ -137,4 +137,8 @@ public class SideNavbar extends VBox {
     public SideNavbarNavigation getNavigation() {
         return navigation;
     }
+
+    public Button getNewProjectButton() {
+        return newProjectButton;
+    }
 }

@@ -68,4 +68,8 @@ public class Toggle extends HBox {
             buttons.get(index).setSelected(true);
         }
     }
+
+    public ToggleButton getButton(int index) {
+        return buttons.get(index);
+    }
 }
