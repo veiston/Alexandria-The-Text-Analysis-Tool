@@ -49,15 +49,17 @@ public class AnalyseScreen extends StackPane {
     };
     private Consumer<String> onTermDetailRequested = term -> {
     };
-
-    /**
-     * (quotationText, location) -> new quotation's id, or null if none was created.
-     */
     private BiFunction<String, String, Integer> onQuotationRequested = (quotationText, location) -> null;
 
     private Consumer<Quotation> onQuotationDeleteRequested = quotation -> {
     };
     private Consumer<Quotation> onQuotationEditRequested = quotation -> {
+    };
+    private Consumer<String> onSearch = term -> {
+    };
+    private Runnable onPreviousMatch = () -> {
+    };
+    private Runnable onNextMatch = () -> {
     };
 
     public AnalyseScreen() {
@@ -123,16 +125,25 @@ public class AnalyseScreen extends StackPane {
         textTermFrequencyPanel.setOnRowClick(word -> onTermDetailRequested.accept(word));
         textContextPanel.setOnJump(documentView::goToPage);
 
-        // Bridges DocumentView's (PDF/text) selection-to-quotation flow up
-        // to whoever is currently registered as the quotation handler.
-        // Read indirectly (via the field) so this keeps working no matter
-        // when setOnQuotationRequested is called relative to loadDocument.
         documentView.setOnQuotationRequested(
                 (quotationText, location) -> onQuotationRequested.apply(quotationText, location));
 
         quotationsView.setOnGoTo(this::goToQuotation);
         quotationsView.setOnDelete(quotation -> onQuotationDeleteRequested.accept(quotation));
         quotationsView.setOnEdit(quotation -> onQuotationEditRequested.accept(quotation));
+
+        searchView.setOnSearch(term -> {
+            onSearch.accept(term);
+            System.out.println("Search submitted: " + term);
+        });
+        searchView.setOnPreviousMatch(() -> {
+            onPreviousMatch.run();
+            System.out.println("Previous match");
+        });
+        searchView.setOnNextMatch(() -> {
+            onNextMatch.run();
+            System.out.println("Next match");
+        });
     }
 
     private void showView(int index) {
@@ -211,31 +222,19 @@ public class AnalyseScreen extends StackPane {
         } : handler;
     }
 
-    /**
-     * Registers the handler invoked with (quotationText, location) -
-     * location already carries the quotation-type prefix (see
-     * {@link QuotationLocation}) - whenever the user marks a selection
-     * (in the PDF or text viewer) as a quotation.
-     */
     public void setOnQuotationRequested(BiFunction<String, String, Integer> handler) {
         onQuotationRequested = handler == null ? (quotationText, location) -> null : handler;
     }
 
-    /**
-     * Registers the handler invoked whenever the user deletes a
-     * quotation from the quotations list (its card's delete button).
-     */
     public void setOnQuotationDeleteRequested(Consumer<Quotation> handler) {
         onQuotationDeleteRequested = handler == null ? quotation -> {
         } : handler;
     }
 
-    /** Pushes the current quotation list down to the quotations view. */
     public void setQuotations(List<Quotation> quotations) {
         quotationsView.setQuotations(quotations);
     }
 
-    /** Removes one quotation's highlight from the document viewer. */
     public void removeQuotationHighlight(int quotationId) {
         documentView.removeQuotationHighlight(quotationId);
     }
@@ -248,10 +247,6 @@ public class AnalyseScreen extends StackPane {
         modal.show(termDetailModal);
     }
 
-    /**
-     * Jumps to a quotation's location in the document and switches back
-     * to the reader view.
-     */
     private void goToQuotation(Quotation quotation) {
         if (quotation == null) {
             return;
@@ -263,6 +258,38 @@ public class AnalyseScreen extends StackPane {
         documentView.goToPage(
                 QuotationLocation.parsePage(quotation.getLocation()),
                 QuotationLocation.parseStartOffset(quotation.getLocation()));
+    }
+
+    public void setOnSearch(Consumer<String> handler) {
+        onSearch = handler == null ? term -> {
+        } : handler;
+    }
+
+    public void setOnPreviousMatch(Runnable handler) {
+        onPreviousMatch = handler == null ? () -> {
+        } : handler;
+    }
+
+    public void setOnNextMatch(Runnable handler) {
+        onNextMatch = handler == null ? () -> {
+        } : handler;
+    }
+
+    public void showSearchResults(
+            String term,
+            List<SearchMatch> matches,
+            TermAnalysisResult termAnalysis) {
+
+        // TODO:
+        // 1. Update tracked words list
+        // 2. Tell DocumentView to highlight matches
+        // 3. Activate the first match
+    }
+
+    public void showSearchMatch(SearchMatch match) {
+
+        // TODO:
+        // Tell DocumentView to activate/highlight this match
     }
 
 }
