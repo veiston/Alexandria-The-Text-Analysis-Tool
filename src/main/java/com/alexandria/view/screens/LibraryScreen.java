@@ -8,10 +8,10 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -52,26 +52,10 @@ public class LibraryScreen extends StackPane {
         searchBox.setAlignment(Pos.CENTER_LEFT);
         searchBox.getStyleClass().addAll("text-field", "library-search-box");
 
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-        Hyperlink viewAll = new Hyperlink("View all \u2192");
-        viewAll.getStyleClass().add("hyperlink");
-        HBox toolbar = new HBox(16, searchBox, spacer, viewAll);
-        toolbar.setAlignment(Pos.CENTER_LEFT);
-
-        // Projects Section
-        FontIcon historyIcon = new FontIcon("fas-history");
-        historyIcon.getStyleClass().add("text-muted");
-        Label sectionTitle = new Label("Recent Projects");
-        sectionTitle.getStyleClass().add("heading-lg");
-        HBox sectionHeader = new HBox(8, historyIcon, sectionTitle);
-        sectionHeader.setAlignment(Pos.CENTER_LEFT);
-
         FlowPane cardsPane = new FlowPane(20, 20);
         cardsPane.getChildren().addAll(createProjectCard(), createNewProjectCard());
-        VBox projectsSection = new VBox(16, sectionHeader, cardsPane);
 
-        content.getChildren().addAll(headerBox, sep, toolbar, projectsSection);
+        content.getChildren().addAll(headerBox, sep, searchBox, cardsPane);
         getChildren().addAll(scrollPane, modal);
     }
 
@@ -98,11 +82,16 @@ public class LibraryScreen extends StackPane {
         Region vSpacer = new Region();
         VBox.setVgrow(vSpacer, Priority.ALWAYS);
 
-        Button editBtn = new Button("Edit");
+        Button editBtn = new Button("", new FontIcon("fas-edit"));
+        editBtn.setTooltip(new Tooltip("Edit"));
         editBtn.getStyleClass().addAll("button", "secondary");
-        Button delBtn = new Button("Delete");
+
+        Button delBtn = new Button("", new FontIcon("fas-trash-alt"));
+        delBtn.setTooltip(new Tooltip("Delete"));
         delBtn.getStyleClass().addAll("button", "danger");
-        Button openBtn = new Button("Open with");
+
+        Button openBtn = new Button("", new FontIcon("fas-folder-open"));
+        openBtn.setTooltip(new Tooltip("Open with"));
         openBtn.getStyleClass().addAll("button", "primary");
         openBtn.setOnAction(e -> showOpenWithModal());
         
