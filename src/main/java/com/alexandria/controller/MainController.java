@@ -9,6 +9,7 @@ import com.alexandria.service.TermAnalysisService;
 import com.alexandria.service.TextAnalysisService;
 import com.alexandria.view.MainView;
 import com.alexandria.view.components.side_navbar.new_project.NewProjectModal;
+import com.alexandria.view.components.user_guide.UserGuideTourData;
 import com.alexandria.view.router.Route;
 import com.alexandria.view.screens.AnalyseScreen;
 import com.alexandria.view.screens.ArchiveScreen;
@@ -25,19 +26,22 @@ public class MainController {
     private final UserDAO userDAO;
     private final UserSessionController session = UserSessionController.getInstance();
     private final AnalyseController analyseController;
+    private final ArchiveController archiveController;
 
     public MainController() {
         userDAO = new UserDAO();
         restoreSession();
 
+        mainView = new MainView();
+
         analyseController = new AnalyseController(
                 new SearchService(),
                 new TermAnalysisService(),
                 new TextAnalysisService());
+        archiveController = new ArchiveController((ArchiveScreen) Route.ARCHIVE.createScreen());
 
-        mainView = new MainView();
+        configureUserGuideTour();
         configureProfile();
-        configureArchive();
         configureProject();
     }
 
@@ -52,6 +56,25 @@ public class MainController {
     private void configureProfile() {
         ProfileScreen profileScreen = (ProfileScreen) Route.PROFILE.createScreen();
         new ProfileController(userDAO, profileScreen);
+    }
+
+    private void configureUserGuideTour() {
+        mainView.setOnTourOpenAnalysis(() -> {
+            Text tourText = new Text(
+                    null,
+                    UserGuideTourData.PROJECT_TITLE,
+                    UserGuideTourData.FILE_NAME,
+                    UserGuideTourData.FILE_TYPE,
+                    UserGuideTourData.TEXT);
+
+            mainView.closeProjectModal();
+			
+            openAnalysis(tourText, List.of(), null);
+        });
+
+        mainView.setOnUserGuideTourAnalysisClosed(() -> ((AnalyseScreen) Route.ANALYZE.createScreen()).clearAnalysis());
+				
+        mainView.setOnUserGuideTourArchiveClosed(archiveController::loadAnalyses);
     }
 
     private void configureProject() {
@@ -98,11 +121,6 @@ public class MainController {
             worker.setDaemon(true);
             worker.start();
         });
-    }
-
-    private void configureArchive() {
-        ArchiveScreen archiveScreen = (ArchiveScreen) Route.ARCHIVE.createScreen();
-        new ArchiveController(archiveScreen);
     }
 
     private void routeToDestination(
