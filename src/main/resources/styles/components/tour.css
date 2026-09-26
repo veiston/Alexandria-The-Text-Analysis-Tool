@@ -1,0 +1,39 @@
+.tour-overlay {
+    -fx-fill: rgba(17, 24, 39, 0.52);
+    -fx-stroke: transparent;
+}
+
+.tour-spotlight {
+    -fx-fill: transparent;
+    -fx-stroke: transparent;
+}
+
+.tour-tooltip {
+    -fx-background-color: -fx-surface;
+    -fx-background-radius: 10px;
+    -fx-padding: 18px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 25, 0, 0, 8);
+}
+
+.tour-step {
+    -fx-font-family: -fx-font-sans-bold;
+    -fx-font-size: 12px;
+    -fx-text-fill: -fx-accent;
+}
+
+.tour-description {
+    -fx-font-size: 12px;
+    -fx-text-fill: -fx-foreground;
+}
+
+.tour-skip {
+    -fx-background-color: transparent;
+    -fx-text-fill: -fx-foreground-secondary;
+    -fx-padding: 8px 4px;
+}
+
+.button.primary.tour-next {
+    -fx-background-color: -fx-accent;
+    -fx-text-fill: -fx-surface;
+    -fx-border-color: transparent;
+}

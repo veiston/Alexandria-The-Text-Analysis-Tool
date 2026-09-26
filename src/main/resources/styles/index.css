@@ -7,6 +7,7 @@
 @import "components/modal.css";
 @import "components/toggle.css";
 @import "components/document.css";
+@import "components/tour.css";
 
 @import "screens/profile-screen.css";
 @import "screens/archive-screen.css";
