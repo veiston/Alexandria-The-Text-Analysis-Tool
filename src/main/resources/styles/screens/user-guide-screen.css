@@ -62,12 +62,6 @@
     -fx-padding: 4px 0 0 0;
 }
 
-.user-guide-screenshot-placeholder {
-    -fx-font-family: -fx-font-sans-bold;
-    -fx-font-size: 12px;
-    -fx-text-fill: -fx-foreground-muted;
-}
-
 .user-guide-note {
     -fx-font-size: 14px;
 }

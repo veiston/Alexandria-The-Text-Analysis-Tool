@@ -2,140 +2,139 @@ package com.alexandria.view.screens;
 
 import com.alexandria.view.components.shared.toggle.Toggle;
 
+import com.alexandria.view.components.user_guide.UserGuideData;
+import com.alexandria.view.components.user_guide.UserGuideSection;
+import com.alexandria.view.components.user_guide.UserGuideSectionContent;
+import com.alexandria.view.components.user_guide.UserGuideStep;
+import com.alexandria.view.components.user_guide.UserGuideTourButton;
+
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Button;
-import javafx.geometry.Pos;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
-/** A short, task-oriented guide for the sections available in the application. */
 public class UserGuideScreen extends VBox {
 
     private final Toggle sectionToggle = new Toggle(
             "New Project", "Library", "Analyze", "Compare", "Archive", "Profile", "Settings");
-    private final VBox guideContent = new VBox(24);
+    private final VBox sectionContent = new VBox(24);
 
     public UserGuideScreen() {
         getStyleClass().add("user-guide-screen");
         setSpacing(20);
         setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
-        Label title = new Label("User Guide");
-        title.getStyleClass().add("heading-xl");
-
-        Label subtitle = new Label("A quick guide to the main areas of the application");
-        subtitle.getStyleClass().addAll("text-muted", "user-guide-subtitle");
-
-        VBox header = new VBox(6, title, subtitle);
-        header.getStyleClass().add("user-guide-header");
-
-        VBox aboutProject = buildAboutProject();
+        VBox description = buildDescription();
 
         sectionToggle.getStyleClass().add("user-guide-tabs");
         sectionToggle.setMaxWidth(Double.MAX_VALUE);
         sectionToggle.setOnToggle(this::showSection);
 
-        guideContent.getStyleClass().add("user-guide-content");
-        ScrollPane scrollPane = new ScrollPane(guideContent);
+        sectionContent.getStyleClass().add("user-guide-content");
+        ScrollPane scrollPane = new ScrollPane(sectionContent);
         scrollPane.setFitToWidth(true);
         scrollPane.getStyleClass().add("shared-scroll");
         VBox.setVgrow(scrollPane, Priority.ALWAYS);
 
-        getChildren().addAll(header, aboutProject, sectionToggle, scrollPane);
+        getChildren().addAll(buildHeader(), description, sectionToggle, scrollPane);
         showSection(0);
     }
 
-    private VBox buildAboutProject() {
-        TextFlow firstParagraph = aboutParagraph("Alexandria is an application for working with texts.");
-        TextFlow secondParagraph = aboutParagraph(
-                "You can add your own text or upload a TXT or PDF file. Alexandria can search for the words "
-                        + "and phrases you need, count words and sentences, show which words are used most often, "
-                        + "analyze a specific word or phrase, and compare several texts.");
-        TextFlow thirdParagraph = aboutParagraph(
-                "You can also save your texts, analysis results, comparisons, search results, and quotations to your account.");
+    private HBox buildHeader() {
+        Label title = new Label("User Guide");
+        title.getStyleClass().add("heading-xl");
 
-        VBox aboutProject = new VBox(8, firstParagraph, secondParagraph, thirdParagraph);
-        aboutProject.setMaxWidth(Double.MAX_VALUE);
-        return aboutProject;
+        Label subtitle = new Label("Guidelines for using the application");
+        subtitle.getStyleClass().addAll("text-muted", "user-guide-subtitle");
+
+        VBox titleBox = new VBox(6, title, subtitle);
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        HBox header = new HBox(titleBox, spacer, new UserGuideTourButton());
+        header.setAlignment(Pos.CENTER_LEFT);
+        header.getStyleClass().add("user-guide-header");
+        return header;
     }
 
-    private TextFlow aboutParagraph(String text) {
-        Text paragraph = new Text(text);
-        paragraph.getStyleClass().add("user-guide-description-text");
+    private VBox buildDescription() {
+        VBox description = new VBox(8);
+        for (String text : UserGuideData.ABOUT_PARAGRAPHS) {
+            Text paragraph = new Text(text);
+            paragraph.getStyleClass().add("user-guide-description-text");
 
-        TextFlow flow = new TextFlow(paragraph);
-        flow.setMinWidth(0);
-        flow.setMaxWidth(Double.MAX_VALUE);
-        flow.setLineSpacing(3);
-        flow.prefWidthProperty().bind(widthProperty().subtract(60));
-        return flow;
+            TextFlow paragraphFlow = new TextFlow(paragraph);
+            paragraphFlow.setMinWidth(0);
+            paragraphFlow.setMaxWidth(Double.MAX_VALUE);
+            paragraphFlow.setLineSpacing(3);
+            paragraphFlow.prefWidthProperty().bind(widthProperty().subtract(60));
+            description.getChildren().add(paragraphFlow);
+        }
+        description.setMaxWidth(Double.MAX_VALUE);
+        return description;
     }
 
     private void showSection(int index) {
-        if (index == 0) {
-            guideContent.getChildren().setAll(buildNewProjectGuide());
-            return;
-        }
-
-        guideContent.getChildren().clear();
-    }
-
-    private VBox buildNewProjectGuide() {
-        Label beforeButton = new Label("Click");
-        beforeButton.getStyleClass().addAll("body-text", "user-guide-description");
-
-        Button newProjectExample = new Button("+ New Project");
-        newProjectExample.getStyleClass().addAll("button", "primary");
-        newProjectExample.setFocusTraversable(false);
-
-        Label afterButton = new Label("in the sidebar to add a text.");
-        afterButton.getStyleClass().addAll("body-text", "user-guide-description");
-
-        HBox instruction = new HBox(6, beforeButton, newProjectExample, afterButton);
-        instruction.setAlignment(Pos.CENTER_LEFT);
-
-        Label screenshotPlaceholder = new Label("SCREENSHOT");
-        screenshotPlaceholder.getStyleClass().add("user-guide-screenshot-placeholder");
-
-        String[] steps = {
-                "Choose Upload File or Paste Text.",
-                "Enter the project name.",
-                "Choose where to open the project:\n\n"
-                        + "• Analyze — work with one text: search for words or phrases and view text statistics.\n"
-                        + "• Compare — work with several texts and compare their words and usage.",
-                "Click Create Project."
+        Node section = switch (index) {
+            case 0 -> new UserGuideSection(
+                    new UserGuideSectionContent(UserGuideData.NEW_PROJECT_STEPS, null),
+                    "/images/user-guide/new-project.png");
+            case 1 -> new UserGuideSection(
+                    new UserGuideSectionContent(UserGuideData.LIBRARY_STEPS, null),
+                    "/images/user-guide/library.png");
+            case 2 -> buildAnalyzeGuide();
+            case 3 -> buildCompareGuide();
+            case 4 -> new UserGuideSection(
+                    new UserGuideSectionContent(UserGuideData.ARCHIVE_STEPS, null),
+                    "/images/user-guide/archive.png");
+            case 5 -> new UserGuideSection(
+                    new UserGuideSectionContent(UserGuideData.PROFILE_STEPS, null),
+                    "/images/user-guide/profile.png");
+            case 6 -> new UserGuideSection(
+                    new UserGuideSectionContent(UserGuideData.SETTINGS_STEPS, UserGuideData.SETTINGS_NOTE),
+                    "/images/user-guide/settings.png");
+            default -> new VBox();
         };
+        sectionContent.getChildren().setAll(section);
+    }
 
-        VBox stepList = new VBox(10);
-        for (int i = 0; i < steps.length; i++) {
-            stepList.getChildren().add(numberedRow(i + 1, steps[i], "user-guide-step"));
+    private Node buildAnalyzeGuide() {
+        Label startTitle = guideHeading("Open a text for analysis");
+        Label startDescription = new Label(UserGuideData.ANALYZE_INTRODUCTION);
+        startDescription.getStyleClass().add("user-guide-row-text");
+        startDescription.setWrapText(true);
+        startDescription.setMinWidth(0);
+        startDescription.setMaxWidth(Double.MAX_VALUE);
+
+        Label functionsTitle = guideHeading("How analysis results are calculated");
+
+        VBox functionList = new VBox(10);
+        for (int i = 0; i < UserGuideData.ANALYZE_METHODS.size(); i++) {
+            functionList.getChildren().add(new UserGuideStep(i + 1, UserGuideData.ANALYZE_METHODS.get(i)));
         }
 
-        return new VBox(18, instruction, screenshotPlaceholder, stepList);
+        VBox content = new VBox(12, startTitle, startDescription, functionsTitle, functionList);
+        content.setMinWidth(0);
+        return new UserGuideSection(content, "/images/user-guide/analyze.png");
     }
 
-    private HBox numberedRow(int number, String text, String styleClass) {
-        Label numberLabel = new Label(String.valueOf(number));
-        numberLabel.getStyleClass().add("user-guide-number");
-
-        Label textLabel = new Label(text);
-        textLabel.getStyleClass().add("user-guide-row-text");
-        configureWrapping(textLabel);
-        HBox.setHgrow(textLabel, Priority.ALWAYS);
-
-        HBox row = new HBox(10, numberLabel, textLabel);
-        row.setAlignment(Pos.TOP_LEFT);
-        row.getStyleClass().add(styleClass);
-        return row;
+    private VBox buildCompareGuide() {
+		// TODO Add guide content for the text comparison screen
+        Label todo = new Label("TODO");
+        todo.getStyleClass().addAll("text-muted", "user-guide-note");
+        return new VBox(todo);
     }
 
-    private void configureWrapping(Label label) {
-        label.setWrapText(true);
-        label.setMinWidth(0);
-        label.setMaxWidth(Double.MAX_VALUE);
+    private Label guideHeading(String text) {
+        Label heading = new Label(text);
+        heading.getStyleClass().addAll("heading-md", "user-guide-section-heading");
+        return heading;
     }
+
 }
