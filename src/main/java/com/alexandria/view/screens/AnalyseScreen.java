@@ -1,6 +1,8 @@
 package com.alexandria.view.screens;
 
 import com.alexandria.model.FileType;
+import com.alexandria.model.Quotation;
+import com.alexandria.view.components.analyse_screen.QuotationLocation;
 import com.alexandria.service.analysis.SearchMatch;
 import com.alexandria.service.analysis.TermAnalysisResult;
 import com.alexandria.service.analysis.TextFragment;
@@ -25,7 +27,7 @@ import javafx.scene.layout.VBox;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 public class AnalyseScreen extends StackPane {
@@ -47,7 +49,15 @@ public class AnalyseScreen extends StackPane {
     };
     private Consumer<String> onTermDetailRequested = term -> {
     };
-    private BiConsumer<String, String> onQuotationRequested = (quotationText, location) -> {
+
+    /**
+     * (quotationText, location) -> new quotation's id, or null if none was created.
+     */
+    private BiFunction<String, String, Integer> onQuotationRequested = (quotationText, location) -> null;
+
+    private Consumer<Quotation> onQuotationDeleteRequested = quotation -> {
+    };
+    private Consumer<Quotation> onQuotationEditRequested = quotation -> {
     };
 
     public AnalyseScreen() {
@@ -113,8 +123,16 @@ public class AnalyseScreen extends StackPane {
         textTermFrequencyPanel.setOnRowClick(word -> onTermDetailRequested.accept(word));
         textContextPanel.setOnJump(documentView::goToPage);
 
+        // Bridges DocumentView's (PDF/text) selection-to-quotation flow up
+        // to whoever is currently registered as the quotation handler.
+        // Read indirectly (via the field) so this keeps working no matter
+        // when setOnQuotationRequested is called relative to loadDocument.
         documentView.setOnQuotationRequested(
-                (quotationText, location) -> onQuotationRequested.accept(quotationText, location));
+                (quotationText, location) -> onQuotationRequested.apply(quotationText, location));
+
+        quotationsView.setOnGoTo(this::goToQuotation);
+        quotationsView.setOnDelete(quotation -> onQuotationDeleteRequested.accept(quotation));
+        quotationsView.setOnEdit(quotation -> onQuotationEditRequested.accept(quotation));
     }
 
     private void showView(int index) {
@@ -122,6 +140,13 @@ public class AnalyseScreen extends StackPane {
             case 1 -> centerSwitcher.getChildren().setAll(quotationsView);
             default -> centerSwitcher.getChildren().setAll(documentView);
         }
+    }
+
+    public void setOnQuotationEditRequested(Consumer<Quotation> handler) {
+        onQuotationEditRequested = handler == null
+                ? quotation -> {
+                }
+                : handler;
     }
 
     private VBox buildEmptyState() {
@@ -186,9 +211,33 @@ public class AnalyseScreen extends StackPane {
         } : handler;
     }
 
-    public void setOnQuotationRequested(BiConsumer<String, String> handler) {
-        onQuotationRequested = handler == null ? (quotationText, location) -> {
+    /**
+     * Registers the handler invoked with (quotationText, location) -
+     * location already carries the quotation-type prefix (see
+     * {@link QuotationLocation}) - whenever the user marks a selection
+     * (in the PDF or text viewer) as a quotation.
+     */
+    public void setOnQuotationRequested(BiFunction<String, String, Integer> handler) {
+        onQuotationRequested = handler == null ? (quotationText, location) -> null : handler;
+    }
+
+    /**
+     * Registers the handler invoked whenever the user deletes a
+     * quotation from the quotations list (its card's delete button).
+     */
+    public void setOnQuotationDeleteRequested(Consumer<Quotation> handler) {
+        onQuotationDeleteRequested = handler == null ? quotation -> {
         } : handler;
+    }
+
+    /** Pushes the current quotation list down to the quotations view. */
+    public void setQuotations(List<Quotation> quotations) {
+        quotationsView.setQuotations(quotations);
+    }
+
+    /** Removes one quotation's highlight from the document viewer. */
+    public void removeQuotationHighlight(int quotationId) {
+        documentView.removeQuotationHighlight(quotationId);
     }
 
     public void showTermDetail(String term, TermAnalysisResult analysis, List<SearchMatch> matches) {
@@ -198,4 +247,22 @@ public class AnalyseScreen extends StackPane {
         });
         modal.show(termDetailModal);
     }
+
+    /**
+     * Jumps to a quotation's location in the document and switches back
+     * to the reader view.
+     */
+    private void goToQuotation(Quotation quotation) {
+        if (quotation == null) {
+            return;
+        }
+
+        header.resetToReader();
+        centerSwitcher.getChildren().setAll(documentView);
+
+        documentView.goToPage(
+                QuotationLocation.parsePage(quotation.getLocation()),
+                QuotationLocation.parseStartOffset(quotation.getLocation()));
+    }
+
 }
