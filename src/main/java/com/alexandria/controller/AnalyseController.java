@@ -1,6 +1,7 @@
 package com.alexandria.controller;
 
 import com.alexandria.model.Text;
+import com.alexandria.model.Quotation;
 import com.alexandria.service.analysis.SearchMatch;
 import com.alexandria.service.analysis.SearchServiceINT;
 import com.alexandria.service.analysis.SearchSettings;
@@ -60,15 +61,22 @@ public class AnalyseController {
             List<Integer> pageOffsets,
             File sourceFile) {
 
+        TextAnalysisOutcome outcome = openText(
+                text,
+                pageOffsets);
+
         analyseScreen.loadDocument(
                 text.getTitle(),
                 text.getFileName(),
                 text.getContent(),
                 text.getFileType(),
-                sourceFile == null ? null : sourceFile.toPath(),
+                sourceFile == null
+                        ? null
+                        : sourceFile.toPath(),
                 pageOffsets);
 
-        TextAnalysisOutcome outcome = openText(text, pageOffsets);
+        analyseScreen.setQuotations(
+                quotationController.getQuotations());
 
         if (!outcome.success()) {
             System.err.println(outcome.message());
@@ -158,12 +166,49 @@ public class AnalyseController {
         });
     }
 
-    private void configureQuotations(AnalyseScreen analyseScreen) {
-        // The quotations screen/card and its persistence are being built
-        // separately (see QuotationsView placeholder). For now, any
-        // selection the user marks as a quotation is just tracked in
-        // memory and logged by QuotationController.
-        analyseScreen.setOnQuotationRequested(quotationController::addQuotation);
+    private void configureQuotations(
+            AnalyseScreen analyseScreen) {
+
+        analyseScreen.setOnQuotationRequested(
+                (quotationText, location) -> {
+
+                    Quotation quotation = quotationController.addQuotation(
+                            quotationText,
+                            location);
+
+                    if (quotation == null) {
+                        return null;
+                    }
+
+                    analyseScreen.setQuotations(
+                            quotationController.getQuotations());
+
+                    return quotation.getId();
+                });
+
+        analyseScreen.setOnQuotationDeleteRequested(
+                quotation -> {
+
+                    if (quotation == null
+                            || quotation.getId() == null) {
+                        return;
+                    }
+
+                    int quotationId = quotation.getId();
+
+                    boolean removed = quotationController.removeQuotation(
+                            quotationId);
+
+                    if (!removed) {
+                        return;
+                    }
+
+                    analyseScreen.removeQuotationHighlight(
+                            quotationId);
+
+                    analyseScreen.setQuotations(
+                            quotationController.getQuotations());
+                });
     }
 
     public record TextAnalysisOutcome(
