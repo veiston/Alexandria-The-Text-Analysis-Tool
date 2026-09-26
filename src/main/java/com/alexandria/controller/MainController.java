@@ -39,11 +39,11 @@ public class MainController {
                 new SearchService(),
                 new TermAnalysisService(),
                 new TextAnalysisService());
-        archiveController = new ArchiveController((ArchiveScreen) Route.ARCHIVE.createScreen());
 
-        configureUserGuideTour();
         configureProfile();
+        archiveController = configureArchive();
         configureProject();
+        configureUserGuideTour();
     }
 
     private void restoreSession() {
@@ -57,6 +57,11 @@ public class MainController {
     private void configureProfile() {
         ProfileScreen profileScreen = (ProfileScreen) Route.PROFILE.createScreen();
         new ProfileController(userDAO, profileScreen);
+    }
+
+    private ArchiveController configureArchive() {
+        ArchiveScreen archiveScreen = (ArchiveScreen) Route.ARCHIVE.createScreen();
+        return new ArchiveController(archiveScreen);
     }
 
     private void configureUserGuideTour() {
