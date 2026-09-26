@@ -88,11 +88,11 @@ public class LibraryScreen extends StackPane {
 
         Button delBtn = new Button("", new FontIcon("fas-trash-alt"));
         delBtn.setTooltip(new Tooltip("Delete"));
-        delBtn.getStyleClass().addAll("button", "danger");
+        delBtn.getStyleClass().addAll("button", "secondary");
 
         Button openBtn = new Button("", new FontIcon("fas-folder-open"));
         openBtn.setTooltip(new Tooltip("Open with"));
-        openBtn.getStyleClass().addAll("button", "primary");
+        openBtn.getStyleClass().addAll("button", "secondary");
         openBtn.setOnAction(e -> showOpenWithModal());
         
         HBox buttons = new HBox(6, editBtn, delBtn, openBtn);
