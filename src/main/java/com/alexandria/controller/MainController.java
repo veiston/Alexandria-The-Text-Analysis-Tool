@@ -10,6 +10,7 @@ import com.alexandria.service.TextAnalysisService;
 import com.alexandria.view.MainView;
 import com.alexandria.view.components.side_navbar.new_project.NewProjectModal;
 import com.alexandria.view.components.user_guide.UserGuideTourData;
+import com.alexandria.view.components.user_guide.UserGuideTour;
 import com.alexandria.view.router.Route;
 import com.alexandria.view.screens.AnalyseScreen;
 import com.alexandria.view.screens.ArchiveScreen;
@@ -59,7 +60,7 @@ public class MainController {
     }
 
     private void configureUserGuideTour() {
-        mainView.setOnTourOpenAnalysis(() -> {
+        mainView.addEventHandler(UserGuideTour.OPEN_ANALYSIS_EVENT, event -> {
             Text tourText = new Text(
                     null,
                     UserGuideTourData.PROJECT_TITLE,
@@ -72,9 +73,10 @@ public class MainController {
             openAnalysis(tourText, List.of(), null);
         });
 
-        mainView.setOnUserGuideTourAnalysisClosed(() -> ((AnalyseScreen) Route.ANALYZE.createScreen()).clearAnalysis());
-				
-        mainView.setOnUserGuideTourArchiveClosed(archiveController::loadAnalyses);
+        mainView.addEventHandler(UserGuideTour.CLOSE_ANALYSIS_EVENT,
+                event -> ((AnalyseScreen) Route.ANALYZE.createScreen()).clearAnalysis());
+        mainView.addEventHandler(UserGuideTour.CLOSE_ARCHIVE_EVENT,
+                event -> archiveController.loadAnalyses());
     }
 
     private void configureProject() {
