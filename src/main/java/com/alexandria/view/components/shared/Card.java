@@ -7,6 +7,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
@@ -18,9 +19,13 @@ public class Card extends VBox {
     private final VBox details = new VBox(4);
     private final Button deleteButton = createDeleteButton();
     private final Label type = new Label();
+    private final HBox tagsBox = new HBox(6);
     private final Label source = new Label();
     private final Label footerText = new Label();
+    private final Separator actionDivider = new Separator();
     private final Button actionButton = new Button();
+    private final HBox actionRow = new HBox();
+    private final HBox secondaryActions = new HBox(8);
     private Node extraContent;
 
     public Card(String titleText) {
@@ -33,17 +38,20 @@ public class Card extends VBox {
         type.getStyleClass().add("tags");
         type.setVisible(false);
         type.setManaged(false);
+        tagsBox.getChildren().add(type);
 
-        AnchorPane header = new AnchorPane(type, deleteButton);
+        AnchorPane header = new AnchorPane(tagsBox, deleteButton);
         header.setPrefHeight(20);
-        AnchorPane.setTopAnchor(type, 0.0);
-        AnchorPane.setLeftAnchor(type, 0.0);
+        AnchorPane.setTopAnchor(tagsBox, 0.0);
+        AnchorPane.setLeftAnchor(tagsBox, 0.0);
         AnchorPane.setTopAnchor(deleteButton, -10.0);
         AnchorPane.setRightAnchor(deleteButton, 0.0);
 
         Label title = new Label(titleText);
         title.getStyleClass().add("heading-md");
         title.setWrapText(true);
+        title.setVisible(titleText != null && !titleText.isBlank());
+        title.setManaged(title.isVisible());
 
         source.getStyleClass().add("text-muted");
         source.setWrapText(true);
@@ -63,12 +71,22 @@ public class Card extends VBox {
         Region spacer = new Region();
         VBox.setVgrow(spacer, Priority.ALWAYS);
 
+        actionDivider.setVisible(false);
+        actionDivider.setManaged(false);
+
         actionButton.getStyleClass().addAll("button", "primary");
         actionButton.setMaxWidth(Double.MAX_VALUE);
         actionButton.setVisible(false);
         actionButton.setManaged(false);
 
-        getChildren().addAll(header, details, spacer, footer, actionButton);
+        actionRow.getChildren().add(actionButton);
+        actionRow.setAlignment(Pos.CENTER);
+        HBox.setHgrow(actionButton, Priority.ALWAYS);
+
+        secondaryActions.setVisible(false);
+        secondaryActions.setManaged(false);
+
+        getChildren().addAll(header, details, spacer, footer, actionDivider, actionRow, secondaryActions);
     }
 
     public void setExtraContent(Node content) {
@@ -89,6 +107,13 @@ public class Card extends VBox {
         type.setManaged(type.isVisible());
     }
 
+    public Label addTag(String text) {
+        Label tag = new Label(text);
+        tag.getStyleClass().add("tags");
+        tagsBox.getChildren().add(tag);
+        return tag;
+    }
+
     public void setSourceText(String text) {
         source.setText(text);
         source.setVisible(text != null && !text.isBlank());
@@ -105,6 +130,35 @@ public class Card extends VBox {
         actionButton.setText(text);
         actionButton.setVisible(text != null && !text.isBlank());
         actionButton.setManaged(actionButton.isVisible());
+    }
+
+    public void setActionButtonExpand(boolean expand) {
+        actionButton.setMaxWidth(expand ? Double.MAX_VALUE : Region.USE_PREF_SIZE);
+        HBox.setHgrow(actionButton, expand ? Priority.ALWAYS : Priority.NEVER);
+    }
+
+    public void setActionAlignment(Pos alignment) {
+        actionRow.setAlignment(alignment);
+    }
+
+    public void setActionDividerVisible(boolean visible) {
+        actionDivider.setVisible(visible);
+        actionDivider.setManaged(visible);
+    }
+
+    public void setSecondaryActions(Node... actions) {
+        secondaryActions.getChildren().clear();
+
+        if (actions != null) {
+            for (Node node : actions) {
+                HBox.setHgrow(node, Priority.ALWAYS);
+                secondaryActions.getChildren().add(node);
+            }
+        }
+
+        boolean hasContent = !secondaryActions.getChildren().isEmpty();
+        secondaryActions.setVisible(hasContent);
+        secondaryActions.setManaged(hasContent);
     }
 
     public Button getDeleteButton() {
