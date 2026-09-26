@@ -2,6 +2,7 @@ package com.alexandria.controller;
 
 import com.alexandria.model.Text;
 import com.alexandria.model.Quotation;
+import com.alexandria.model.User;
 import com.alexandria.service.analysis.SearchMatch;
 import com.alexandria.service.analysis.SearchServiceINT;
 import com.alexandria.service.analysis.SearchSettings;
@@ -20,6 +21,7 @@ public class AnalyseController {
     private final TermAnalysisServiceINT termAnalysisService;
     private final TextAnalysisServiceINT textAnalysisService;
     private final QuotationController quotationController;
+    private final UserSessionController session = UserSessionController.getInstance();
 
     private Text currentText;
     private List<Integer> currentPageOffsets = List.of();
@@ -42,14 +44,20 @@ public class AnalyseController {
         currentText = text;
         currentPageOffsets = pageOffsets == null ? List.of() : List.copyOf(pageOffsets);
 
-        // TODO: pass the real signed-in user id and a persisted text id
-        // once those exist. For now quotations are just tracked in memory
-        // for whichever text is currently open.
-        quotationController.openText(null, null);
-
         try {
+            User user = session.getCurrentUser();
+            Integer userId = user == null ? null : user.getId();
+            Integer textId = text.getId();
+
+
+            if (!java.util.Objects.equals(userId, text.getUserId())) {
+                userId = null;
+                textId = null;
+            }
+
+            quotationController.openText(userId, textId);
             return TextAnalysisOutcome.ok(computeTextAnalysis());
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return TextAnalysisOutcome.error(
                     "Could not process text analysis: " + e.getMessage());
         }
@@ -172,9 +180,16 @@ public class AnalyseController {
         analyseScreen.setOnQuotationRequested(
                 (quotationText, location) -> {
 
-                    Quotation quotation = quotationController.addQuotation(
-                            quotationText,
-                            location);
+                    Quotation quotation;
+
+                    try {
+                        quotation = quotationController.addQuotation(
+                                quotationText,
+                                location);
+                    } catch (Exception e) {
+                        System.err.println("Could not save quotation: " + e.getMessage());
+                        return null;
+                    }
 
                     if (quotation == null) {
                         return null;
@@ -196,8 +211,14 @@ public class AnalyseController {
 
                     int quotationId = quotation.getId();
 
-                    boolean removed = quotationController.removeQuotation(
-                            quotationId);
+                    boolean removed;
+
+                    try {
+                        removed = quotationController.removeQuotation(quotationId);
+                    } catch (Exception e) {
+                        System.err.println("Could not delete quotation: " + e.getMessage());
+                        return;
+                    }
 
                     if (!removed) {
                         return;
@@ -208,6 +229,31 @@ public class AnalyseController {
 
                     analyseScreen.setQuotations(
                             quotationController.getQuotations());
+                });
+
+        analyseScreen.setOnQuotationEditRequested(
+                quotation -> {
+                    if (quotation == null || quotation.getId() == null) {
+                        return;
+                    }
+
+                    try {
+                        boolean updated = quotationController.updateQuotation(quotation);
+
+                        if (!updated) {
+                            quotationController.reloadQuotations();
+                        }
+                    } catch (Exception e) {
+                        System.err.println("Could not update quotation: " + e.getMessage());
+
+                        try {
+                            quotationController.reloadQuotations();
+                        } catch (Exception reloadError) {
+                            System.err.println("Could not reload quotations: " + reloadError.getMessage());
+                        }
+                    }
+
+                    analyseScreen.setQuotations(quotationController.getQuotations());
                 });
     }
 
