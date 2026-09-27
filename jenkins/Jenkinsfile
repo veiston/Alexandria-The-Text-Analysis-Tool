@@ -1,6 +1,7 @@
 // Required Jenkins plugins:
 // - HTML Publisher
 // - Credentials Binding
+// The report is published to GitHub Pages only by Kseniia's Jenkins.
 
 pipeline {
     agent any
@@ -12,7 +13,7 @@ pipeline {
     stages {
         stage('Code Checkout') {
             steps {
-                git branch: 'jenkins-docker',
+                git branch: 'main',
                     url: 'https://github.com/veiston/Alexandria-The-Text-Analysis-Tool.git'
             }
         }
@@ -73,45 +74,30 @@ pipeline {
         }
 
         stage('Publish JaCoCo Report to GitHub Pages') {
+            when {
+                environment name: 'PUBLISH_GITHUB_PAGES', value: 'true'
+            }
+
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'alexandria-jacoco-reports-credentials',
                     usernameVariable: 'GITHUB_USERNAME',
                     passwordVariable: 'GITHUB_TOKEN'
                 )]) {
-                    script {
-                        if (isUnix()) {
-                            sh '''
-                                rm -rf jacoco-pages
-                                mkdir jacoco-pages
-                                cp -R target/site/jacoco/. jacoco-pages/
-                                cd jacoco-pages
-                                git init
-                                git checkout -b gh-pages
-                                git config user.name "Jenkins"
-                                git config user.email "kseniia.shlenskaia@gmail.com"
-                                git add .
-                                git commit -m "Publish JaCoCo report build ${BUILD_NUMBER}"
-                                git remote add origin "https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/x-bananer/alexandria-jacoco-reports.git"
-                                git push --force origin gh-pages
-                            '''
-                        } else {
-                            bat '''
-                                if exist jacoco-pages rmdir /s /q jacoco-pages
-                                mkdir jacoco-pages
-                                xcopy target\\site\\jacoco\\* jacoco-pages\\ /E /I /Y
-                                cd jacoco-pages
-                                git init
-                                git checkout -b gh-pages
-                                git config user.name "Jenkins"
-                                git config user.email "kseniia.shlenskaia@gmail.com"
-                                git add .
-                                git commit -m "Publish JaCoCo report build %BUILD_NUMBER%"
-                                git remote add origin "https://%GITHUB_USERNAME%:%GITHUB_TOKEN%@github.com/x-bananer/alexandria-jacoco-reports.git"
-                                git push --force origin gh-pages
-                            '''
-                        }
-                    }
+                    sh '''
+                        rm -rf jacoco-pages
+                        mkdir jacoco-pages
+                        cp -R target/site/jacoco/. jacoco-pages/
+                        cd jacoco-pages
+                        git init
+                        git checkout -b gh-pages
+                        git config user.name "Jenkins"
+                        git config user.email "kseniia.shlenskaia@gmail.com"
+                        git add .
+                        git commit -m "Publish JaCoCo report build ${BUILD_NUMBER}"
+                        git remote add origin "https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/x-bananer/alexandria-jacoco-reports.git"
+                        git push --force origin gh-pages
+                    '''
                 }
             }
         }

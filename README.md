@@ -103,6 +103,10 @@ Our vision is to create a desktop application for quantitative text research usi
  - Run all tests with `mvn test`
  - Run the application with `mvn javafx:run`
 
+## Automated test coverage report
+
+The [JaCoCo coverage report](https://x-bananer.github.io/alexandria-jacoco-reports/) is published on GitHub Pages. It is automatically regenerated after Jenkins, running on team member Kseniia Shlenskaia's computer, detects a new commit.
+
 ## Folder Structure
 ```markdown
 Alexandria-The-Text-Analysis-Tool/
