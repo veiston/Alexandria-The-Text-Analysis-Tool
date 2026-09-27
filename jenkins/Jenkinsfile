@@ -1,6 +1,3 @@
-// Required Jenkins plugins:
-// - HTML Publisher
-// - Credentials Binding
 // The report is published to GitHub Pages only by Kseniia's Jenkins.
 
 pipeline {
