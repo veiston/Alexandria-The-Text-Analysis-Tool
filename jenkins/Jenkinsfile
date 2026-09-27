@@ -72,7 +72,7 @@ pipeline {
             }
         }
 
-        stage('Publish to GitHub Pages') {
+        stage('Publish JaCoCo Report to GitHub Pages') {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'alexandria-jacoco-reports-credentials',
@@ -99,7 +99,7 @@ pipeline {
                             bat '''
                                 if exist jacoco-pages rmdir /s /q jacoco-pages
                                 mkdir jacoco-pages
-                                xcopy target\site\jacoco\* jacoco-pages\ /E /I /Y
+                                xcopy target\\site\\jacoco\\* jacoco-pages\\ /E /I /Y
                                 cd jacoco-pages
                                 git init
                                 git checkout -b gh-pages
