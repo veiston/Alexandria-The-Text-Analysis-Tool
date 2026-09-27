@@ -7,6 +7,7 @@ import com.alexandria.service.PdfService;
 import com.alexandria.service.SearchService;
 import com.alexandria.service.TermAnalysisService;
 import com.alexandria.service.TextAnalysisService;
+import com.alexandria.utils.UserGuideSettings;
 import com.alexandria.view.MainView;
 import com.alexandria.view.components.side_navbar.new_project.NewProjectModal;
 import com.alexandria.view.components.user_guide.UserGuideTourData;
@@ -16,6 +17,7 @@ import com.alexandria.view.screens.AnalyseScreen;
 import com.alexandria.view.screens.ArchiveScreen;
 import com.alexandria.view.screens.ProfileScreen;
 
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 
 import java.io.File;
@@ -44,6 +46,14 @@ public class MainController {
         archiveController = configureArchive();
         configureProject();
         configureUserGuideTour();
+    }
+
+    public void startUserGuideIfNeeded() {
+        if (UserGuideSettings.isShownOnStartup()) {
+            Platform.runLater(() -> {
+                mainView.startUserGuide();
+            });
+        }
     }
 
     private void restoreSession() {
