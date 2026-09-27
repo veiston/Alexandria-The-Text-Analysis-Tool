@@ -120,6 +120,21 @@ public class TextAnalysisServiceTest {
     }
 
     @Test
+    public void testCompareTermWithIgnoreStopWords() {
+        Map<Integer, String> texts = new HashMap<>();
+        texts.put(1, "The Romulus is fast.");
+        texts.put(2, "The Remus is small.");
+
+        TermComparisonResult withStopWords = termComparisonService.compareTerm(texts, null, "the", false);
+        assertNotNull(withStopWords);
+        assertEquals(2, withStopWords.occurrencesPerText().size());
+
+        TermComparisonResult withoutStopWords = termComparisonService.compareTerm(texts, null, "the", true);
+        assertNotNull(withoutStopWords);
+        assertEquals(0, withoutStopWords.occurrencesPerText().size());
+    }
+
+    @Test
     public void testSearchPreservesActualMatchedCasing() {
         String text = "Quick BROWN fox jumps over the lazy Dog.";
         List<SearchMatch> matches = searchService.search(
@@ -189,7 +204,7 @@ public class TextAnalysisServiceTest {
 
     @Test
     public void testSearchWithIgnoreStopWords() {
-        String text = "The Roman empire was grand.";
+        String text = "The Roman empire was the grandest.";
 
         List<SearchMatch> withStopWords = searchService.search(text, "the", new SearchSettings(false, false, false, false), null);
         assertNotNull(withStopWords);

@@ -1,8 +1,14 @@
 package com.alexandria.service;
 
-import java.util.*;
-import java.util.regex.*;
-import java.util.stream.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import com.alexandria.service.analysis.WordFrequency;
 
@@ -57,7 +63,19 @@ class AnalysisUtils {
     static final Pattern PARAGRAPH_SPLIT_PATTERN = Pattern.compile("(\\r?\\n\\s*){2,}");
 
     static final Set<String> STOP_WORDS = Set.of(
-        "the", "be", "to", "of", "and", "a", "in", "that", "have", "i", "it", "for", "not", "on", "with", "he", "as", "you", "do", "at"
+        "a", "about", "above", "after", "again", "against", "all", "am", "an", "and",
+        "any", "are", "as", "at", "be", "because", "been", "before", "being", "below",
+        "between", "both", "but", "by", "can", "cannot", "could", "did", "do", "does",
+        "doing", "down", "during", "each", "few", "for", "from", "further", "had", "has",
+        "have", "having", "he", "her", "here", "hers", "herself", "him", "himself", "his",
+        "how", "i", "if", "in", "into", "is", "it", "its", "itself", "me",
+        "more", "most", "my", "myself", "no", "nor", "not", "of", "off", "on",
+        "once", "only", "or", "other", "our", "ours", "ourselves", "out", "over", "own",
+        "s", "same", "she", "should", "so", "some", "such", "than", "that", "the", "their",
+        "theirs", "them", "themselves", "then", "there", "these", "they", "thou", "thy", "this", "those", "through",
+        "to", "too", "under", "until", "up", "very", "was", "we", "were", "what",
+        "when", "where", "which", "while", "who", "whom", "why", "will", "with", "would",
+        "you", "your", "yours", "yourself", "yourselves"
     );
 
     static List<String> extractWords(String content) {
