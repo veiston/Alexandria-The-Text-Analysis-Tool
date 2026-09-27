@@ -211,4 +211,15 @@ public class NewProjectModal extends VBox {
     public PasteTextForm getPasteForm() {
         return pasteForm;
     }
+
+    public Toggle getSourceToggle() {
+        return sourceToggle;
+    }
+
+    public Toggle getDestinationToggle(SourceType source) {
+        return switch (source) {
+            case UPLOAD -> uploadDestinationToggle;
+            case PASTE -> pasteDestinationToggle;
+        };
+    }
 }

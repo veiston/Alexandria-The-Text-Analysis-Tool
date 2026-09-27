@@ -50,4 +50,8 @@ public class UploadPdfForm extends VBox {
     public void reset() {
         form.reset();
     }
+
+    public Form getForm() {
+        return form;
+    }
 }

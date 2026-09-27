@@ -1,5 +1,6 @@
 package com.alexandria.view.components.shared.document;
 
+import com.alexandria.view.components.analyse_screen.QuotationLocation;
 import com.alexandria.view.components.shared.document.highlight.PdfHighlight;
 import com.alexandria.view.components.shared.document.highlight.PdfTextLayout;
 import com.alexandria.view.components.shared.selection.QuotationSelectionPopup;
@@ -29,11 +30,10 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 public class PdfDocumentRenderer {
@@ -41,7 +41,6 @@ public class PdfDocumentRenderer {
     private static final float BASE_DPI = 144f;
     private static final double BASE_PAGE_WIDTH = 620.0;
     private static final double PAGE_MARGIN = 30.0;
-
     private static final String LIVE_SELECTION_STYLE_CLASS = "pdf-selection-rect";
 
     private final BorderPane root = new BorderPane();
@@ -49,18 +48,16 @@ public class PdfDocumentRenderer {
     private final StackPane pageHost = new StackPane();
     private final ImageView imageView = new ImageView();
     private final Label errorLabel = new Label();
-
     private final Pane selectionOverlay = new Pane();
     private final StackPane contentStack = new StackPane();
+    private final Map<Integer, Integer> quotationPageById = new HashMap<>();
+    private final Map<Integer, List<double[]>> quotationRectsById = new HashMap<>();
 
     private PDDocument document;
     private PDFRenderer renderer;
-
     private int currentPage = 0;
     private double zoom = 1.0;
-
     private BufferedImage currentImage;
-
     private PdfTextLayout currentLayout;
 
     private double imageOffsetX = 0;
@@ -70,16 +67,10 @@ public class PdfDocumentRenderer {
 
     private boolean dragActive = false;
     private int dragStartGlyphIndex = -1;
-
     private QuotationSelectionPopup quotationPopup;
-
-    private final Map<Integer, List<double[]>> quotationRectsByPage = new HashMap<>();
-
     private Consumer<Integer> onVisiblePageChanged = ignored -> {
     };
-
-    private BiConsumer<String, String> onQuotationRequested = (quotationText, location) -> {
-    };
+    private BiFunction<String, String, Integer> onQuotationRequested = (quotationText, location) -> null;
 
     public PdfDocumentRenderer() {
         root.getStyleClass().add("pdf-renderer");
@@ -90,7 +81,6 @@ public class PdfDocumentRenderer {
 
         imageView.setPreserveRatio(true);
         imageView.setSmooth(true);
-
         imageView.setCursor(Cursor.TEXT);
 
         pageHost.getChildren().add(imageView);
@@ -106,7 +96,6 @@ public class PdfDocumentRenderer {
         scrollPane.getStyleClass().add("viewer-scroll");
 
         selectionOverlay.setPickOnBounds(false);
-
         selectionOverlay.prefWidthProperty().bind(contentStack.widthProperty());
         selectionOverlay.prefHeightProperty().bind(contentStack.heightProperty());
 
@@ -124,8 +113,7 @@ public class PdfDocumentRenderer {
         closeDocument();
 
         if (path == null || !Files.isRegularFile(path) || !Files.isReadable(path)) {
-            showError("The PDF file could not be opened:\n"+ path);
-
+            showError("The PDF file could not be opened:\n" + path);
             return;
         }
 
@@ -154,15 +142,8 @@ public class PdfDocumentRenderer {
         dragActive = false;
 
         try {
-            currentImage = renderer.renderImageWithDPI(
-                    currentPage,
-                    BASE_DPI,
-                    ImageType.RGB);
-
-            imageView.setImage(
-                    SwingFXUtils.toFXImage(
-                            currentImage,
-                            null));
+            currentImage = renderer.renderImageWithDPI(currentPage, BASE_DPI, ImageType.RGB);
+            imageView.setImage(SwingFXUtils.toFXImage(currentImage, null));
 
             try {
                 currentLayout = PdfTextLayout.forPage(document, currentPage, BASE_DPI);
@@ -174,21 +155,18 @@ public class PdfDocumentRenderer {
 
             errorLabel.setVisible(false);
             restorePageHost();
-
-            onVisiblePageChanged.accept(
-                    currentPage + 1);
+            onVisiblePageChanged.accept(currentPage + 1);
 
         } catch (IOException | RuntimeException e) {
-            showError(
-                    "Could not render PDF page "
-                            + (currentPage + 1)
-                            + ":\n"
-                            + e.getMessage());
+            showError("Could not render PDF page "
+                    + (currentPage + 1)
+                    + ":\n"
+                    + e.getMessage());
         }
     }
 
     private double[] rasterToDisplay(double[] rasterBounds) {
-        return new double[]{
+        return new double[] {
                 imageOffsetX + rasterBounds[0] * displayScaleX,
                 imageOffsetY + rasterBounds[1] * displayScaleY,
                 rasterBounds[2] * displayScaleX,
@@ -209,8 +187,16 @@ public class PdfDocumentRenderer {
     }
 
     private void restoreQuotationHighlights() {
-        for (double[] bounds : quotationRectsByPage.getOrDefault(currentPage, List.of())) {
-            drawQuotationRect(bounds);
+        for (Map.Entry<Integer, Integer> entry : quotationPageById.entrySet()) {
+            if (entry.getValue() == currentPage) {
+                List<double[]> rects = quotationRectsById.get(entry.getKey());
+
+                if (rects != null) {
+                    for (double[] rect : rects) {
+                        drawQuotationRect(rect);
+                    }
+                }
+            }
         }
     }
 
@@ -228,10 +214,17 @@ public class PdfDocumentRenderer {
         imageView.toBack();
     }
 
-    public void highlight(
-            String text,
-            String styleClass) {
+    public void removeQuotationHighlight(int quotationId) {
+        Integer page = quotationPageById.remove(quotationId);
+        quotationRectsById.remove(quotationId);
 
+        if (page != null && page == currentPage) {
+            clearHighlights();
+            restoreQuotationHighlights();
+        }
+    }
+
+    public void highlight(String text, String styleClass) {
         if (document == null || currentImage == null) {
             return;
         }
@@ -255,26 +248,18 @@ public class PdfDocumentRenderer {
             imageView.toBack();
 
         } catch (IOException | RuntimeException e) {
-            // Highlighting is supplementary UI; don't destroy the PDF view.
         }
     }
 
     public void highlightSearch(String searchTerm) {
         clearHighlights();
-
-        highlight(
-                searchTerm,
-                PdfHighlight.SEARCH_STYLE_CLASS);
-
+        highlight(searchTerm, PdfHighlight.SEARCH_STYLE_CLASS);
         restoreQuotationHighlights();
     }
 
     public void highlightQuotation(String quotedText) {
         clearHighlights();
-
-        highlight(
-                quotedText,
-                PdfHighlight.QUOTATION_STYLE_CLASS);
+        highlight(quotedText, PdfHighlight.QUOTATION_STYLE_CLASS);
     }
 
     public void clearHighlights() {
@@ -294,39 +279,23 @@ public class PdfDocumentRenderer {
             return;
         }
 
-        double baseScale = BASE_PAGE_WIDTH
-                / currentImage.getWidth();
-
+        double baseScale = BASE_PAGE_WIDTH / currentImage.getWidth();
         double pageWidth = BASE_PAGE_WIDTH * zoom;
-
-        double pageHeight = currentImage.getHeight()
-                * baseScale
-                * zoom;
-
+        double pageHeight = currentImage.getHeight() * baseScale * zoom;
         double viewportWidth = scrollPane.getViewportBounds().getWidth();
-
         double viewportHeight = scrollPane.getViewportBounds().getHeight();
-
-        double hostWidth = Math.max(
-                pageWidth + PAGE_MARGIN * 2,
-                viewportWidth);
-
-        double hostHeight = Math.max(
-                pageHeight + PAGE_MARGIN * 2,
-                viewportHeight);
+        double hostWidth = Math.max(pageWidth + PAGE_MARGIN * 2, viewportWidth);
+        double hostHeight = Math.max(pageHeight + PAGE_MARGIN * 2, viewportHeight);
 
         pageHost.setPrefWidth(hostWidth);
         pageHost.setPrefHeight(hostHeight);
-
         pageHost.setMinWidth(hostWidth);
         pageHost.setMinHeight(hostHeight);
-
         imageView.setFitWidth(pageWidth);
         imageView.setFitHeight(pageHeight);
 
         imageOffsetX = (hostWidth - pageWidth) / 2.0;
         imageOffsetY = (hostHeight - pageHeight) / 2.0;
-
         displayScaleX = pageWidth / currentImage.getWidth();
         displayScaleY = pageHeight / currentImage.getHeight();
 
@@ -346,24 +315,11 @@ public class PdfDocumentRenderer {
         double viewportHeight = scrollPane.getViewportBounds().getHeight();
         double contentWidth = pageHost.getWidth();
         double contentHeight = pageHost.getHeight();
+        double maxX = Math.max(0, contentWidth - viewportWidth);
+        double maxY = Math.max(0, contentHeight - viewportHeight);
 
-        double maxX = Math.max(
-                0,
-                contentWidth - viewportWidth);
-
-        double maxY = Math.max(
-                0,
-                contentHeight - viewportHeight);
-
-        scrollPane.setHvalue(
-                maxX <= 0
-                        ? 0.5
-                        : 0.5);
-
-        scrollPane.setVvalue(
-                maxY <= 0
-                        ? 0.5
-                        : 0.5);
+        scrollPane.setHvalue(maxX <= 0 ? 0.5 : 0.5);
+        scrollPane.setVvalue(maxY <= 0 ? 0.5 : 0.5);
     }
 
     private void showError(String message) {
@@ -373,11 +329,8 @@ public class PdfDocumentRenderer {
                         : message);
 
         errorLabel.setVisible(true);
-
         VBox errorBox = new VBox(12, errorLabel);
-
         errorBox.setAlignment(Pos.CENTER);
-
         root.setCenter(errorBox);
     }
 
@@ -391,52 +344,34 @@ public class PdfDocumentRenderer {
         return root;
     }
 
-    public void goToPage(
-            Integer page,
-            Integer paragraph) {
-
-        if (document == null
-                || page == null
-                || document.getNumberOfPages() == 0) {
+    public void goToPage(Integer page, Integer paragraph) {
+        if (document == null || page == null || document.getNumberOfPages() == 0) {
             return;
         }
 
-        currentPage = Math.max(
-                0,
-                Math.min(
-                        page - 1,
-                        document.getNumberOfPages() - 1));
-
+        currentPage = Math.max(0, Math.min(page - 1, document.getNumberOfPages() - 1));
         renderCurrentPage();
     }
 
     public void setZoom(double value) {
-        zoom = Math.max(
-                0.5,
-                Math.min(2.0, value));
-
+        zoom = Math.max(0.5, Math.min(2.0, value));
         updateImageSize();
     }
 
     public int getPageCount() {
-        return document == null
-                ? 0
-                : document.getNumberOfPages();
+        return document == null ? 0 : document.getNumberOfPages();
     }
 
     public void setOnVisiblePageChanged(
             Consumer<Integer> handler) {
 
-        onVisiblePageChanged = handler == null
-                ? ignored -> {
-                }
-                : handler;
+        onVisiblePageChanged = handler == null ? ignored -> {
+        } : handler;
     }
 
-    public void setOnQuotationRequested(BiConsumer<String, String> handler) {
+    public void setOnQuotationRequested(BiFunction<String, String, Integer> handler) {
         onQuotationRequested = handler == null
-                ? (quotationText, location) -> {
-                }
+                ? (quotationText, location) -> null
                 : handler;
     }
 
@@ -463,22 +398,18 @@ public class PdfDocumentRenderer {
         }
 
         event.consume();
-
         int currentIndex = glyphIndexAt(event);
-
         updateLiveSelectionRects(dragStartGlyphIndex, currentIndex);
     }
 
     private void endSelection(MouseEvent event) {
         scrollPane.setPannable(true);
-
         if (!dragActive) {
             return;
         }
 
         dragActive = false;
         event.consume();
-
         if (currentLayout == null || document == null) {
             clearLiveSelectionRects();
             return;
@@ -486,7 +417,6 @@ public class PdfDocumentRenderer {
 
         int endIndex = glyphIndexAt(event);
         int startIndex = dragStartGlyphIndex;
-
         if (startIndex < 0 || endIndex < 0 || startIndex == endIndex) {
             // A plain click (no real drag across text) isn't a selection.
             clearLiveSelectionRects();
@@ -494,30 +424,27 @@ public class PdfDocumentRenderer {
         }
 
         String selectedText = currentLayout.textFor(startIndex, endIndex);
-
         if (selectedText.isBlank()) {
             clearLiveSelectionRects();
             return;
         }
 
         List<double[]> rasterRects = currentLayout.selectionRectangles(startIndex, endIndex);
-
         if (rasterRects.isEmpty()) {
             clearLiveSelectionRects();
             return;
         }
 
-        String location = "page:" + (currentPage + 1);
+        String rawLocation = "page:" + (currentPage + 1);
 
         showQuotationPopup(
                 event.getScreenX(),
                 event.getScreenY(),
                 selectedText,
-                location,
+                rawLocation,
                 rasterRects);
     }
 
-    /** Converts an ImageView-local mouse event to a glyph index via {@link #currentLayout}. */
     private int glyphIndexAt(MouseEvent event) {
         if (currentLayout == null || displayScaleX <= 0 || displayScaleY <= 0) {
             return -1;
@@ -529,10 +456,8 @@ public class PdfDocumentRenderer {
         return currentLayout.nearestGlyphIndex(rasterX, rasterY);
     }
 
-    /** Rebuilds the temporary (blue) selection rectangles for the drag in progress. */
     private void updateLiveSelectionRects(int startIndex, int endIndex) {
         clearLiveSelectionRects();
-
         if (currentLayout == null || startIndex < 0 || endIndex < 0) {
             return;
         }
@@ -555,21 +480,23 @@ public class PdfDocumentRenderer {
             double screenX,
             double screenY,
             String selectedText,
-            String location,
+            String rawLocation,
             List<double[]> rasterRects) {
 
         int page = currentPage;
 
-        quotationPopup = new QuotationSelectionPopup(() -> {
-            quotationRectsByPage
-                    .computeIfAbsent(page, ignored -> new ArrayList<>())
-                    .addAll(rasterRects);
+        quotationPopup = new QuotationSelectionPopup(type -> {
+            String location = QuotationLocation.encode(type, rawLocation);
 
-            for (double[] rect : rasterRects) {
-                drawQuotationRect(rect);
+            Integer quotationId = onQuotationRequested.apply(selectedText, location);
+            if (quotationId != null) {
+                quotationPageById.put(quotationId, page);
+                quotationRectsById.put(quotationId, rasterRects);
+
+                for (double[] rect : rasterRects) {
+                    drawQuotationRect(rect);
+                }
             }
-
-            onQuotationRequested.accept(selectedText, location);
 
             hideQuotationPopup();
             clearLiveSelectionRects();
@@ -593,7 +520,8 @@ public class PdfDocumentRenderer {
         hideQuotationPopup();
         clearLiveSelectionRects();
         scrollPane.setPannable(true);
-        quotationRectsByPage.clear();
+        quotationPageById.clear();
+        quotationRectsById.clear();
 
         dragActive = false;
         dragStartGlyphIndex = -1;

@@ -1,50 +1,74 @@
 package com.alexandria.controller;
 
 import com.alexandria.model.Quotation;
+import com.alexandria.service.QuotationService;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class QuotationController {
+
     private Integer currentUserId;
     private Integer currentTextId;
-
     private final List<Quotation> quotations = new ArrayList<>();
 
-    public void openText(Integer userId, Integer textId) {
+    private final QuotationService quotationService;
+
+    public QuotationController() {
+        this(new QuotationService());
+    }
+
+    QuotationController(QuotationService quotationService) {
+        this.quotationService = quotationService;
+    }
+
+    public void openText(Integer userId, Integer textId) throws SQLException {
         this.currentUserId = userId;
         this.currentTextId = textId;
 
-        quotations.clear();
+        reloadQuotations();
     }
 
-    public Quotation addQuotation(String quotationText, String location) {
-        if (quotationText == null || quotationText.isBlank()) {
+    public Quotation addQuotation(String quotationText, String location) throws SQLException {
+        if (!canSaveQuotations() || quotationText == null || quotationText.isBlank()) {
             return null;
         }
 
-        Quotation quotation = new Quotation(
-                currentUserId,
-                currentTextId,
-                quotationText.strip(),
-                location);
+        Quotation quotation = quotationService.create(currentUserId, currentTextId, quotationText, location);
 
         quotations.add(quotation);
 
-        // TODO: Persist the quotation via QuotationDAO.create(quotation)
-        // once the quotations screen/service exists and we have a real
-        // signed-in user id + persisted text id to attach it to.
-        // Currently quotations are calculated/kept in memory only.
-        // IMPORTANT: do not remove in-memory storage, it is used for guests
-        // without an account.
-
-        System.out.println(
-                "[Quotation added] userId=" + currentUserId
-                        + ", textId=" + currentTextId
-                        + ", location=" + location
-                        + ", text=\"" + quotation.getQuotationText() + "\"");
-
         return quotation;
+    }
+
+    public boolean removeQuotation(int quotationId) throws SQLException {
+        if (!canSaveQuotations() || !quotationService.deleteById(quotationId, currentUserId)) {
+            return false;
+        }
+
+        return quotations.removeIf(quotation -> Objects.equals(quotation.getId(),quotationId));
+    }
+
+    public boolean updateQuotation(Quotation quotation) throws SQLException {
+        if (!canSaveQuotations()) {
+            return false;
+        }
+
+        return quotationService.update(quotation, currentUserId);
+    }
+
+	private boolean canSaveQuotations() {
+        return currentUserId != null && currentTextId != null;
+    }
+
+    public void reloadQuotations() throws SQLException {
+        quotations.clear();
+
+        if (canSaveQuotations()) {
+            quotations.addAll(quotationService.findAllByTextId(currentTextId, currentUserId));
+        }
     }
 
     public List<Quotation> getQuotations() {

@@ -1,22 +1,36 @@
 package com.alexandria.view.components.shared.selection;
 
+import com.alexandria.model.QuotationType;
+
 import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 
+import java.util.function.Consumer;
+
 public final class QuotationSelectionPopup {
     private final HBox root;
     private Pane attachedTo;
 
-    public QuotationSelectionPopup(Runnable onAdd) {
-        Button addButton = new Button("Add quotation");
-        addButton.getStyleClass().add("selection-popup-toggle");
-        addButton.setOnAction(e -> onAdd.run());
+    public QuotationSelectionPopup(Consumer<QuotationType> onSelect) {
+        Button directBtn = createTypeButton("Direct citation",
+                () -> onSelect.accept(QuotationType.DIRECT));
+        Button indirectBtn = createTypeButton("Indirect citation",
+                () -> onSelect.accept(QuotationType.INDIRECT));
+        Button annotationBtn = createTypeButton("Annotation",
+                () -> onSelect.accept(QuotationType.ANNOTATION));
 
-        root = new HBox(addButton);
+        root = new HBox(6, directBtn, indirectBtn, annotationBtn);
         root.getStyleClass().add("selection-popup");
         root.setManaged(false);
+    }
+
+    private Button createTypeButton(String text, Runnable action) {
+        Button button = new Button(text);
+        button.getStyleClass().add("selection-popup-toggle");
+        button.setOnAction(e -> action.run());
+        return button;
     }
 
     public void showAt(Pane overlay, double screenX, double screenY) {
