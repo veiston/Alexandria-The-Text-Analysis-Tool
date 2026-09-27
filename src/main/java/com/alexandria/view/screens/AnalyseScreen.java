@@ -276,20 +276,33 @@ public class AnalyseScreen extends StackPane {
     }
 
     public void showSearchResults(
-            String term,
-            List<SearchMatch> matches,
-            TermAnalysisResult termAnalysis) {
+        String term,
+        List<SearchMatch> matches,
+        TermAnalysisResult termAnalysis) {
 
-        // TODO:
-        // 1. Update tracked words list
-        // 2. Tell DocumentView to highlight matches
-        // 3. Activate the first match
+    if (matches == null || matches.isEmpty()) {
+        documentView.clearSearchHighlights();
+        return;
     }
 
-    public void showSearchMatch(SearchMatch match) {
-
-        // TODO:
-        // Tell DocumentView to activate/highlight this match
+    showSearchMatch(matches, 0);
     }
 
+    public void showSearchMatch(List<SearchMatch> matches, int activeIndex) {
+
+    if (matches == null || matches.isEmpty()) {
+        return;
+    }
+
+    int safeIndex = Math.max(0, Math.min(activeIndex, matches.size() - 1));
+    SearchMatch activeMatch = matches.get(safeIndex);
+
+    if (activeMatch.page() != null) {
+        documentView.goToPage(
+                activeMatch.page(),
+                activeMatch.paragraph());
+    }
+
+    documentView.showSearchMatches(matches, safeIndex);
+    }
 }
