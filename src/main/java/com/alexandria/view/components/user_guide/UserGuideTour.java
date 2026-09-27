@@ -67,13 +67,14 @@ public class UserGuideTour {
                                 + "features. You can return to this tutorial at any time from the User Guide page.",
                         sideNavbar::getBrandSection,
                         () -> navigateTo(Route.LIBRARY),
-                        false),
+                        false,
+                        new Tour.StepOptions(null, Tour.TooltipPosition.BELOW)),
                 new Tour.Step(
                         "Your Library",
                         "This is the first page of the application. If you already have saved projects, you can find them here. Open any project to continue working with it.",
                         () -> viewRouter,
                         () -> navigateTo(Route.LIBRARY),
-                        false,
+                        true,
                         new Tour.StepOptions(
                                 () -> sideNavbar.getNavigation().getButton("library"))),
                 new Tour.Step(
