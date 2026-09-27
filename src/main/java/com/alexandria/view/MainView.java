@@ -59,7 +59,7 @@ public class MainView extends StackPane {
         sideNavbar.selectItem(route.id());
     }
 
-    private void showNewProjectModal() {
+    public void showNewProjectModal() {
         newProjectModal.reset();
         modal.show(newProjectModal);
     }

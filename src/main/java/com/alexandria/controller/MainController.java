@@ -1,5 +1,8 @@
 package com.alexandria.controller;
 
+import java.io.File;
+import java.util.List;
+
 import com.alexandria.dao.TextDAO;
 import com.alexandria.dao.UserDAO;
 import com.alexandria.model.Text;
@@ -8,18 +11,17 @@ import com.alexandria.service.SearchService;
 import com.alexandria.service.TermAnalysisService;
 import com.alexandria.service.TextAnalysisService;
 import com.alexandria.view.MainView;
+import com.alexandria.view.components.shared.document.highlight.TextPaginator;
 import com.alexandria.view.components.side_navbar.new_project.NewProjectModal;
-import com.alexandria.view.components.user_guide.UserGuideTourData;
 import com.alexandria.view.components.user_guide.UserGuideTour;
+import com.alexandria.view.components.user_guide.UserGuideTourData;
 import com.alexandria.view.router.Route;
 import com.alexandria.view.screens.AnalyseScreen;
 import com.alexandria.view.screens.ArchiveScreen;
+import com.alexandria.view.screens.LibraryScreen;
 import com.alexandria.view.screens.ProfileScreen;
 
 import javafx.concurrent.Task;
-
-import java.io.File;
-import java.util.List;
 
 public class MainController {
 
@@ -28,6 +30,7 @@ public class MainController {
     private final UserSessionController session = UserSessionController.getInstance();
     private final AnalyseController analyseController;
     private final ArchiveController archiveController;
+    private final LibraryController libraryController;
 
     public MainController() {
         userDAO = new UserDAO();
@@ -42,6 +45,7 @@ public class MainController {
 
         configureProfile();
         archiveController = configureArchive();
+        libraryController = configureLibrary();
         configureProject();
         configureUserGuideTour();
     }
@@ -62,6 +66,27 @@ public class MainController {
     private ArchiveController configureArchive() {
         ArchiveScreen archiveScreen = (ArchiveScreen) Route.ARCHIVE.createScreen();
         return new ArchiveController(archiveScreen);
+    }
+
+    private LibraryController configureLibrary() {
+        LibraryScreen libraryScreen = (LibraryScreen) Route.LIBRARY.createScreen();
+        return new LibraryController(
+                new TextDAO(),
+                libraryScreen,
+                this::openLibraryText,
+                text -> {
+                    mainView.navigateTo(Route.COMPARE);
+                },
+                mainView::showNewProjectModal);
+    }
+
+    private void openLibraryText(Text text) {
+        // Get source file for PDF rendering, // TODO: Fix This
+        List<Integer> pageOffsets = List.of();
+        if (text.getContent() != null && !text.getContent().isBlank()) {
+            pageOffsets = TextPaginator.paginate(text.getContent(), TextPaginator.CHARS_PER_PAGE);
+        }
+        openAnalysis(text, pageOffsets, null);
     }
 
     private void configureUserGuideTour() {
@@ -108,6 +133,7 @@ public class MainController {
                 }
 
                 mainView.closeProjectModal();
+                libraryController.loadTexts();
                 routeToDestination(
                         result.text(),
                         result.pageOffsets(),
