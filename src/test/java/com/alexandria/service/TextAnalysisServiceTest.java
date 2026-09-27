@@ -224,7 +224,7 @@ public class TextAnalysisServiceTest {
         assertEquals(0, withoutStopWords.size());
     }
 
-    @Test(timeout = 10000)
+    @Test(timeout = 5000)
     public void testAnalyzeLargeTextPerformance() {
         String text = "text ".repeat(100_000);
 
@@ -236,7 +236,7 @@ public class TextAnalysisServiceTest {
         System.out.println("100 000 word analysis completed in " + durationMillis + " ms");
     }
 
-    @Test(timeout = 10000)
+    @Test(timeout = 5000)
     public void testSearchLargeTextPerformance() {
         StringBuilder text = new StringBuilder();
         for (int i = 0; i < 100_000; i++) {
