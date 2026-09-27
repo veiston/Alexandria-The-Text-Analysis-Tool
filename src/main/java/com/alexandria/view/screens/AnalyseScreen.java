@@ -60,6 +60,12 @@ public class AnalyseScreen extends StackPane {
     };
     private Consumer<Quotation> onQuotationEditRequested = quotation -> {
     };
+    private Consumer<String> onSearch = term -> {
+    };
+    private Runnable onPreviousMatch = () -> {
+    };
+    private Runnable onNextMatch = () -> {
+    };
 
     public AnalyseScreen() {
         getStyleClass().add("analyse-screen");
@@ -134,6 +140,19 @@ public class AnalyseScreen extends StackPane {
         quotationsView.setOnGoTo(this::goToQuotation);
         quotationsView.setOnDelete(quotation -> onQuotationDeleteRequested.accept(quotation));
         quotationsView.setOnEdit(quotation -> onQuotationEditRequested.accept(quotation));
+
+        searchView.setOnSearch(term -> {
+            onSearch.accept(term);
+            System.out.println("Search submitted: " + term);
+        });
+        searchView.setOnPreviousMatch(() -> {
+            onPreviousMatch.run();
+            System.out.println("Previous match");
+        });
+        searchView.setOnNextMatch(() -> {
+            onNextMatch.run();
+            System.out.println("Next match");
+        });
     }
 
     private void showView(int index) {
@@ -276,6 +295,51 @@ public class AnalyseScreen extends StackPane {
 
     public AnalyseHeader getHeader() {
         return header;
+    }
+
+    public void setOnSearch(Consumer<String> handler) {
+        onSearch = handler == null ? term -> {
+        } : handler;
+    }
+
+    public void setOnPreviousMatch(Runnable handler) {
+        onPreviousMatch = handler == null ? () -> {
+        } : handler;
+    }
+
+    public void setOnNextMatch(Runnable handler) {
+        onNextMatch = handler == null ? () -> {
+        } : handler;
+    }
+
+    public void showSearchResults(
+            String term,
+            List<SearchMatch> matches,
+            TermAnalysisResult termAnalysis) {
+
+        if (matches == null || matches.isEmpty()) {
+            documentView.clearSearchHighlights();
+            return;
+        }
+
+        showSearchMatch(matches, 0);
+    }
+
+    public void showSearchMatch(List<SearchMatch> matches, int activeIndex) {
+        if (matches == null || matches.isEmpty()) {
+            return;
+        }
+
+        int safeIndex = Math.max(0, Math.min(activeIndex, matches.size() - 1));
+        SearchMatch activeMatch = matches.get(safeIndex);
+
+        if (activeMatch.page() != null) {
+            documentView.goToPage(
+                    activeMatch.page(),
+                    activeMatch.paragraph());
+        }
+
+        documentView.showSearchMatches(matches, safeIndex);
     }
 
     /**

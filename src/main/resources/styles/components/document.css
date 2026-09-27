@@ -24,6 +24,12 @@
     -fx-stroke-width: 1px;
 }
 
+.pdf-search-highlight-active {
+    -fx-fill: rgba(255, 140, 0, 0.45);
+    -fx-stroke: #e07b00;
+    -fx-stroke-width: 2px;
+}
+
 /* --- TXT -------------------------------------------------------------- */
 
 /* Temporary TXT selection shape while dragging */
@@ -46,6 +52,10 @@
     -fx-fill: rgba(255, 210, 0, 0.30);
     -fx-stroke: #e0a900;
     -fx-stroke-width: 1px;
+}
+
+.text-search-highlight-active {
+    -fx-fill: rgba(255, 140, 0, 0.45);
 }
 
 /* --- Quotation popup --------------------------------------------------- */

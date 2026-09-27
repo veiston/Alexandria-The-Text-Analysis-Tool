@@ -9,6 +9,7 @@ import com.alexandria.model.FileType;
 import com.alexandria.model.Text;
 import com.alexandria.model.User;
 import com.alexandria.service.PdfService;
+import com.alexandria.view.components.shared.document.highlight.TextPaginator;
 import com.alexandria.view.components.side_navbar.new_project.NewProjectModal;
 
 public class ProjectController {
@@ -50,6 +51,11 @@ public class ProjectController {
             }
 
             FileType fileType = resolveFileType(created);
+
+            if (fileType != FileType.PDF) {
+                pageOffsets = TextPaginator.paginate(content, TextPaginator.CHARS_PER_PAGE);
+            }
+
             String fileName = resolveFileName(created);
             User user = session.getCurrentUser();
 

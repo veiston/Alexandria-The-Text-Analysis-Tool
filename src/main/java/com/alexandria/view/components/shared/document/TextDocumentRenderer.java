@@ -1,6 +1,8 @@
 package com.alexandria.view.components.shared.document;
 
+import com.alexandria.service.analysis.SearchMatch;
 import com.alexandria.view.components.analyse_screen.QuotationLocation;
+import com.alexandria.view.components.shared.document.highlight.TextPaginator;
 import com.alexandria.view.components.shared.document.highlight.TxtHighlight;
 import com.alexandria.view.components.shared.document.highlight.TxtTextLayout;
 import com.alexandria.view.components.shared.selection.QuotationSelectionPopup;
@@ -18,7 +20,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +27,6 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 public class TextDocumentRenderer {
-    private static final int CHARS_PER_PAGE = 1800;
     private static final double BASE_PAGE_WIDTH = 620.0;
     private static final String LIVE_SELECTION_STYLE_CLASS = "txt-selection-rect";
 
@@ -38,6 +38,7 @@ public class TextDocumentRenderer {
     private final Map<Integer, TxtHighlight.Range> quotationRangeById = new HashMap<>();
     private final Map<Integer, TextFlow> pageFlows = new HashMap<>();
     private final Map<Integer, Pane> pageOverlays = new HashMap<>();
+    private final Map<Integer, String> pageTexts = new HashMap<>();
 
     private String content = "";
     private List<Integer> pageStarts = List.of();
@@ -73,7 +74,8 @@ public class TextDocumentRenderer {
 
     private void setText(String content) {
         this.content = content == null ? "" : content;
-        pageStarts = paginate(this.content, CHARS_PER_PAGE);
+        pageStarts = TextPaginator.paginate(this.content, TextPaginator.CHARS_PER_PAGE);
+
         if (pageStarts.isEmpty()) {
             pageStarts = List.of(0);
         }
@@ -91,6 +93,7 @@ public class TextDocumentRenderer {
         pagesHost.getChildren().clear();
         pageFlows.clear();
         pageOverlays.clear();
+        pageTexts.clear();
         pendingQuotationPage = -1;
 
         for (int i = 0; i < pageStarts.size(); i++) {
@@ -99,11 +102,14 @@ public class TextDocumentRenderer {
             int end = i + 1 < pageStarts.size()
                     ? pageStarts.get(i + 1)
                     : content.length();
-            String pageText = content.substring(
-                    start,
-                    Math.min(end, content.length()));
-            TextFlow flow = new TextFlow(
-                    new Text(pageText));
+
+            end = Math.min(end, content.length());
+
+            String pageText = content.substring(start, end);
+            pageTexts.put(pageIndex, pageText);
+
+            Text text = new Text(pageText);
+            TextFlow flow = new TextFlow(text);
 
             flow.getStyleClass().add("document-page-text");
             flow.setCursor(Cursor.TEXT);
@@ -118,43 +124,19 @@ public class TextDocumentRenderer {
 
             flow.setOnMousePressed(event -> beginSelection(pageIndex, flow, event));
             flow.setOnMouseDragged(event -> updateSelection(pageIndex, flow, highlightOverlay, event));
-            flow.setOnMouseReleased(event -> endSelection(pageIndex, flow, pageText, highlightOverlay, event));
+            flow.setOnMouseReleased(event -> endSelection(
+                    pageIndex,
+                    flow,
+                    pageText,
+                    highlightOverlay,
+                    event));
 
             pageFlows.put(pageIndex, flow);
             pageOverlays.put(pageIndex, highlightOverlay);
 
             applyQuotationHighlights(pageIndex, flow, highlightOverlay);
-
             pagesHost.getChildren().add(pageStack);
         }
-    }
-
-    private static List<Integer> paginate(String content, int charsPerPage) {
-        List<Integer> offsets = new ArrayList<>();
-
-        if (content.isEmpty()) {
-            return offsets;
-        }
-        offsets.add(0);
-
-        int pos = 0;
-        while (pos + charsPerPage < content.length()) {
-            int candidate = pos + charsPerPage;
-            int breakPoint = content.lastIndexOf("\n\n", candidate);
-
-            if (breakPoint <= pos) {
-                breakPoint = content.lastIndexOf(' ', candidate);
-            }
-
-            if (breakPoint <= pos) {
-                breakPoint = candidate;
-            }
-
-            pos = breakPoint;
-            offsets.add(pos);
-        }
-
-        return offsets;
     }
 
     private void updatePageSizes() {
@@ -162,6 +144,7 @@ public class TextDocumentRenderer {
         double viewportWidth = scrollPane.getViewportBounds().getWidth();
 
         pagesHost.setPrefWidth(Math.max(pageWidth, viewportWidth));
+
         for (Node node : pagesHost.getChildren()) {
             if (node instanceof StackPane pageStack) {
                 pageStack.setPrefWidth(pageWidth);
@@ -190,7 +173,12 @@ public class TextDocumentRenderer {
             return;
         }
 
-        int safe = Math.max(0, Math.min(page - 1, pagesHost.getChildren().size() - 1));
+        int safe = Math.max(
+                0,
+                Math.min(
+                        page - 1,
+                        pagesHost.getChildren().size() - 1));
+
         Node pageNode = pagesHost.getChildren().get(safe);
 
         Platform.runLater(() -> {
@@ -208,14 +196,18 @@ public class TextDocumentRenderer {
         double viewportHeight = scrollPane.getViewportBounds().getHeight();
         double contentWidth = pagesHost.getWidth();
         double contentHeight = pagesHost.getHeight();
+
         double pageX = pageNode.getBoundsInParent().getMinX();
         double pageY = pageNode.getBoundsInParent().getMinY();
         double pageWidth = pageNode.getBoundsInParent().getWidth();
         double pageHeight = pageNode.getBoundsInParent().getHeight();
+
         double targetX = pageX + pageWidth / 2.0 - viewportWidth / 2.0;
         double targetY = pageY + pageHeight / 2.0 - viewportHeight / 2.0;
+
         double maxX = Math.max(0, contentWidth - viewportWidth);
         double maxY = Math.max(0, contentHeight - viewportHeight);
+
         double horizontal = maxX == 0 ? 0 : targetX / maxX;
         double vertical = maxY == 0 ? 0 : targetY / maxY;
 
@@ -233,17 +225,23 @@ public class TextDocumentRenderer {
         }
 
         double viewportHeight = scrollPane.getViewportBounds().getHeight();
-        double scrollableHeight = Math.max(0, pagesHost.getHeight() - viewportHeight);
-        double viewportCenter = scrollPane.getVvalue() * scrollableHeight + viewportHeight / 2.0;
+        double scrollableHeight = Math.max(
+                0,
+                pagesHost.getHeight() - viewportHeight);
+
+        double viewportCenter = scrollPane.getVvalue()
+                * scrollableHeight
+                + viewportHeight / 2.0;
 
         int closest = 0;
         double best = Double.MAX_VALUE;
 
         for (int i = 0; i < pagesHost.getChildren().size(); i++) {
             Node node = pagesHost.getChildren().get(i);
+
             double center = node.getBoundsInParent().getMinY()
-                    + node.getBoundsInParent().getHeight()
-                            / 2.0;
+                    + node.getBoundsInParent().getHeight() / 2.0;
+
             double distance = Math.abs(center - viewportCenter);
 
             if (distance < best) {
@@ -262,6 +260,7 @@ public class TextDocumentRenderer {
 
     public void setZoom(double zoom) {
         this.zoom = Math.max(0.75, Math.min(1.5, zoom));
+
         updatePageSizes();
 
         Platform.runLater(() -> {
@@ -279,33 +278,42 @@ public class TextDocumentRenderer {
         return pageStarts.size();
     }
 
-    public void setOnVisiblePageChanged(
-            Consumer<Integer> handler) {
-
+    public void setOnVisiblePageChanged(Consumer<Integer> handler) {
         onVisiblePageChanged = handler == null
                 ? ignored -> {
                 }
                 : handler;
     }
 
-    public void setOnQuotationRequested(BiFunction<String, String, Integer> handler) {
+    public void setOnQuotationRequested(
+            BiFunction<String, String, Integer> handler) {
+
         onQuotationRequested = handler == null
                 ? (quotationText, location) -> null
                 : handler;
     }
 
-    private void applyQuotationHighlights(int pageIndex, TextFlow flow, Pane overlay) {
+    private void applyQuotationHighlights(
+            int pageIndex,
+            TextFlow flow,
+            Pane overlay) {
+
         overlay.getChildren().clear();
 
         for (Map.Entry<Integer, Integer> entry : quotationPageById.entrySet()) {
-            if (entry.getValue() == pageIndex) {
-                TxtHighlight.Range range = quotationRangeById.get(entry.getKey());
+            if (entry.getValue() != pageIndex) {
+                continue;
+            }
 
-                if (range != null) {
-                    overlay.getChildren().add(
-                            TxtTextLayout.shapeFor(flow, range.start(), range.end(),
-                                    TxtHighlight.QUOTATION_STYLE_CLASS));
-                }
+            TxtHighlight.Range range = quotationRangeById.get(entry.getKey());
+
+            if (range != null) {
+                overlay.getChildren().add(
+                        TxtTextLayout.shapeFor(
+                                flow,
+                                range.start(),
+                                range.end(),
+                                TxtHighlight.QUOTATION_STYLE_CLASS));
             }
         }
     }
@@ -316,7 +324,10 @@ public class TextDocumentRenderer {
             TextFlow flow = pageFlows.get(pageIndex);
 
             if (flow != null) {
-                applyQuotationHighlights(pageIndex, flow, entry.getValue());
+                applyQuotationHighlights(
+                        pageIndex,
+                        flow,
+                        entry.getValue());
             }
         }
     }
@@ -330,7 +341,10 @@ public class TextDocumentRenderer {
             Pane overlay = pageOverlays.get(page);
 
             if (flow != null && overlay != null) {
-                applyQuotationHighlights(page, flow, overlay);
+                applyQuotationHighlights(
+                        page,
+                        flow,
+                        overlay);
             }
         }
     }
@@ -344,13 +358,19 @@ public class TextDocumentRenderer {
         Pane overlay = pageOverlays.get(pendingQuotationPage);
 
         if (flow != null && overlay != null) {
-            applyQuotationHighlights(pendingQuotationPage, flow, overlay);
+            applyQuotationHighlights(
+                    pendingQuotationPage,
+                    flow,
+                    overlay);
         }
 
         pendingQuotationPage = -1;
     }
 
-    private void beginSelection(int pageIndex, TextFlow flow, MouseEvent event) {
+    private void beginSelection(
+            int pageIndex,
+            TextFlow flow,
+            MouseEvent event) {
 
         hideQuotationPopup();
         cancelPendingSelection();
@@ -362,51 +382,104 @@ public class TextDocumentRenderer {
         selectionStartIndex = charIndexAt(flow, event);
     }
 
-    private void updateSelection(int pageIndex, TextFlow flow, Pane overlay, MouseEvent event) {
-        if (activeSelectionPage != pageIndex || selectionStartIndex < 0) {
+    private void updateSelection(
+            int pageIndex,
+            TextFlow flow,
+            Pane overlay,
+            MouseEvent event) {
+
+        if (activeSelectionPage != pageIndex
+                || selectionStartIndex < 0) {
             return;
         }
 
         event.consume();
 
         int current = charIndexAt(flow, event);
-        applyQuotationHighlights(pageIndex, flow, overlay);
+
+        applyQuotationHighlights(
+                pageIndex,
+                flow,
+                overlay);
 
         if (current != selectionStartIndex) {
             overlay.getChildren().add(
-                    TxtTextLayout.shapeFor(flow, selectionStartIndex, current, LIVE_SELECTION_STYLE_CLASS));
+                    TxtTextLayout.shapeFor(
+                            flow,
+                            selectionStartIndex,
+                            current,
+                            LIVE_SELECTION_STYLE_CLASS));
         }
     }
 
-    private void endSelection(int pageIndex, TextFlow flow, String pageText, Pane overlay, MouseEvent event) {
+    private void endSelection(
+            int pageIndex,
+            TextFlow flow,
+            String pageText,
+            Pane overlay,
+            MouseEvent event) {
+
         scrollPane.setPannable(true);
 
-        if (activeSelectionPage != pageIndex || selectionStartIndex < 0) {
+        if (activeSelectionPage != pageIndex
+                || selectionStartIndex < 0) {
             return;
         }
 
         event.consume();
 
         int current = charIndexAt(flow, event);
-        int start = Math.min(selectionStartIndex, current);
-        int end = Math.max(selectionStartIndex, current);
+
+        int start = Math.min(
+                selectionStartIndex,
+                current);
+
+        int end = Math.max(
+                selectionStartIndex,
+                current);
 
         activeSelectionPage = -1;
         selectionStartIndex = -1;
+
         if (end <= start) {
-            applyQuotationHighlights(pageIndex, flow, overlay);
+            applyQuotationHighlights(
+                    pageIndex,
+                    flow,
+                    overlay);
             return;
         }
 
-        String selectedText = pageText.substring(start, end).strip();
+        start = Math.max(0, Math.min(start, pageText.length()));
+        end = Math.max(0, Math.min(end, pageText.length()));
+
+        if (end <= start) {
+            applyQuotationHighlights(
+                    pageIndex,
+                    flow,
+                    overlay);
+            return;
+        }
+
+        String selectedText = pageText
+                .substring(start, end)
+                .strip();
+
         if (selectedText.isEmpty()) {
-            applyQuotationHighlights(pageIndex, flow, overlay);
+            applyQuotationHighlights(
+                    pageIndex,
+                    flow,
+                    overlay);
             return;
         }
 
         pendingQuotationPage = pageIndex;
 
-        String rawLocation = "page:" + (pageIndex + 1) + ";offset:" + start + "-" + end;
+        String rawLocation = "page:"
+                + (pageIndex + 1)
+                + ";offset:"
+                + start
+                + "-"
+                + end;
 
         showQuotationPopup(
                 event.getScreenX(),
@@ -420,8 +493,30 @@ public class TextDocumentRenderer {
                 end);
     }
 
-    private int charIndexAt(TextFlow flow, MouseEvent event) {
-        return flow.hitTest(new Point2D(event.getX(), event.getY())).getCharIndex();
+    private int charIndexAt(
+            TextFlow flow,
+            MouseEvent event) {
+
+        int index = flow.hitTest(
+                new Point2D(
+                        event.getX(),
+                        event.getY()))
+                .getCharIndex();
+
+        if (index < 0) {
+            return 0;
+        }
+
+        String pageText = pageTexts.get(
+                activeSelectionPage >= 0
+                        ? activeSelectionPage
+                        : currentVisiblePage - 1);
+
+        if (pageText != null) {
+            return Math.min(index, pageText.length());
+        }
+
+        return index;
     }
 
     private void showQuotationPopup(
@@ -436,20 +531,39 @@ public class TextDocumentRenderer {
             int end) {
 
         quotationPopup = new QuotationSelectionPopup(type -> {
-            String location = QuotationLocation.encode(type, rawLocation);
+            String location = QuotationLocation.encode(
+                    type,
+                    rawLocation);
 
-            Integer quotationId = onQuotationRequested.apply(selectedText, location);
+            Integer quotationId = onQuotationRequested.apply(
+                    selectedText,
+                    location);
+
             if (quotationId != null) {
-                quotationPageById.put(quotationId, pageIndex);
-                quotationRangeById.put(quotationId, new TxtHighlight.Range(start, end));
+                quotationPageById.put(
+                        quotationId,
+                        pageIndex);
+
+                quotationRangeById.put(
+                        quotationId,
+                        new TxtHighlight.Range(
+                                start,
+                                end));
             }
 
-            applyQuotationHighlights(pageIndex, flow, overlay);
+            applyQuotationHighlights(
+                    pageIndex,
+                    flow,
+                    overlay);
+
             pendingQuotationPage = -1;
             hideQuotationPopup();
         });
 
-        quotationPopup.showAt(selectionOverlay, screenX, screenY);
+        quotationPopup.showAt(
+                selectionOverlay,
+                screenX,
+                screenY);
     }
 
     private void hideQuotationPopup() {
@@ -461,11 +575,153 @@ public class TextDocumentRenderer {
 
     public void dispose() {
         hideQuotationPopup();
+
         pendingQuotationPage = -1;
+        activeSelectionPage = -1;
+        selectionStartIndex = -1;
+
         quotationPageById.clear();
         quotationRangeById.clear();
         pageFlows.clear();
         pageOverlays.clear();
+        pageTexts.clear();
+
         pagesHost.getChildren().clear();
+    }
+
+    public void highlightSearchMatches(
+            List<SearchMatch> matches,
+            int activeIndex) {
+
+        clearSearchHighlights();
+
+        if (matches == null || matches.isEmpty()) {
+            return;
+        }
+
+        for (int i = 0; i < matches.size(); i++) {
+            SearchMatch match = matches.get(i);
+
+            if (match == null || match.page() == null) {
+                continue;
+            }
+
+            int pageIndex = match.page() - 1;
+
+            if (pageIndex < 0
+                    || pageIndex >= pageStarts.size()) {
+                continue;
+            }
+
+            TextFlow flow = pageFlows.get(pageIndex);
+            Pane overlay = pageOverlays.get(pageIndex);
+
+            if (flow == null || overlay == null) {
+                continue;
+            }
+
+            int pageStart = pageStarts.get(pageIndex);
+
+            int localStart = match.matchStart() - pageStart;
+            int localEnd = match.matchEnd() - pageStart;
+
+            if (localEnd <= 0) {
+                continue;
+            }
+
+            String pageText = pageTexts.get(pageIndex);
+
+            if (pageText == null) {
+                continue;
+            }
+
+            int pageLength = pageText.length();
+
+            localStart = Math.max(
+                    0,
+                    localStart);
+
+            localEnd = Math.min(
+                    pageLength,
+                    localEnd);
+
+            if (localStart >= localEnd) {
+                continue;
+            }
+
+            String styleClass = i == activeIndex
+                    ? TxtHighlight.ACTIVE_SEARCH_STYLE_CLASS
+                    : TxtHighlight.SEARCH_STYLE_CLASS;
+
+            overlay.getChildren().add(
+                    TxtTextLayout.shapeFor(
+                            flow,
+                            localStart,
+                            localEnd,
+                            styleClass));
+        }
+    }
+
+    public void highlightSearchMatch(SearchMatch match) {
+        clearSearchHighlights();
+
+        if (match == null
+                || match.page() == null) {
+            return;
+        }
+
+        int pageIndex = match.page() - 1;
+
+        if (pageIndex < 0
+                || pageIndex >= pageStarts.size()) {
+            return;
+        }
+
+        TextFlow flow = pageFlows.get(pageIndex);
+        Pane overlay = pageOverlays.get(pageIndex);
+
+        if (flow == null || overlay == null) {
+            return;
+        }
+
+        int pageStart = pageStarts.get(pageIndex);
+
+        int localStart = match.matchStart() - pageStart;
+        int localEnd = match.matchEnd() - pageStart;
+
+        String pageText = pageTexts.get(pageIndex);
+
+        if (pageText == null) {
+            return;
+        }
+
+        int pageLength = pageText.length();
+
+        localStart = Math.max(
+                0,
+                localStart);
+
+        localEnd = Math.min(
+                pageLength,
+                localEnd);
+
+        if (localStart >= localEnd) {
+            return;
+        }
+
+        overlay.getChildren().add(
+                TxtTextLayout.shapeFor(
+                        flow,
+                        localStart,
+                        localEnd,
+                        TxtHighlight.ACTIVE_SEARCH_STYLE_CLASS));
+    }
+
+    public void clearSearchHighlights() {
+        for (Pane overlay : pageOverlays.values()) {
+            overlay.getChildren().clear();
+        }
+
+        refreshAllQuotationHighlights();
     }
 }
