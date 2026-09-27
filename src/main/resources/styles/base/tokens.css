@@ -34,3 +34,43 @@
     /* Effects */
     -fx-card-shadow: dropshadow(gaussian, rgba(0,0,0,0.06), 12, 0, 0, 2);
 }
+
+.root.dark {
+    -fx-background: #121826;
+    -fx-document-background: #192233;
+    -fx-surface: #202b3b;
+    -fx-surface-hover: #2a3749;
+    -fx-border-subtle: #3a4759;
+
+    -fx-foreground: #e7edf5;
+    -fx-foreground-secondary: #b2bdcc;
+    -fx-foreground-muted: #95a3b8;
+    -fx-foreground-faint: #66758c;
+
+    -fx-accent: #7db5ff;
+    -fx-accent-soft: #1e3a5f;
+    -fx-highlight: #86efac;
+    -fx-highlight-soft: #164a35;
+
+    -fx-card-shadow: dropshadow(gaussian, rgba(0,0,0,0.30), 12, 0, 0, 2);
+}
+
+.root.dark .side-navbar .ikonli-font-icon {
+    -fx-icon-color: -fx-foreground;
+}
+
+.root.dark .side-navbar .nav-item:selected .ikonli-font-icon {
+    -fx-icon-color: -fx-foreground;
+}
+
+.root.dark .card-pill-button .ikonli-font-icon {
+    -fx-icon-color: -fx-foreground;
+}
+
+.root.dark .text-muted.ikonli-font-icon {
+    -fx-icon-color: -fx-foreground-muted;
+}
+
+.root.dark .toggle-button.toggle-switch:selected {
+    -fx-background-color: #35658f;
+}

@@ -28,3 +28,23 @@
 .toggle-option:selected:hover {
     -fx-background-color: -fx-foreground;
 }
+
+/* Switch */
+.toggle-button.toggle-switch {
+    -fx-min-width: 44px;
+    -fx-pref-width: 44px;
+    -fx-min-height: 24px;
+    -fx-pref-height: 24px;
+    -fx-padding: 0 4px;
+    -fx-background-color: -fx-border-subtle;
+    -fx-background-radius: 999px;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 14px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-cursor: hand;
+}
+
+.toggle-button.toggle-switch:selected {
+    -fx-background-color: -fx-accent;
+    -fx-alignment: CENTER_RIGHT;
+}
