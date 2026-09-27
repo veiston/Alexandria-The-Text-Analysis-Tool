@@ -116,6 +116,7 @@
 .viewer-nav-button {
     -fx-background-color: transparent;
     -fx-border-color: transparent;
+    -fx-text-fill: -fx-foreground;
     -fx-min-width: 28px;
     -fx-min-height: 26px;
     -fx-padding: 3px 8px;
@@ -124,6 +125,11 @@
 
 .viewer-nav-button:hover {
     -fx-background-color: -fx-surface-hover;
+}
+
+.viewer-nav-button:disabled {
+    -fx-text-fill: -fx-foreground-faint;
+    -fx-opacity: 1;
 }
 
 .viewer-page-label {
