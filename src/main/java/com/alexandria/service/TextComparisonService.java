@@ -12,16 +12,19 @@ import static com.alexandria.service.AnalysisUtils.*;
 
 public class TextComparisonService {
 
-    private final TextAnalysisService textAnalysisService = new TextAnalysisService();
-
     public TextComparisonResult compareTexts(Map<Integer, String> textsById, int limit) {
-        if (textsById == null || textsById.isEmpty()) return new TextComparisonResult(Collections.emptyList(), Collections.emptyList());
+        if (textsById == null || textsById.isEmpty()) {
+            return new TextComparisonResult(Collections.emptyList(), Collections.emptyList());
+        }
 
-        var analyses = textsById.entrySet().stream()
-            .collect(Collectors.toMap(Map.Entry::getKey, e -> textAnalysisService.analyzeText(e.getValue())));
+        var extractedWords = textsById.entrySet().stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, e -> extractWords(e.getValue())));
 
-        var sharedWords = analyses.values().stream()
-            .flatMap(res -> res.frequentWords().stream().map(WordFrequency::word))
+        var wordFrequencies = extractedWords.entrySet().stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, e -> countWordFrequencies(e.getValue())));
+
+        var candidateWords = wordFrequencies.values().stream()
+            .flatMap(freqs -> freqs.keySet().stream())
             .collect(Collectors.toSet());
 
         long maxRows;
@@ -31,27 +34,23 @@ public class TextComparisonService {
             maxRows = Long.MAX_VALUE;
         }
 
-        var rows = sharedWords.stream()
-            .map(word -> createComparisonRow(word, analyses))
-            .sorted(Comparator.comparingInt(this::sumComparisonCounts).reversed())
+        var rows = candidateWords.stream()
+            .map(word -> createComparisonRow(word, extractedWords, wordFrequencies))
+            .sorted(Comparator.comparingInt(this::sumComparisonCounts).reversed().thenComparing(TextComparisonRow::word))
             .limit(maxRows)
             .toList();
 
         return new TextComparisonResult(new ArrayList<>(textsById.keySet()), rows);
     }
 
-    private TextComparisonRow createComparisonRow(String word, Map<Integer, TextAnalysisResult> analyses) {
+    private TextComparisonRow createComparisonRow(String word, Map<Integer, List<String>> extractedWords, Map<Integer, Map<String, Long>> wordFrequencies) {
         var counts = new HashMap<Integer, Integer>();
         var relFreqs = new HashMap<Integer, Double>();
 
-        analyses.forEach((id, res) -> {
-            int count = res.frequentWords().stream()
-                .filter(w -> w.word().equals(word))
-                .mapToInt(WordFrequency::count)
-                .findFirst().orElse(0);
-
+        extractedWords.forEach((id, words) -> {
+            int count = wordFrequencies.get(id).getOrDefault(word, 0L).intValue();
             counts.put(id, count);
-            relFreqs.put(id, calculateRelativeFrequency(count, res.totalWords()));
+            relFreqs.put(id, calculateRelativeFrequency(count, words.size()));
         });
 
         return new TextComparisonRow(word, counts, relFreqs);

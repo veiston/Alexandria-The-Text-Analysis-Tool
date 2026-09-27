@@ -11,11 +11,18 @@ public class SearchService implements SearchServiceINT {
 
     @Override
     public List<SearchMatch> search(String content, String term, SearchSettings setting, List<Integer> pageOffsets) {
-        if (content == null || content.isBlank() || term == null || term.isBlank())
+        if (content == null || content.isBlank() || term == null || term.isBlank()) {
             return Collections.emptyList();
+        }
+
+        if (setting.ignoreStopWords() && STOP_WORDS.contains(term.toLowerCase(Locale.ROOT))) {
+            return Collections.emptyList();
+        }
+
+        List<Integer> paragraphOffsets = resolveParagraphOffsets(content);
 
         if (setting.fuzzy()) {
-            return new FuzzySearchService().findWithFuzzy(content, term);
+            return new FuzzySearchService().findWithFuzzy(content, term, setting, pageOffsets, paragraphOffsets);
         }
 
         String query;
@@ -32,12 +39,18 @@ public class SearchService implements SearchServiceINT {
             flags = Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE;
         }
 
-        return Pattern.compile(query, flags).matcher(content).results()
+        var results = Pattern.compile(query, flags).matcher(content).results();
+        if (setting.ignoreStopWords()) {
+            results = results.filter(m -> !STOP_WORDS.contains(content.substring(m.start(), m.end()).toLowerCase(Locale.ROOT)));
+        }
+
+        return results
                 .map(m -> {
                     String ctx = content
                             .substring(Math.max(0, m.start() - 40), Math.min(content.length(), m.end() + 40)).strip();
                     Integer page = resolvePage(m.start(), pageOffsets);
-                    return new SearchMatch(content.substring(m.start(), m.end()), m.start(), m.end(), page, null, ctx);
+                    Integer paragraph = resolveParagraph(m.start(), paragraphOffsets);
+                    return new SearchMatch(content.substring(m.start(), m.end()), m.start(), m.end(), page, paragraph, ctx);
                 })
                 .toList();
     }

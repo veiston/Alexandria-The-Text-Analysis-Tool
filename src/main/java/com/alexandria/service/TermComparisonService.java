@@ -13,7 +13,21 @@ import static com.alexandria.service.AnalysisUtils.*;
 public class TermComparisonService {
 
     public TermComparisonResult compareTerm(Map<Integer, String> textsById, Map<Integer, String> titlesById, String term) {
-        if (textsById == null || textsById.isEmpty() || term == null || term.isBlank()) return new TermComparisonResult(term, Collections.emptyList());
+        return compareTerm(textsById, titlesById, term, false);
+    }
+
+    public TermComparisonResult compareTerm(Map<Integer, String> textsById, Map<Integer, String> titlesById, String term, boolean ignoreStopWords) {
+        if (term == null || term.isBlank()) {
+            return null;
+        }
+
+        if (textsById == null || textsById.isEmpty()) {
+            return new TermComparisonResult(term, Collections.emptyList());
+        }
+
+        if (ignoreStopWords && STOP_WORDS.contains(term.strip().toLowerCase(Locale.ROOT))) {
+            return new TermComparisonResult(term, Collections.emptyList());
+        }
 
         var pattern = Pattern.compile("\\b" + Pattern.quote(term.strip()) + "\\b", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
 

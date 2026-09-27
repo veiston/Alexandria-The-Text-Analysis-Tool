@@ -2,20 +2,20 @@ package com.alexandria.view.screens;
 
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import com.alexandria.view.components.shared.Card;
+import com.alexandria.view.components.shared.SearchInput;
 import com.alexandria.view.components.shared.modal.Modal;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
@@ -42,86 +42,32 @@ public class LibraryScreen extends StackPane {
         javafx.scene.control.Separator sep = new javafx.scene.control.Separator();
         
         // Toolbar
-        FontIcon searchIcon = new FontIcon("fas-search");
-        searchIcon.getStyleClass().add("text-muted");
-        TextField searchInput = new TextField();
-        searchInput.setPromptText("Search library...");
-        searchInput.getStyleClass().add("library-search-input");
+        SearchInput searchInput = new SearchInput("Search library...");
+        searchInput.getStyleClass().add("library-search-box");
         HBox.setHgrow(searchInput, Priority.ALWAYS);
-        HBox searchBox = new HBox(8, searchIcon, searchInput);
-        searchBox.setAlignment(Pos.CENTER_LEFT);
-        searchBox.getStyleClass().addAll("text-field", "library-search-box");
-
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-        Hyperlink viewAll = new Hyperlink("View all \u2192");
-        viewAll.getStyleClass().add("hyperlink");
-        HBox toolbar = new HBox(16, searchBox, spacer, viewAll);
-        toolbar.setAlignment(Pos.CENTER_LEFT);
-
-        // Projects Section
-        FontIcon historyIcon = new FontIcon("fas-history");
-        historyIcon.getStyleClass().add("text-muted");
-        Label sectionTitle = new Label("Recent Projects");
-        sectionTitle.getStyleClass().add("heading-lg");
-        HBox sectionHeader = new HBox(8, historyIcon, sectionTitle);
-        sectionHeader.setAlignment(Pos.CENTER_LEFT);
 
         FlowPane cardsPane = new FlowPane(20, 20);
         cardsPane.getChildren().addAll(createProjectCard(), createNewProjectCard());
-        VBox projectsSection = new VBox(16, sectionHeader, cardsPane);
 
-        content.getChildren().addAll(headerBox, sep, toolbar, projectsSection);
+        content.getChildren().addAll(headerBox, sep, searchInput, cardsPane);
         getChildren().addAll(scrollPane, modal);
     }
 
-    private VBox createProjectCard() {
-        VBox card = new VBox(12);
-        card.getStyleClass().add("card");
-        card.setPrefWidth(280);
-        card.setPrefHeight(200);
+    private Card createProjectCard() {
+        Card card = new Card("Meditations");
+        card.setTypeText("PDF");
+        card.setSourceText("meditations.pdf");
+        card.setFooterText("Added 2h ago");
 
-        Label tag = new Label("PDF");
-        tag.getStyleClass().add("tags");
-        Region hSpacer = new Region();
-        HBox.setHgrow(hSpacer, Priority.ALWAYS);
-        HBox header = new HBox(tag, hSpacer);
-
-        Label title = new Label("Meditations");
-        title.getStyleClass().add("heading-md");
-        title.setWrapText(true);
-        Label subtitle = new Label("meditations.pdf");
-        subtitle.getStyleClass().add("text-muted");
-        subtitle.setWrapText(true);
-        VBox textContent = new VBox(4, title, subtitle);
-
-        Region vSpacer = new Region();
-        VBox.setVgrow(vSpacer, Priority.ALWAYS);
-
-        Button editBtn = new Button("Edit");
+        Button editBtn = new Button("", new FontIcon("fas-edit"));
+        editBtn.setTooltip(new Tooltip("Edit"));
         editBtn.getStyleClass().addAll("button", "secondary");
-        Button delBtn = new Button("Delete");
-        delBtn.getStyleClass().addAll("button", "danger");
-        Button openBtn = new Button("Open with");
-        openBtn.getStyleClass().addAll("button", "primary");
+
+        Button openBtn = new Button("Open with", new FontIcon("fas-folder-open"));
+        openBtn.getStyleClass().addAll("button", "secondary");
         openBtn.setOnAction(e -> showOpenWithModal());
-        
-        HBox buttons = new HBox(6, editBtn, delBtn, openBtn);
-        buttons.setAlignment(Pos.CENTER_LEFT);
-        buttons.setOpacity(0.0);
-        card.setOnMouseEntered(e -> buttons.setOpacity(1.0));
-        card.setOnMouseExited(e -> buttons.setOpacity(0.0));
 
-        Label fileType = new Label("Document");
-        fileType.getStyleClass().addAll("text-muted", "mono-text");
-        Region fSpacer = new Region();
-        HBox.setHgrow(fSpacer, Priority.ALWAYS);
-        Label date = new Label("Added 2h ago");
-        date.getStyleClass().addAll("text-muted", "mono-text");
-        HBox footer = new HBox(fileType, fSpacer, date);
-        footer.setAlignment(Pos.CENTER_LEFT);
-
-        card.getChildren().addAll(header, textContent, vSpacer, buttons, footer);
+        card.setSecondaryActions(editBtn, openBtn);
         return card;
     }
 

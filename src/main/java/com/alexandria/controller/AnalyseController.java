@@ -123,6 +123,15 @@ public class AnalyseController {
             boolean caseSensitive,
             boolean fuzzy,
             boolean wholeWordsOnly) {
+        return search(term, caseSensitive, fuzzy, wholeWordsOnly, false);
+    }
+
+    public SearchOutcome search(
+            String term,
+            boolean caseSensitive,
+            boolean fuzzy,
+            boolean wholeWordsOnly,
+            boolean ignoreStopWords) {
 
         if (currentText == null) {
             return SearchOutcome.error("No text is currently open.");
@@ -133,7 +142,7 @@ public class AnalyseController {
         }
 
         try {
-            SearchSettings settings = new SearchSettings(caseSensitive, fuzzy, wholeWordsOnly);
+            SearchSettings settings = new SearchSettings(caseSensitive, fuzzy, wholeWordsOnly, ignoreStopWords);
 
             List<SearchMatch> matches = searchService.search(
                     currentText.getContent(),
