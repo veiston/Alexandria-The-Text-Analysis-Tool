@@ -23,13 +23,6 @@ public class AnalyseController {
 
     private Text currentText;
     private List<Integer> currentPageOffsets = List.of();
-
-    /*
-     * Current search navigation state.
-     *
-     * The controller owns this because the UI should not need
-     * to know which match is currently active.
-     */
     private List<SearchMatch> currentSearchMatches = List.of();
     private int currentSearchMatchIndex = -1;
 
@@ -62,9 +55,6 @@ public class AnalyseController {
         // for whichever text is currently open.
         quotationController.openText(null, null);
 
-        /*
-         * A new document means there is no active search anymore.
-         */
         clearSearchState();
 
         try {
@@ -116,13 +106,6 @@ public class AnalyseController {
         configureSearch(analyseScreen);
     }
 
-    /*
-     * UI-facing search method.
-     *
-     * The Analyse screen currently uses the default search settings.
-     * Keeping this method separate means the UI does not need to know
-     * about SearchSettings.
-     */
     public SearchOutcome search(String term) {
 
         SearchOutcome outcome = search(
@@ -147,12 +130,6 @@ public class AnalyseController {
         return outcome;
     }
 
-    /*
-     * Configurable search implementation.
-     *
-     * This contains the actual search operation and can be reused
-     * by other parts of the application that need different settings.
-     */
     public SearchOutcome search(
             String term,
             boolean caseSensitive,
@@ -196,12 +173,6 @@ public class AnalyseController {
         }
     }
 
-    /*
-     * Move to the next search match.
-     *
-     * The controller only decides WHICH match is active.
-     * The screen/document layer will decide HOW to display it.
-     */
     public SearchMatch nextMatch() {
 
         if (currentSearchMatches.isEmpty()) {
@@ -215,9 +186,6 @@ public class AnalyseController {
                 currentSearchMatchIndex);
     }
 
-    /*
-     * Move to the previous search match.
-     */
     public SearchMatch previousMatch() {
 
         if (currentSearchMatches.isEmpty()) {
@@ -334,64 +302,50 @@ public class AnalyseController {
     }
 
     private void configureSearch(
-            AnalyseScreen analyseScreen) {
+        AnalyseScreen analyseScreen) {
 
-        /*
-         * Search submission.
-         */
-        analyseScreen.setOnSearch(term -> {
+    analyseScreen.setOnSearch(term -> {
 
-            SearchOutcome outcome = search(term);
+        SearchOutcome outcome = search(term);
 
-            if (!outcome.success()) {
-                System.err.println(
-                        outcome.message());
-                return;
-            }
+        if (!outcome.success()) {
+            System.err.println(
+                    outcome.message());
+            return;
+        }
 
-            /*
-             * The controller has now stored:
-             *
-             * currentSearchMatches
-             * currentSearchMatchIndex
-             *
-             * The screen can use the returned matches to
-             * update the document highlighting.
-             */
-            analyseScreen.showSearchResults(
-                    term,
-                    outcome.matches(),
-                    outcome.termAnalysis());
-        });
+        analyseScreen.showSearchResults(
+                term,
+                outcome.matches(),
+                outcome.termAnalysis());
+    });
 
-        /*
-         * Previous match.
-         */
-        analyseScreen.setOnPreviousMatch(() -> {
+    analyseScreen.setOnPreviousMatch(() -> {
 
-            SearchMatch match = previousMatch();
+        SearchMatch match = previousMatch();
 
-            if (match == null) {
-                return;
-            }
+        if (match == null) {
+            return;
+        }
 
-            analyseScreen.showSearchMatch(match);
-        });
+        analyseScreen.showSearchMatch(
+                currentSearchMatches,
+                currentSearchMatchIndex);
+    });
 
-        /*
-         * Next match.
-         */
-        analyseScreen.setOnNextMatch(() -> {
+    analyseScreen.setOnNextMatch(() -> {
 
-            SearchMatch match = nextMatch();
+        SearchMatch match = nextMatch();
 
-            if (match == null) {
-                return;
-            }
+        if (match == null) {
+            return;
+        }
 
-            analyseScreen.showSearchMatch(match);
-        });
-    }
+        analyseScreen.showSearchMatch(
+                currentSearchMatches,
+                currentSearchMatchIndex);
+    });
+}
 
     public record TextAnalysisOutcome(
             boolean success,
