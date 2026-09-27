@@ -67,7 +67,8 @@ public class TextAnalysisServiceTest {
     @Test
     public void testSearch() {
         String text = "Look for the needle in the haystack. It is super hard to find.";
-        List<SearchMatch> matches = searchService.search(text, "needle", new SearchSettings(false, false, false));
+        List<SearchMatch> matches = searchService.search(
+                text, "needle", new SearchSettings(false, false, false), List.of());
 
         assertNotNull(matches);
         assertEquals(1, matches.size());
@@ -101,7 +102,8 @@ public class TextAnalysisServiceTest {
     @Test
     public void testSearchPreservesActualMatchedCasing() {
         String text = "Quick BROWN fox jumps over the lazy Dog.";
-        List<SearchMatch> matches = searchService.search(text, "BROWN", new SearchSettings(false, false, false));
+        List<SearchMatch> matches = searchService.search(
+                text, "BROWN", new SearchSettings(false, false, false), List.of());
         assertEquals(1, matches.size());
         assertEquals("BROWN", matches.get(0).text());
     }
