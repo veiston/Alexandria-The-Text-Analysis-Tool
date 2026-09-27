@@ -13,20 +13,6 @@ import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-/**
- * Search controls for the Analyse screen.
- *
- * Responsibilities:
- * - Compose the generic SearchInput with search navigation controls.
- * - Expose search/navigation events through callbacks.
- * - Display the tracked words list.
- *
- * Does NOT:
- * - Search the document.
- * - Highlight matches.
- * - Manage the current match.
- * - Open the term detail modal.
- */
 public class SearchView extends VBox {
 
     private final SearchInput searchInput;
