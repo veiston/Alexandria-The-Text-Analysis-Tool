@@ -13,6 +13,7 @@ import com.alexandria.view.router.Route;
 import com.alexandria.view.router.ViewRouter;
 import com.alexandria.view.screens.AnalyseScreen;
 import com.alexandria.view.screens.ArchiveScreen;
+import com.alexandria.utils.UserGuideSettings;
 
 import javafx.application.Platform;
 import javafx.event.Event;
@@ -57,6 +58,16 @@ public class UserGuideTour {
 
     private List<Tour.Step> steps() {
         return List.of(
+                new Tour.Step(
+                        "Welcome to Alexandria!",
+                        "Alexandria is a statistical text analysis tool for language researchers. "
+                                + "It can help you explore texts through word frequencies, term searches, "
+                                + "key paragraphs, quotations, and comparisons.\n\n"
+                                + "Take a quick tour through the application to get familiar with its main "
+                                + "features. You can return to this tutorial at any time from the User Guide page.",
+                        sideNavbar::getBrandSection,
+                        () -> navigateTo(Route.LIBRARY),
+                        false),
                 new Tour.Step(
                         "Your Library",
                         "This is the first page of the application. If you already have saved projects, you can find them here. Open any project to continue working with it.",
@@ -144,6 +155,12 @@ public class UserGuideTour {
                         null,
                         true),
                 new Tour.Step(
+                        "Search and track terms",
+                        "Search for a word or phrase in the current text. Your searches appear in Tracked Words, where you can reopen a term, move through its matches, or remove it from the list.",
+                        () -> analyseScreen().getSearchView(),
+                        null,
+                        true),
+                new Tour.Step(
                         "Review key paragraphs",
                         "Key Paragraphs identifies sentences that contain words used frequently across the text. This can help you notice repeated topics. Use Go to button to open the relevant page in the reader.",
                         () -> analyseScreen().getTextContextPanel(),
@@ -151,13 +168,13 @@ public class UserGuideTour {
                         true),
                 new Tour.Step(
                         "Save your analysis",
-                        "Use Save Findings to keep the current results of a text analysis, term search, or comparison in Archive. You need to be signed in to save findings.",
+                        "Use Save Findings button to keep the current results of a text analysis, term search, or comparison in Archive. You need to be signed in to save findings.",
                         () -> analyseScreen().getHeader().getSaveButton(),
                         this::openAnalysis,
                         true),
                 new Tour.Step(
                         "Compare texts",
-                        "Compare lets you explore patterns across several texts. This area is still under development.",
+                        "Compare page lets you explore patterns across several texts. This area is still under development.",
                         () -> viewRouter,
                         () -> navigateTo(Route.COMPARE),
                         true,
@@ -165,7 +182,7 @@ public class UserGuideTour {
                                 () -> sideNavbar.getNavigation().getButton("compare"))),
                 new Tour.Step(
                         "Archive",
-                        "Open Archive to view the statistics and comparisons you saved while working with your texts.",
+                        "Open Archive to view the the results of a text analysis, term search, or comparison you saved while working with your texts.",
                         () -> viewRouter,
                         this::showArchivePreview,
                         true,
@@ -173,7 +190,7 @@ public class UserGuideTour {
                                 () -> sideNavbar.getNavigation().getButton("archive"))),
                 new Tour.Step(
                         "Settings",
-                        "Open Settings to manage application preferences. More settings will be available in a future version.",
+                        "Open Settings to manage application preferences.",
                         () -> viewRouter,
                         () -> navigateTo(Route.SETTINGS),
                         true,
@@ -181,7 +198,7 @@ public class UserGuideTour {
                                 () -> sideNavbar.getNavigation().getButton("settings"))),
                 new Tour.Step(
                         "Profile",
-                        "Use Profile to create an account, sign in, or edit your profile if you are already signed in.",
+                        "Use Profile page to create an account, sign in, or edit your profile if you are already signed in.",
                         () -> viewRouter,
                         () -> navigateTo(Route.PROFILE),
                         true,
@@ -251,6 +268,8 @@ public class UserGuideTour {
     }
 
     private void endTour() {
+        UserGuideSettings.setShownOnStartup(false);
+		
         clearQuotationPreview();
         tour.fireEvent(new Event(CLOSE_ARCHIVE_EVENT));
         if (analysisOpen) {
@@ -259,7 +278,7 @@ public class UserGuideTour {
         }
         newProjectModal.reset();
         modal.hide();
-        navigateTo(Route.USERGUIDE);
+        navigateTo(Route.LIBRARY);
     }
 
     private AnalyseScreen analyseScreen() {
