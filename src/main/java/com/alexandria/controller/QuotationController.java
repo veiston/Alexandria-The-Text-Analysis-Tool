@@ -1,8 +1,9 @@
 package com.alexandria.controller;
 
 import com.alexandria.model.Quotation;
-import com.alexandria.view.components.analyse_screen.QuotationLocation;
+import com.alexandria.service.QuotationService;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -11,65 +12,63 @@ public class QuotationController {
 
     private Integer currentUserId;
     private Integer currentTextId;
-    private int nextId = 1;
-
     private final List<Quotation> quotations = new ArrayList<>();
 
-    public void openText(Integer userId, Integer textId) {
+    private final QuotationService quotationService;
+
+    public QuotationController() {
+        this(new QuotationService());
+    }
+
+    QuotationController(QuotationService quotationService) {
+        this.quotationService = quotationService;
+    }
+
+    public void openText(Integer userId, Integer textId) throws SQLException {
         this.currentUserId = userId;
         this.currentTextId = textId;
 
-        quotations.clear();
-        nextId = 1;
+        reloadQuotations();
     }
 
-    public Quotation addQuotation(String quotationText, String location) {
-        if (quotationText == null || quotationText.isBlank()) {
+    public Quotation addQuotation(String quotationText, String location) throws SQLException {
+        if (!canSaveQuotations() || quotationText == null || quotationText.isBlank()) {
             return null;
         }
 
-        Quotation quotation = new Quotation(
-                currentUserId,
-                currentTextId,
-                quotationText.strip(),
-                location);
-
-        quotation.setId(nextId++);
+        Quotation quotation = quotationService.create(currentUserId, currentTextId, quotationText, location);
 
         quotations.add(quotation);
-
-        // TODO: Persist via QuotationDAO.create(quotation) once the
-        // quotations screen/service has a real signed-in user id and
-        // persisted text id to attach it to.
-        // Currently quotations are calculated/kept in memory only.
-        // IMPORTANT: do not remove in-memory storage, it is used for
-        // guests without an account.
-
-        System.out.println(
-                "[Quotation added] id=" + quotation.getId()
-                        + ", type=" + QuotationLocation.parseType(location)
-                        + ", userId=" + currentUserId
-                        + ", textId=" + currentTextId
-                        + ", location=" + location
-                        + ", text=\"" + quotation.getQuotationText() + "\"");
 
         return quotation;
     }
 
-    public boolean removeQuotation(int quotationId) {
-        boolean removed = quotations.removeIf(
-                quotation -> Objects.equals(
-                        quotation.getId(),
-                        quotationId));
-
-        if (removed) {
-            // TODO: Persist removal via QuotationDAO.delete(quotationId)
-            // once persistence exists.
-            System.out.println(
-                    "[Quotation removed] id=" + quotationId);
+    public boolean removeQuotation(int quotationId) throws SQLException {
+        if (!canSaveQuotations() || !quotationService.deleteById(quotationId, currentUserId)) {
+            return false;
         }
 
-        return removed;
+        return quotations.removeIf(quotation -> Objects.equals(quotation.getId(),quotationId));
+    }
+
+    public boolean updateQuotation(Quotation quotation) throws SQLException {
+        if (!canSaveQuotations()) {
+            return false;
+        }
+
+        return quotationService.update(quotation, currentUserId);
+    }
+
+	private boolean canSaveQuotations() {
+        return currentUserId != null && currentTextId != null;
+    }
+
+    public void reloadQuotations() throws SQLException {
+        quotations.clear();
+
+        if (canSaveQuotations()) {
+            quotations.addAll(quotationService.findAllByTextId(currentTextId, currentUserId));
+        }
     }
 
     public List<Quotation> getQuotations() {
