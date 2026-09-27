@@ -186,4 +186,26 @@ public class TextAnalysisServiceTest {
         assertNotNull(insensitive);
         assertEquals(2, insensitive.size());
     }
+
+    @Test
+    public void testSearchWithIgnoreStopWords() {
+        String text = "The Roman empire was grand.";
+
+        List<SearchMatch> withStopWords = searchService.search(text, "the", new SearchSettings(false, false, false, false), null);
+        assertNotNull(withStopWords);
+        assertEquals(2, withStopWords.size());
+
+        List<SearchMatch> withoutStopWords = searchService.search(text, "the", new SearchSettings(false, false, false, true), null);
+        assertNotNull(withoutStopWords);
+        assertEquals(0, withoutStopWords.size());
+    }
+
+    @Test
+    public void testFuzzySearchWithIgnoreStopWords() {
+        String text = "He is on the right path.";
+
+        List<SearchMatch> withoutStopWords = searchService.search(text, "the", new SearchSettings(false, true, true, true), null);
+        assertNotNull(withoutStopWords);
+        assertEquals(0, withoutStopWords.size());
+    }
 }

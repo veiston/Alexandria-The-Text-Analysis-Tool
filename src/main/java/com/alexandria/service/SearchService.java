@@ -15,6 +15,10 @@ public class SearchService implements SearchServiceINT {
             return Collections.emptyList();
         }
 
+        if (setting.ignoreStopWords() && STOP_WORDS.contains(term.toLowerCase(Locale.ROOT))) {
+            return Collections.emptyList();
+        }
+
         List<Integer> paragraphOffsets = resolveParagraphOffsets(content);
 
         if (setting.fuzzy()) {
@@ -35,7 +39,12 @@ public class SearchService implements SearchServiceINT {
             flags = Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE;
         }
 
-        return Pattern.compile(query, flags).matcher(content).results()
+        var results = Pattern.compile(query, flags).matcher(content).results();
+        if (setting.ignoreStopWords()) {
+            results = results.filter(m -> !STOP_WORDS.contains(content.substring(m.start(), m.end()).toLowerCase(Locale.ROOT)));
+        }
+
+        return results
                 .map(m -> {
                     String ctx = content
                             .substring(Math.max(0, m.start() - 40), Math.min(content.length(), m.end() + 40)).strip();

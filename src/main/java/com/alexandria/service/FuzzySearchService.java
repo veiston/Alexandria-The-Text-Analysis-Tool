@@ -45,9 +45,15 @@ public class FuzzySearchService {
 
         boolean caseSensitive = false;
         boolean wholeWordsOnly = false;
+        boolean ignoreStopWords = false;
         if (setting != null) {
             caseSensitive = setting.caseSensitive();
             wholeWordsOnly = setting.wholeWordsOnly();
+            ignoreStopWords = setting.ignoreStopWords();
+        }
+
+        if (ignoreStopWords && AnalysisUtils.STOP_WORDS.contains(searchable.toLowerCase())) {
+            return matches;
         }
 
         int m = searchable.length();
@@ -161,6 +167,12 @@ public class FuzzySearchService {
                     }
                 }
             }
+        }
+
+        if (ignoreStopWords) {
+            return matches.stream()
+                    .filter(match -> !AnalysisUtils.STOP_WORDS.contains(match.text().toLowerCase()))
+                    .toList();
         }
 
         return matches;
