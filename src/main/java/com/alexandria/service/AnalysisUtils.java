@@ -8,13 +8,49 @@ import com.alexandria.service.analysis.WordFrequency;
 
 class AnalysisUtils {
 
-    static Integer resolvePage(int offset, List<Integer> pageOffsets) {
-        if (pageOffsets == null || pageOffsets.isEmpty()) return null;
-        int idx = Collections.binarySearch(pageOffsets, offset);
-        if (idx >= 0) return idx + 1;
+    static Integer resolveIndex(int offset, List<Integer> offsets) {
+        if (offsets == null || offsets.isEmpty()) {
+            return null;
+        }
+        int idx = Collections.binarySearch(offsets, offset);
+        if (idx >= 0) {
+            return idx + 1;
+        }
         int insertionPoint = -idx - 1;
         return Math.max(1, insertionPoint);
     }
+
+    static Integer resolvePage(int offset, List<Integer> pageOffsets) {
+        return resolveIndex(offset, pageOffsets);
+    }
+
+    static Integer resolveParagraph(int offset, List<Integer> paragraphOffsets) {
+        return resolveIndex(offset, paragraphOffsets);
+    }
+
+    static List<Integer> resolveParagraphOffsets(String content) {
+        if (content == null || content.isBlank()) {
+            return Collections.emptyList();
+        }
+        List<Integer> offsets = new ArrayList<>();
+        String[] paragraphs = PARAGRAPH_SPLIT_PATTERN.split(content);
+        int searchFrom = 0;
+        for (String paragraph : paragraphs) {
+            if (paragraph.isBlank()) {
+                continue;
+            }
+            int idx = content.indexOf(paragraph, searchFrom);
+            if (idx >= 0) {
+                offsets.add(idx);
+                searchFrom = idx + paragraph.length();
+            }
+        }
+        if (offsets.isEmpty()) {
+            offsets.add(0);
+        }
+        return offsets;
+    }
+
 
     static final Pattern WORD_PATTERN = Pattern.compile("[\\p{L}]+");
     static final Pattern SENTENCE_PATTERN = Pattern.compile("[^.!?]+[.!?]*");

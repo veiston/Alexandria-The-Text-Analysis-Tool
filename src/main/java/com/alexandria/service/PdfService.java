@@ -25,7 +25,9 @@ public class PdfService {
 	}
 
 	public Map<Integer, String> extractPages(File file) throws IOException {
-		if (file == null || !file.exists()) throw new FileNotFoundException("PDF not found: " + file);
+		if (file == null || !file.exists()) {
+			throw new FileNotFoundException("PDF not found: " + file);
+		}
 
 		var pages = new LinkedHashMap<Integer, String>();
 		try (var reader = new PdfReader(file);
@@ -44,7 +46,9 @@ public class PdfService {
 	}
 
 	public PagedText extractTextWithPageBoundaries(File file) throws IOException {
-		if (file == null || !file.exists()) throw new FileNotFoundException("PDF not found: " + file);
+		if (file == null || !file.exists()) {
+			throw new FileNotFoundException("PDF not found: " + file);
+		}
 
 		var fullText = new StringBuilder();
 		var offsets = new ArrayList<Integer>();
@@ -55,14 +59,15 @@ public class PdfService {
 
 			for (int p = 1; p <= pdf.getNumberOfPages(); p++) {
 				String page = PdfTextExtractor.getTextFromPage(pdf.getPage(p), new SimpleTextExtractionStrategy());
+				offsets.add(fullText.length());
+				pageNumbers.add(p);
 				if (page != null && !page.isBlank()) {
-					offsets.add(fullText.length());
-					pageNumbers.add(p);
-					fullText.append(page).append("\n\n");
+					fullText.append(page);
 				}
+				fullText.append("\n\n");
 			}
 		}
-		return new PagedText(fullText.toString().strip(), Collections.unmodifiableList(offsets), Collections.unmodifiableList(pageNumbers));
+		return new PagedText(fullText.toString().stripTrailing(), Collections.unmodifiableList(offsets), Collections.unmodifiableList(pageNumbers));
 	}
 
 	public record PagedText(String content, List<Integer> pageOffsets, List<Integer> pageNumbers) {

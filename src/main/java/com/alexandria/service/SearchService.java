@@ -11,11 +11,14 @@ public class SearchService implements SearchServiceINT {
 
     @Override
     public List<SearchMatch> search(String content, String term, SearchSettings setting, List<Integer> pageOffsets) {
-        if (content == null || content.isBlank() || term == null || term.isBlank())
+        if (content == null || content.isBlank() || term == null || term.isBlank()) {
             return Collections.emptyList();
+        }
+
+        List<Integer> paragraphOffsets = resolveParagraphOffsets(content);
 
         if (setting.fuzzy()) {
-            return new FuzzySearchService().findWithFuzzy(content, term);
+            return new FuzzySearchService().findWithFuzzy(content, term, setting, pageOffsets, paragraphOffsets);
         }
 
         String query;
@@ -37,7 +40,8 @@ public class SearchService implements SearchServiceINT {
                     String ctx = content
                             .substring(Math.max(0, m.start() - 40), Math.min(content.length(), m.end() + 40)).strip();
                     Integer page = resolvePage(m.start(), pageOffsets);
-                    return new SearchMatch(content.substring(m.start(), m.end()), m.start(), m.end(), page, null, ctx);
+                    Integer paragraph = resolveParagraph(m.start(), paragraphOffsets);
+                    return new SearchMatch(content.substring(m.start(), m.end()), m.start(), m.end(), page, paragraph, ctx);
                 })
                 .toList();
     }
