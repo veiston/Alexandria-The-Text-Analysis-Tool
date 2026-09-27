@@ -1,1 +1,71 @@
-// Jenkinsfile pipeline script
+pipeline {
+    agent any
+
+    tools {
+        maven 'Maven3'
+    }
+
+    stages {
+        stage('Code Checkout') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/veiston/Alexandria-The-Text-Analysis-Tool.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                script {
+                    if (isUnix()) {
+                        sh 'mvn clean compile'
+                    } else {
+                        bat 'mvn clean compile'
+                    }
+                }
+            }
+        }
+
+        stage('Unit Tests') {
+            steps {
+                script {
+                    if (isUnix()) {
+                        sh 'mvn test'
+                    } else {
+                        bat 'mvn test'
+                    }
+                }
+            }
+        }
+
+        stage('Generate JaCoCo Report') {
+            steps {
+                script {
+                    if (isUnix()) {
+                        sh 'mvn verify'
+                    } else {
+                        bat 'mvn verify'
+                    }
+                }
+            }
+        }
+
+        stage('Publish Test Results') {
+            steps {
+                junit 'target/surefire-reports/*.xml'
+            }
+        }
+
+        stage('Publish JaCoCo Report') {
+            steps {
+                publishHTML(target: [
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'target/site/jacoco',
+                    reportFiles: 'index.html',
+                    reportName: 'JaCoCo Coverage Report'
+                ])
+            }
+        }
+    }
+}
