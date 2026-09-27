@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Code Checkout') {
             steps {
-                git branch: 'main',
+                git branch: 'jenkins-docker',
                     url: 'https://github.com/veiston/Alexandria-The-Text-Analysis-Tool.git'
             }
         }
