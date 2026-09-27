@@ -22,7 +22,7 @@ public class SettingsScreen extends VBox {
         Label title = new Label("Settings");
         title.getStyleClass().add("heading-xl");
 
-        Label subtitle = new Label("Manage your application preferences.");
+        Label subtitle = new Label("Manage your application preferences");
         subtitle.getStyleClass().add("text-muted");
 
         Label appearanceTitle = new Label("Appearance");
@@ -33,6 +33,7 @@ public class SettingsScreen extends VBox {
         HBox.setHgrow(darkThemeLabel, Priority.ALWAYS);
 
         ToggleSwitch darkThemeToggle = new ToggleSwitch();
+
         darkThemeToggle.setSelected(ThemeSettings.isDarkTheme());
         darkThemeToggle.setOnAction(event -> ThemeSettings.setDarkTheme(
                 getScene() == null ? null : getScene().getRoot(),
@@ -49,11 +50,10 @@ public class SettingsScreen extends VBox {
         Label languageTitle = new Label("Language");
         languageTitle.getStyleClass().add("heading-lg");
 
-        Label languageStatus = new Label(
-                "Language settings are under development and will be available later.");
+        Label languageStatus = new Label("Language settings are under development and will be available later.");
         languageStatus.getStyleClass().add("text-muted");
 
-        Label userGuideTitle = new Label("Additional Dettings");
+        Label userGuideTitle = new Label("Additional Ыettings");
         userGuideTitle.getStyleClass().add("heading-lg");
 
         Label userGuideLabel = new Label("Show user tour on next launch");
@@ -62,8 +62,7 @@ public class SettingsScreen extends VBox {
 
         ToggleSwitch userGuideToggle = new ToggleSwitch();
         userGuideToggle.setSelected(UserGuideSettings.isShownOnStartup());
-        userGuideToggle.setOnAction(event ->
-                UserGuideSettings.setShownOnStartup(userGuideToggle.isSelected()));
+        userGuideToggle.setOnAction(event -> UserGuideSettings.setShownOnStartup(userGuideToggle.isSelected()));
 
         HBox userGuideRow = new HBox(20, userGuideLabel, userGuideToggle);
         userGuideRow.setAlignment(Pos.CENTER_LEFT);
@@ -74,15 +73,15 @@ public class SettingsScreen extends VBox {
         languageDivider.setMaxWidth(Double.MAX_VALUE);
 
         getChildren().addAll(
-                title,
-                subtitle,
-                appearanceTitle,
-                darkThemeRow,
-                divider,
-                languageTitle,
-                languageStatus,
-                languageDivider,
-                userGuideTitle,
-                userGuideRow);
+            title,
+            subtitle,
+            appearanceTitle,
+            darkThemeRow,
+            divider,
+            languageTitle,
+            languageStatus,
+            languageDivider,
+            userGuideTitle,
+            userGuideRow);
     }
 }
