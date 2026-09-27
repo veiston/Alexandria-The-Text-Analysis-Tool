@@ -4,6 +4,8 @@ import java.util.function.Consumer;
 
 import com.alexandria.view.components.side_navbar.SideNavbar;
 import com.alexandria.view.components.shared.modal.Modal;
+import com.alexandria.view.components.shared.tour.Tour;
+import com.alexandria.view.components.user_guide.UserGuideTour;
 import com.alexandria.view.components.side_navbar.new_project.NewProjectModal;
 import com.alexandria.view.router.Route;
 import com.alexandria.view.router.ViewRouter;
@@ -19,15 +21,25 @@ public class MainView extends StackPane {
     private final Modal modal = new Modal();
     private final NewProjectModal newProjectModal = new NewProjectModal();
 
+    private final Tour tour = new Tour();
+    private final UserGuideTour userGuideTour;
+
     public MainView() {
         sideNavbar = new SideNavbar();
         viewRouter = new ViewRouter();
+		
+        userGuideTour = new UserGuideTour(tour, sideNavbar, viewRouter, modal, newProjectModal);
 
         BorderPane shell = new BorderPane();
         shell.setLeft(sideNavbar);
         shell.setCenter(viewRouter);
 
-        getChildren().addAll(shell, modal);
+        tour.prefWidthProperty().bind(widthProperty());
+        tour.prefHeightProperty().bind(heightProperty());
+
+        getChildren().addAll(shell, modal, tour);
+
+        addEventHandler(Tour.START_EVENT, event -> userGuideTour.start());
 
         configureNavigation();
 

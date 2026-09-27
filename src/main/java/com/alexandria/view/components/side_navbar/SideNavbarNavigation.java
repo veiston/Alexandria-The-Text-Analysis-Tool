@@ -1,6 +1,8 @@
 package com.alexandria.view.components.side_navbar;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import org.kordamp.ikonli.Ikon;
@@ -15,6 +17,7 @@ import javafx.scene.layout.VBox;
 public class SideNavbarNavigation {
 
     private final ToggleGroup navGroup = new ToggleGroup();
+    private final Map<String, ToggleButton> navButtons = new HashMap<>();
 
     private final VBox mainNavigation;
     private final VBox footerNavigation;
@@ -64,7 +67,6 @@ public class SideNavbarNavigation {
         icon.getStyleClass().add("nav-item-icon");
 
         button.setGraphic(icon);
-        button.setUserData(item.id());
         button.setToggleGroup(navGroup);
         button.setMaxWidth(Double.MAX_VALUE);
         button.setAlignment(Pos.CENTER_LEFT);
@@ -81,6 +83,7 @@ public class SideNavbarNavigation {
             }
         });
 
+        navButtons.put(item.id(), button);
         return button;
     }
 
@@ -93,11 +96,9 @@ public class SideNavbarNavigation {
     }
 
     public void selectItem(String id) {
-        for (var toggle : navGroup.getToggles()) {
-            if (toggle instanceof ToggleButton button && id.equals(button.getUserData())) {
-                button.setSelected(true);
-                break;
-            }
+        ToggleButton button = navButtons.get(id);
+        if (button != null) {
+            button.setSelected(true);
         }
     }
 
@@ -107,6 +108,10 @@ public class SideNavbarNavigation {
 
     public void setOnFooterNavigate(Consumer<String> handler) {
         this.onFooterNavigate = handler;
+    }
+
+    public ToggleButton getButton(String id) {
+        return navButtons.get(id);
     }
 
     private record NavItem(

@@ -1,1 +1,102 @@
-// Jenkinsfile pipeline script
+// The report is published to GitHub Pages only by Kseniia's Jenkins.
+
+pipeline {
+    agent any
+
+    tools {
+        maven 'Maven3'
+    }
+
+    stages {
+        stage('Code Checkout') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/veiston/Alexandria-The-Text-Analysis-Tool.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                script {
+                    if (isUnix()) {
+                        sh 'mvn clean compile'
+                    } else {
+                        bat 'mvn clean compile'
+                    }
+                }
+            }
+        }
+
+        stage('Unit Tests') {
+            steps {
+                script {
+                    if (isUnix()) {
+                        sh 'mvn test'
+                    } else {
+                        bat 'mvn test'
+                    }
+                }
+            }
+        }
+
+        stage('Generate JaCoCo Report') {
+            steps {
+                script {
+                    if (isUnix()) {
+                        sh 'mvn verify'
+                    } else {
+                        bat 'mvn verify'
+                    }
+                }
+            }
+        }
+
+        stage('Publish Test Results') {
+            steps {
+                junit 'target/surefire-reports/*.xml'
+            }
+        }
+
+        stage('Publish JaCoCo Report') {
+            steps {
+                publishHTML(target: [
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'target/site/jacoco',
+                    reportFiles: 'index.html',
+                    reportName: 'JaCoCo Coverage Report'
+                ])
+            }
+        }
+
+        stage('Publish JaCoCo Report to GitHub Pages') {
+            when {
+                environment name: 'PUBLISH_GITHUB_PAGES', value: 'true'
+            }
+
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'alexandria-jacoco-reports-credentials',
+                    usernameVariable: 'GITHUB_USERNAME',
+                    passwordVariable: 'GITHUB_TOKEN'
+                )]) {
+                    sh '''
+                        rm -rf jacoco-pages
+                        mkdir jacoco-pages
+                        cp -R target/site/jacoco/. jacoco-pages/
+                        cd jacoco-pages
+                        git init
+                        git checkout -b gh-pages
+                        git config user.name "Jenkins"
+                        git config user.email "kseniia.shlenskaia@gmail.com"
+                        git add .
+                        git commit -m "Publish JaCoCo report build ${BUILD_NUMBER}"
+                        git remote add origin "https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/x-bananer/alexandria-jacoco-reports.git"
+                        git push --force origin gh-pages
+                    '''
+                }
+            }
+        }
+    }
+}

@@ -1,6 +1,8 @@
 package com.alexandria.controller;
 
 import com.alexandria.model.Text;
+import com.alexandria.model.Quotation;
+import com.alexandria.model.User;
 import com.alexandria.service.analysis.SearchMatch;
 import com.alexandria.service.analysis.SearchServiceINT;
 import com.alexandria.service.analysis.SearchSettings;
@@ -18,9 +20,13 @@ public class AnalyseController {
     private final SearchServiceINT searchService;
     private final TermAnalysisServiceINT termAnalysisService;
     private final TextAnalysisServiceINT textAnalysisService;
+    private final QuotationController quotationController;
+    private final UserSessionController session = UserSessionController.getInstance();
 
     private Text currentText;
     private List<Integer> currentPageOffsets = List.of();
+    private List<SearchMatch> currentSearchMatches = List.of();
+    private int currentSearchMatchIndex = -1;
 
     public AnalyseController(
             SearchServiceINT searchService,
@@ -30,6 +36,7 @@ public class AnalyseController {
         this.searchService = searchService;
         this.termAnalysisService = termAnalysisService;
         this.textAnalysisService = textAnalysisService;
+        this.quotationController = new QuotationController();
     }
 
     public TextAnalysisOutcome openText(Text text, List<Integer> pageOffsets) {
@@ -40,8 +47,20 @@ public class AnalyseController {
         currentPageOffsets = pageOffsets == null ? List.of() : List.copyOf(pageOffsets);
 
         try {
+            User user = session.getCurrentUser();
+            Integer userId = user == null ? null : user.getId();
+            Integer textId = text.getId();
+
+
+            if (!java.util.Objects.equals(userId, text.getUserId())) {
+                userId = null;
+                textId = null;
+            }
+
+            quotationController.openText(userId, textId);
+            clearSearchState();
             return TextAnalysisOutcome.ok(computeTextAnalysis());
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return TextAnalysisOutcome.error(
                     "Could not process text analysis: " + e.getMessage());
         }
@@ -53,15 +72,22 @@ public class AnalyseController {
             List<Integer> pageOffsets,
             File sourceFile) {
 
+        TextAnalysisOutcome outcome = openText(
+                text,
+                pageOffsets);
+
         analyseScreen.loadDocument(
                 text.getTitle(),
                 text.getFileName(),
                 text.getContent(),
                 text.getFileType(),
-                sourceFile == null ? null : sourceFile.toPath(),
+                sourceFile == null
+                        ? null
+                        : sourceFile.toPath(),
                 pageOffsets);
 
-        TextAnalysisOutcome outcome = openText(text, pageOffsets);
+        analyseScreen.setQuotations(
+                quotationController.getQuotations());
 
         if (!outcome.success()) {
             System.err.println(outcome.message());
@@ -75,6 +101,21 @@ public class AnalyseController {
                 analysis.importantFragments());
 
         configureTermDetail(analyseScreen);
+        configureQuotations(analyseScreen);
+        configureSearch(analyseScreen);
+    }
+
+    public SearchOutcome search(String term) {
+        SearchOutcome outcome = search(term, false, false, false);
+
+        if (outcome.success()) {
+            currentSearchMatches = outcome.matches();
+            currentSearchMatchIndex = currentSearchMatches.isEmpty() ? -1 : 0;
+        } else {
+            clearSearchState();
+        }
+
+        return outcome;
     }
 
     public SearchOutcome search(
@@ -108,6 +149,31 @@ public class AnalyseController {
             return SearchOutcome.error(
                     "Could not complete search: " + e.getMessage());
         }
+    }
+
+    public SearchMatch nextMatch() {
+        if (currentSearchMatches.isEmpty()) {
+            return null;
+        }
+
+        currentSearchMatchIndex = (currentSearchMatchIndex + 1)
+                % currentSearchMatches.size();
+        return currentSearchMatches.get(currentSearchMatchIndex);
+    }
+
+    public SearchMatch previousMatch() {
+        if (currentSearchMatches.isEmpty()) {
+            return null;
+        }
+
+        currentSearchMatchIndex = (currentSearchMatchIndex - 1
+                + currentSearchMatches.size()) % currentSearchMatches.size();
+        return currentSearchMatches.get(currentSearchMatchIndex);
+    }
+
+    private void clearSearchState() {
+        currentSearchMatches = List.of();
+        currentSearchMatchIndex = -1;
     }
 
     private TextAnalysisResult computeTextAnalysis() {
@@ -147,6 +213,121 @@ public class AnalyseController {
                     word,
                     outcome.termAnalysis(),
                     outcome.matches());
+        });
+    }
+
+    private void configureQuotations(
+            AnalyseScreen analyseScreen) {
+
+        analyseScreen.setOnQuotationRequested(
+                (quotationText, location) -> {
+
+                    Quotation quotation;
+
+                    try {
+                        quotation = quotationController.addQuotation(
+                                quotationText,
+                                location);
+                    } catch (Exception e) {
+                        System.err.println("Could not save quotation: " + e.getMessage());
+                        return null;
+                    }
+
+                    if (quotation == null) {
+                        return null;
+                    }
+
+                    analyseScreen.setQuotations(
+                            quotationController.getQuotations());
+
+                    return quotation.getId();
+                });
+
+        analyseScreen.setOnQuotationDeleteRequested(
+                quotation -> {
+
+                    if (quotation == null
+                            || quotation.getId() == null) {
+                        return;
+                    }
+
+                    int quotationId = quotation.getId();
+
+                    boolean removed;
+
+                    try {
+                        removed = quotationController.removeQuotation(quotationId);
+                    } catch (Exception e) {
+                        System.err.println("Could not delete quotation: " + e.getMessage());
+                        return;
+                    }
+
+                    if (!removed) {
+                        return;
+                    }
+
+                    analyseScreen.removeQuotationHighlight(
+                            quotationId);
+
+                    analyseScreen.setQuotations(
+                            quotationController.getQuotations());
+                });
+
+        analyseScreen.setOnQuotationEditRequested(
+                quotation -> {
+                    if (quotation == null || quotation.getId() == null) {
+                        return;
+                    }
+
+                    try {
+                        boolean updated = quotationController.updateQuotation(quotation);
+
+                        if (!updated) {
+                            quotationController.reloadQuotations();
+                        }
+                    } catch (Exception e) {
+                        System.err.println("Could not update quotation: " + e.getMessage());
+
+                        try {
+                            quotationController.reloadQuotations();
+                        } catch (Exception reloadError) {
+                            System.err.println("Could not reload quotations: " + reloadError.getMessage());
+                        }
+                    }
+
+                    analyseScreen.setQuotations(quotationController.getQuotations());
+                });
+    }
+
+    private void configureSearch(AnalyseScreen analyseScreen) {
+        analyseScreen.setOnSearch(term -> {
+            SearchOutcome outcome = search(term);
+
+            if (!outcome.success()) {
+                System.err.println(outcome.message());
+                return;
+            }
+
+            analyseScreen.showSearchResults(
+                    term,
+                    outcome.matches(),
+                    outcome.termAnalysis());
+        });
+
+        analyseScreen.setOnPreviousMatch(() -> {
+            if (previousMatch() != null) {
+                analyseScreen.showSearchMatch(
+                        currentSearchMatches,
+                        currentSearchMatchIndex);
+            }
+        });
+
+        analyseScreen.setOnNextMatch(() -> {
+            if (nextMatch() != null) {
+                analyseScreen.showSearchMatch(
+                        currentSearchMatches,
+                        currentSearchMatchIndex);
+            }
         });
     }
 

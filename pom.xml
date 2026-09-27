@@ -8,8 +8,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.alexandria</groupId>
-    <artifactId>fuzzy</artifactId>
-    <version>1</version>
+    <artifactId>alexandria</artifactId>
+    <version>1.0.0</version>
 
     <name>Alexandria - Text Analysis Tool</name>
 
@@ -222,5 +222,26 @@
         </pluginManagement>
 
     </build>
+
+    <profiles>
+        <profile>
+            <id>docker</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/view/**/*.java</exclude>
+                                <exclude>**/dao/**/*.java</exclude>
+                                <exclude>**/db/**/*.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>
