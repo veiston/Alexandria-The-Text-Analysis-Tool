@@ -325,3 +325,64 @@
 .analyse-sidebar-scroll > .scroll-bar:vertical > .thumb:hover {
     -fx-background-color: -fx-foreground-faint;
 }
+
+/* search */
+
+.search-section {
+    -fx-padding: 10px 0 0 0;
+}
+
+.search-box {
+    -fx-background-color: -fx-surface;
+    -fx-border-color: -fx-border-subtle;
+    -fx-border-width: 1px;
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+    -fx-padding: 0;
+}
+
+.search-box .text-field {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 6px 8px;
+    -fx-font-size: 11px;
+}
+
+/* SearchView */
+
+.search-view {
+    -fx-spacing: 6px;
+}
+.search-navigation-buttons {
+    -fx-spacing: 6px;
+}
+.search-navigation-button {
+    -fx-min-width: 36px;
+    -fx-pref-width: 36px;
+    -fx-min-height: 36px;
+    -fx-pref-height: 36px;
+
+    -fx-padding: 0;
+
+    -fx-background-color: transparent;
+    -fx-background-radius: 5px;
+
+    -fx-border-color: -fx-border-subtle;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+
+    -fx-alignment: CENTER;
+}
+.search-navigation-button:hover {
+    -fx-background-color: -fx-surface-hover;
+}
+.search-navigation-button:pressed {
+    -fx-background-color: -fx-border-subtle;
+}
+
+/* The actual FontAwesome icon */
+
+.search-navigation-button .ikonli-font-icon {
+    -fx-icon-color: -fx-foreground-muted;
+    -fx-icon-size: 12px;
+}

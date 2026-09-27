@@ -5,11 +5,13 @@ import java.util.List;
 import java.util.Locale;
 
 public final class TxtHighlight {
-
+    public static final String ACTIVE_SEARCH_STYLE_CLASS = "text-search-highlight-active";
     public static final String SEARCH_STYLE_CLASS = "txt-search-highlight";
     public static final String QUOTATION_STYLE_CLASS = "txt-quotation-highlight";
+
     public record Range(int start, int end) {
     }
+
     private TxtHighlight() {
     }
 

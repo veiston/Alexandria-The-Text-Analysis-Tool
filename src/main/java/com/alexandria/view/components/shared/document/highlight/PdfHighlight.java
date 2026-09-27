@@ -14,6 +14,7 @@ import java.util.Locale;
 public final class PdfHighlight {
 
     public static final String SEARCH_STYLE_CLASS = "pdf-search-highlight";
+    public static final String ACTIVE_SEARCH_STYLE_CLASS = "pdf-search-highlight-active";
     public static final String QUOTATION_STYLE_CLASS = "pdf-quotation-highlight";
 
     private PdfHighlight() {

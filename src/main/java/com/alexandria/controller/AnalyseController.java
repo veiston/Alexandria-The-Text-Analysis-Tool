@@ -25,6 +25,8 @@ public class AnalyseController {
 
     private Text currentText;
     private List<Integer> currentPageOffsets = List.of();
+    private List<SearchMatch> currentSearchMatches = List.of();
+    private int currentSearchMatchIndex = -1;
 
     public AnalyseController(
             SearchServiceINT searchService,
@@ -56,6 +58,7 @@ public class AnalyseController {
             }
 
             quotationController.openText(userId, textId);
+            clearSearchState();
             return TextAnalysisOutcome.ok(computeTextAnalysis());
         } catch (Exception e) {
             return TextAnalysisOutcome.error(
@@ -99,6 +102,20 @@ public class AnalyseController {
 
         configureTermDetail(analyseScreen);
         configureQuotations(analyseScreen);
+        configureSearch(analyseScreen);
+    }
+
+    public SearchOutcome search(String term) {
+        SearchOutcome outcome = search(term, false, false, false);
+
+        if (outcome.success()) {
+            currentSearchMatches = outcome.matches();
+            currentSearchMatchIndex = currentSearchMatches.isEmpty() ? -1 : 0;
+        } else {
+            clearSearchState();
+        }
+
+        return outcome;
     }
 
     public SearchOutcome search(
@@ -132,6 +149,31 @@ public class AnalyseController {
             return SearchOutcome.error(
                     "Could not complete search: " + e.getMessage());
         }
+    }
+
+    public SearchMatch nextMatch() {
+        if (currentSearchMatches.isEmpty()) {
+            return null;
+        }
+
+        currentSearchMatchIndex = (currentSearchMatchIndex + 1)
+                % currentSearchMatches.size();
+        return currentSearchMatches.get(currentSearchMatchIndex);
+    }
+
+    public SearchMatch previousMatch() {
+        if (currentSearchMatches.isEmpty()) {
+            return null;
+        }
+
+        currentSearchMatchIndex = (currentSearchMatchIndex - 1
+                + currentSearchMatches.size()) % currentSearchMatches.size();
+        return currentSearchMatches.get(currentSearchMatchIndex);
+    }
+
+    private void clearSearchState() {
+        currentSearchMatches = List.of();
+        currentSearchMatchIndex = -1;
     }
 
     private TextAnalysisResult computeTextAnalysis() {
@@ -255,6 +297,38 @@ public class AnalyseController {
 
                     analyseScreen.setQuotations(quotationController.getQuotations());
                 });
+    }
+
+    private void configureSearch(AnalyseScreen analyseScreen) {
+        analyseScreen.setOnSearch(term -> {
+            SearchOutcome outcome = search(term);
+
+            if (!outcome.success()) {
+                System.err.println(outcome.message());
+                return;
+            }
+
+            analyseScreen.showSearchResults(
+                    term,
+                    outcome.matches(),
+                    outcome.termAnalysis());
+        });
+
+        analyseScreen.setOnPreviousMatch(() -> {
+            if (previousMatch() != null) {
+                analyseScreen.showSearchMatch(
+                        currentSearchMatches,
+                        currentSearchMatchIndex);
+            }
+        });
+
+        analyseScreen.setOnNextMatch(() -> {
+            if (nextMatch() != null) {
+                analyseScreen.showSearchMatch(
+                        currentSearchMatches,
+                        currentSearchMatchIndex);
+            }
+        });
     }
 
     public record TextAnalysisOutcome(
