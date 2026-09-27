@@ -48,6 +48,10 @@
     -fx-stroke-width: 1px;
 }
 
+.text-search-highlight-active {
+    -fx-fill: rgba(255, 140, 0, 0.75);
+}
+
 /* --- Quotation popup --------------------------------------------------- */
 
 /* Floating "Add quotation" popup shown near a selection */
