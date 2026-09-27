@@ -26,8 +26,6 @@
 
 .pdf-search-highlight-active {
     -fx-fill: rgba(255, 140, 0, 0.45);
-    -fx-stroke: #e07b00;
-    -fx-stroke-width: 2px;
 }
 
 /* --- TXT -------------------------------------------------------------- */
