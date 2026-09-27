@@ -18,9 +18,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class TrackedWordsList extends VBox {
-
-    private static final String ACTIVE_STYLE_CLASS = "tracked-word-active";
-
     private final Label headingLabel = new Label("Tracked Words");
     private final Label countBadge = new Label("0");
     private final FontIcon toggleIcon = new FontIcon(FontAwesomeSolid.CHEVRON_UP);
@@ -104,25 +101,15 @@ public class TrackedWordsList extends VBox {
         showEmptyIfNeeded();
     }
 
-    public String activeHighlightColorClass() {
-        return ACTIVE_STYLE_CLASS;
-    }
-
     public void setActiveTerm(String word) {
         if (activeTerm != null) {
             Row previous = rows.get(activeTerm);
-            if (previous != null) {
-                previous.container.getStyleClass().remove(ACTIVE_STYLE_CLASS);
-            }
         }
 
         activeTerm = word;
 
         if (activeTerm != null) {
             Row current = rows.get(activeTerm);
-            if (current != null) {
-                current.container.getStyleClass().add(ACTIVE_STYLE_CLASS);
-            }
         }
     }
 
