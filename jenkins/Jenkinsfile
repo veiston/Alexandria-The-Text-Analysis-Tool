@@ -90,7 +90,7 @@ pipeline {
                                 git init
                                 git checkout -b gh-pages
                                 git config user.name "Jenkins"
-                                git config user.email "xeniya.shlyonskaya@gmail.com"
+                                git config user.email "kseniia.shlenskaia@gmail.com"
                                 git add .
                                 git commit -m "Publish JaCoCo report build ${BUILD_NUMBER}"
                                 git remote add origin "https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/x-bananer/alexandria-jacoco-reports.git"
@@ -106,7 +106,7 @@ pipeline {
                                 git init
                                 git checkout -b gh-pages
                                 git config user.name "Jenkins"
-                                git config user.email "xeniya.shlyonskaya@gmail.com"
+                                git config user.email "kseniia.shlenskaia@gmail.com"
                                 git add .
                                 git commit -m "Publish JaCoCo report build %BUILD_NUMBER%"
                                 git remote add origin "https://%GITHUB_USERNAME%:%GITHUB_TOKEN%@github.com/x-bananer/alexandria-jacoco-reports.git"
