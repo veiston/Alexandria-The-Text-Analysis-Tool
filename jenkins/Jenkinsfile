@@ -1,5 +1,6 @@
 // Required Jenkins plugins:
 // - HTML Publisher
+// - Credentials Binding
 
 pipeline {
     agent any
@@ -68,6 +69,52 @@ pipeline {
                     reportFiles: 'index.html',
                     reportName: 'JaCoCo Coverage Report'
                 ])
+            }
+        }
+
+        stage('Publish to GitHub Pages') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'alexandria-jacoco-reports-credentials',
+                    usernameVariable: 'GITHUB_USERNAME',
+                    passwordVariable: 'GITHUB_TOKEN'
+                )]) {
+                    script {
+                        if (isUnix()) {
+                            sh '''
+                                rm -rf jacoco-pages
+                                mkdir jacoco-pages
+                                cp -R target/site/jacoco/. jacoco-pages/
+                                cd jacoco-pages
+                                touch .nojekyll
+                                git init
+                                git checkout -b gh-pages
+                                git config user.name "Jenkins"
+                                git config user.email "jenkins@localhost"
+                                git add .
+                                git commit -m "Publish JaCoCo report build ${BUILD_NUMBER}"
+                                git remote add origin "https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/x-bananer/alexandria-jacoco-reports.git"
+                                git push --force origin gh-pages
+                            '''
+                        } else {
+                            bat '''
+                                if exist jacoco-pages rmdir /s /q jacoco-pages
+                                mkdir jacoco-pages
+                                xcopy target\site\jacoco\* jacoco-pages\ /E /I /Y
+                                cd jacoco-pages
+                                type nul > .nojekyll
+                                git init
+                                git checkout -b gh-pages
+                                git config user.name "Jenkins"
+                                git config user.email "jenkins@localhost"
+                                git add .
+                                git commit -m "Publish JaCoCo report build %BUILD_NUMBER%"
+                                git remote add origin "https://%GITHUB_USERNAME%:%GITHUB_TOKEN%@github.com/x-bananer/alexandria-jacoco-reports.git"
+                                git push --force origin gh-pages
+                            '''
+                        }
+                    }
+                }
             }
         }
     }
