@@ -1,3 +1,6 @@
+// Required Jenkins plugins:
+// - HTML Publisher
+
 pipeline {
     agent any
 
