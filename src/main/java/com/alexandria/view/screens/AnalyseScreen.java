@@ -294,6 +294,10 @@ public class AnalyseScreen extends StackPane {
         return textTermFrequencyPanel;
     }
 
+    public SearchView getSearchView() {
+        return searchView;
+    }
+
     public TextContextPanel getTextContextPanel() {
         return textContextPanel;
     }

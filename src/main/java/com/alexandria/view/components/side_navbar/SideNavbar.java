@@ -19,6 +19,7 @@ public class SideNavbar extends VBox {
 
     private final Label titleLabel;
     private final Label subtitleLabel;
+    private final VBox brandSection;
     private final Button newProjectButton;
 
     private final SideNavbarNavigation navigation;
@@ -50,10 +51,11 @@ public class SideNavbar extends VBox {
 
         navigation = new SideNavbarNavigation();
 
+        brandSection = buildBrandSection();
         newProjectButton = buildNewProjectButton();
 
         getChildren().addAll(
-                buildBrandSection(),
+                brandSection,
                 newProjectButton,
                 navigation.getMainNavigation(),
                 buildSpacer(),
@@ -140,5 +142,9 @@ public class SideNavbar extends VBox {
 
     public Button getNewProjectButton() {
         return newProjectButton;
+    }
+
+    public VBox getBrandSection() {
+        return brandSection;
     }
 }

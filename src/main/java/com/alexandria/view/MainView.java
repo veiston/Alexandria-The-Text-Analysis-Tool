@@ -68,6 +68,10 @@ public class MainView extends StackPane {
         modal.hide();
     }
 
+    public void startUserGuide() {
+        userGuideTour.start();
+    }
+
     /* New Project */
 
     public void setOnProjectCreated(
