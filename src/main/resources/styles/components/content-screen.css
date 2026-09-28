@@ -1,0 +1,12 @@
+/* Shared layout for full-page content screens. */
+.content-screen {
+    -fx-background-color: -fx-background;
+}
+
+.content-screen-header {
+    -fx-padding: 24px 30px 16px;
+}
+
+.content-screen-body {
+    -fx-padding: 0 30px 30px;
+}

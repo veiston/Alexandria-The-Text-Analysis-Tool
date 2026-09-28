@@ -40,7 +40,7 @@ public class ArchiveScreen extends StackPane {
     private Runnable onShown = () -> {};
 
     public ArchiveScreen() {
-        getStyleClass().add("archive-screen");
+        getStyleClass().add("content-screen");
         searchInput.setMaxWidth(Double.MAX_VALUE);
 
         archiveLayout.setTop(buildHeader());
@@ -72,13 +72,13 @@ public class ArchiveScreen extends StackPane {
         subtitle.getStyleClass().add("archive-subtitle");
 
         VBox header = new VBox(6, title, subtitle);
-        header.getStyleClass().add("archive-header");
+        header.getStyleClass().add("content-screen-header");
         return header;
     }
 
     private VBox buildBody() {
         VBox archiveBody = new VBox(contentArea);
-        archiveBody.getStyleClass().add("archive-body");
+        archiveBody.getStyleClass().add("content-screen-body");
         VBox.setVgrow(contentArea, Priority.ALWAYS);
         return archiveBody;
     }

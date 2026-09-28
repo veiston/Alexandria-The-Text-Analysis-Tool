@@ -45,7 +45,7 @@ public class LibraryScreen extends StackPane {
     private Runnable onShown = () -> {};
 
     public LibraryScreen() {
-        getStyleClass().add("archive-screen");
+        getStyleClass().add("content-screen");
         searchInput.setMaxWidth(Double.MAX_VALUE);
 
         libraryLayout.setTop(buildHeader());
@@ -83,13 +83,13 @@ public class LibraryScreen extends StackPane {
         subtitle.getStyleClass().addAll("text-muted", "archive-subtitle");
 
         VBox header = new VBox(6, title, subtitle);
-        header.getStyleClass().add("archive-header");
+        header.getStyleClass().add("content-screen-header");
         return header;
     }
 
     private VBox buildBody() {
         VBox body = new VBox(contentArea);
-        body.getStyleClass().add("archive-body");
+        body.getStyleClass().add("content-screen-body");
         VBox.setVgrow(contentArea, Priority.ALWAYS);
         return body;
     }

@@ -1,17 +1,5 @@
-.archive-screen {
-    -fx-background-color: -fx-background;
-}
-
-.archive-header {
-    -fx-padding: 24px 30px 16px;
-}
-
 .archive-subtitle {
     -fx-font-size: 12px;
-}
-
-.archive-body {
-    -fx-padding: 0 30px 30px;
 }
 
 .archive-analysis-table {
