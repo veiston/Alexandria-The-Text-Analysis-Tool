@@ -223,4 +223,35 @@ public class TextAnalysisServiceTest {
         assertNotNull(withoutStopWords);
         assertEquals(0, withoutStopWords.size());
     }
+
+    @Test(timeout = 5000)
+    public void testAnalyzeLargeTextPerformance() {
+        String text = "text ".repeat(100_000);
+
+        long startedAt = System.nanoTime();
+        TextAnalysisResult result = textService.analyzeText(text);
+        long durationMillis = (System.nanoTime() - startedAt) / 1_000_000;
+
+        assertEquals(100_000, result.totalWords());
+        System.out.println("100 000 word analysis completed in " + durationMillis + " ms");
+    }
+
+    @Test(timeout = 5000)
+    public void testSearchLargeTextPerformance() {
+        StringBuilder text = new StringBuilder();
+        for (int i = 0; i < 100_000; i++) {
+            if (i % 1_000 == 0) {
+				text.append("target ");
+			} else {
+				text.append("word ");
+			}
+        }
+
+        long startedAt = System.nanoTime();
+        List<SearchMatch> matches = searchService.search(text.toString(), "target", SearchSettings.defaults(), List.of());
+        long durationMillis = (System.nanoTime() - startedAt) / 1_000_000;
+
+        assertEquals(100, matches.size());
+        System.out.println("100 000 word search completed in " + durationMillis + " ms");
+    }
 }
