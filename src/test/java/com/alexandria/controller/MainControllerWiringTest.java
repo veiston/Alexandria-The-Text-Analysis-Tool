@@ -5,6 +5,7 @@ import com.alexandria.dao.UserDAO;
 import com.alexandria.service.PdfService;
 import com.alexandria.view.MainView;
 import com.alexandria.view.screens.ArchiveScreen;
+import com.alexandria.view.screens.LibraryScreen;
 import com.alexandria.view.screens.ProfileScreen;
 
 import org.junit.Test;
@@ -25,6 +26,7 @@ public class MainControllerWiringTest {
                 MockedConstruction<MainView> mainViewConstruction = mockConstruction(MainView.class);
                 MockedConstruction<ProfileScreen> profileScreenConstruction = mockConstruction(ProfileScreen.class);
                 MockedConstruction<ArchiveScreen> archiveScreenConstruction = mockConstruction(ArchiveScreen.class);
+                MockedConstruction<LibraryScreen> libraryScreenConstruction = mockConstruction(LibraryScreen.class);
                 MockedConstruction<ProfileController> profileControllerConstruction = mockConstruction(
                         ProfileController.class);
                 MockedConstruction<ArchiveController> archiveControllerConstruction = mockConstruction(
@@ -57,8 +59,8 @@ public class MainControllerWiringTest {
             assertEquals(1, archiveScreenConstruction.constructed().size());
             assertEquals(1, archiveControllerConstruction.constructed().size());
 
-            // configureProject(): new ProjectController(new TextDAO(), new PdfService())
-            assertEquals(1, textDaoConstruction.constructed().size());
+            // configureLibrary() and configureProject() each construct a TextDAO.
+            assertEquals(2, textDaoConstruction.constructed().size());
             assertEquals(1, pdfServiceConstruction.constructed().size());
             assertEquals(1, projectControllerConstruction.constructed().size());
 
@@ -86,6 +88,7 @@ public class MainControllerWiringTest {
                 MockedConstruction<MainView> mainViewConstruction = mockConstruction(MainView.class);
                 MockedConstruction<ProfileScreen> profileScreenConstruction = mockConstruction(ProfileScreen.class);
                 MockedConstruction<ArchiveScreen> archiveScreenConstruction = mockConstruction(ArchiveScreen.class);
+                MockedConstruction<LibraryScreen> libraryScreenConstruction = mockConstruction(LibraryScreen.class);
                 MockedConstruction<ProfileController> profileControllerConstruction = mockConstruction(
                         ProfileController.class);
                 MockedConstruction<ArchiveController> archiveControllerConstruction = mockConstruction(
