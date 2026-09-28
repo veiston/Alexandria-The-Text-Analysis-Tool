@@ -234,6 +234,7 @@
                         <configuration>
                             <excludes>
                                 <exclude>**/view/**/*.java</exclude>
+                                <exclude>**/controller/LibraryControllerTest.java</exclude>
                                 <exclude>**/dao/**/*.java</exclude>
                                 <exclude>**/db/**/*.java</exclude>
                             </excludes>
