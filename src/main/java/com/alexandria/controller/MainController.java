@@ -48,6 +48,8 @@ public class MainController {
         libraryController = configureLibrary();
         configureProject();
         configureUserGuideTour();
+		
+        openInitialRoute();
     }
 
     private void restoreSession() {
@@ -56,6 +58,10 @@ public class MainController {
         } catch (Exception e) {
             System.err.println("Could not restore session: " + e.getMessage());
         }
+    }
+
+    private void openInitialRoute() {
+        mainView.navigateTo(session.isLoggedIn() ? Route.LIBRARY : Route.PROFILE);
     }
 
     private void configureProfile() {

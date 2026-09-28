@@ -43,7 +43,6 @@ public class MainView extends StackPane {
 
         configureNavigation();
 
-        viewRouter.navigateTo(Route.LIBRARY);
     }
 
     private void configureNavigation() {
