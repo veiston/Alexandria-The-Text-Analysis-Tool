@@ -49,8 +49,9 @@ public final class UserGuideData {
             "Signing in lets you save projects and findings to your account.");
 
     public static final List<String> SETTINGS_STEPS = List.of(
-            "Open Settings to manage application preferences.");
-    public static final String SETTINGS_NOTE = "More settings will be available in a future version";
+            "Use the Dark theme switch to choose between the light and dark appearance.",
+            "Turn on Show user tour on next launch to see this guided tour when you next open Alexandria.");
+    public static final String SETTINGS_NOTE = "Language settings are under development and will be available later.";
 
     private UserGuideData() {
     }

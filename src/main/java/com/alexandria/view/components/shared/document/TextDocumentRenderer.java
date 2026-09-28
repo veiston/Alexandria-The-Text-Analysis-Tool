@@ -109,6 +109,7 @@ public class TextDocumentRenderer {
             pageTexts.put(pageIndex, pageText);
 
             Text text = new Text(pageText);
+            text.getStyleClass().add("document-page-content");
             TextFlow flow = new TextFlow(text);
 
             flow.getStyleClass().add("document-page-text");

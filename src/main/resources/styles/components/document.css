@@ -60,7 +60,7 @@
 
 /* Floating "Add quotation" popup shown near a selection */
 .selection-popup {
-    -fx-background-color: -fx-control-inner-background;
+    -fx-background-color: -fx-surface;
     -fx-padding: 4px;
     -fx-background-radius: 6px;
     -fx-border-color: rgba(0, 0, 0, 0.15);
