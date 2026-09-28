@@ -46,9 +46,9 @@ Changes added to the repository:
 
 | Team Member | Assigned Tasks | Time Spent (hrs) | In-class Tasks |
 | --- | --- | ---: | --- |
-| Luara Moreira Da Silva | Analysis workflow, quotations, highlighting, selection, analysis and quotation tests, code review | TBA | TBA |
+| Luara Moreira Da Silva | Analysis workflow, quotations, highlighting, selection, analysis and quotation tests, code review | 37 | TBA |
 | Kseniia Shlenskaia | Settings, User Guide, Archive, statistics and quotations backend, Jenkins, JaCoCo, Docker | 31 | Submitted |
-| Veikka Liukkonen | Bug fixes: fuzzy search, PDF page and paragraph counting, Library UI, stop-word handling, and text comparison | TBA | TBA |
+| Veikka Liukkonen | Bug fixes: fuzzy search, PDF page and paragraph counting, Library UI, stop-word handling, and text comparison | 11.2 | TBA |
 | Unna Postila | Comparison screen and unit tests | TBA | TBA |
 
 ## Sprint Summary
