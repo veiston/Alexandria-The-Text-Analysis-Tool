@@ -1,109 +1,43 @@
 package com.alexandria.view.components.compare_screen;
 
-import javafx.geometry.Pos;
+import com.alexandria.view.components.shared.ScreenHeader;
+
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.ToggleButton;
 
-public class CompareHeader extends HBox {
+import java.util.function.IntConsumer;
 
-    private final Label title = new Label("Compare");
-    private final Label subtitle = new Label();
+public class CompareHeader extends ScreenHeader {
 
-    private final Button readerButton = new Button("Reader");
-    private final Button quotationsButton = new Button("Quotations");
-    private final Button saveButton = new Button("Save findings");
+    private final SimilarityIndicator similarityIndicator = new SimilarityIndicator();
+    private final Actions actions = new Actions("Reader", "Quotations", "Save Findings");
 
     public CompareHeader() {
-        getStyleClass().add("compare-header");
-
-        title.getStyleClass().add("heading-lg");
-        subtitle.getStyleClass().add("text-muted");
-
-        readerButton.getStyleClass().add("header-view-button");
-        quotationsButton.getStyleClass().add("header-view-button");
-        saveButton.getStyleClass().add("header-primary-button");
-
-        VBox titleBox = new VBox(2, title, subtitle);
-
-        HBox spacer = new HBox();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-
-        HBox actions = new HBox(
-                8,
-                readerButton,
-                quotationsButton,
-                saveButton);
-
-        actions.setAlignment(Pos.CENTER_RIGHT);
-
-        setAlignment(Pos.CENTER_LEFT);
-        setSpacing(12);
-
-        getChildren().addAll(titleBox, spacer, actions);
+        setContent(similarityIndicator, actions);
     }
 
-    public void setTitle(
-            String documentATitle,
-            String documentBTitle) {
-
-        title.setText("Compare");
-
-        subtitle.setText(
-                safe(documentATitle)
-                        + " vs "
-                        + safe(documentBTitle));
+    /** 0-100, or null while there is no result yet. */
+    public void setSimilarity(Double percent) {
+        similarityIndicator.setSimilarity(percent);
     }
 
-    private String safe(String value) {
-        return value == null || value.isBlank()
-                ? "Document"
-                : value;
-    }
-
-    public void resetToReader() {
-        readerButton.getStyleClass().add("active");
-        quotationsButton.getStyleClass().remove("active");
-    }
-
-    public Button getReaderButton() {
-        return readerButton;
-    }
-
-    public Button getQuotationsButton() {
-        return quotationsButton;
-    }
-
-    public Button getSaveButton() {
-        return saveButton;
+    public void setOnViewChange(IntConsumer handler) {
+        actions.setOnViewChange(handler);
     }
 
     public void setOnSave(Runnable handler) {
-        saveButton.setOnAction(
-                event -> {
-                    if (handler != null) {
-                        handler.run();
-                    }
-                });
+        actions.setOnSave(handler);
     }
 
-    public void setOnReader(Runnable handler) {
-        readerButton.setOnAction(
-                event -> {
-                    if (handler != null) {
-                        handler.run();
-                    }
-                });
+    public void resetToReader() {
+        actions.resetToFirstView();
     }
 
-    public void setOnQuotations(Runnable handler) {
-        quotationsButton.setOnAction(
-                event -> {
-                    if (handler != null) {
-                        handler.run();
-                    }
-                });
+    public ToggleButton getQuotationsButton() {
+        return actions.getViewToggle().getButton(1);
+    }
+
+    public Button getSaveButton() {
+        return actions.getSaveButton();
     }
 }
