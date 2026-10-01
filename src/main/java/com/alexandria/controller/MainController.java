@@ -21,6 +21,7 @@ import com.alexandria.view.components.user_guide.UserGuideTour;
 import com.alexandria.view.components.user_guide.UserGuideTourData;
 import com.alexandria.view.router.Route;
 import com.alexandria.view.screens.AnalyseScreen;
+import com.alexandria.view.screens.CompareScreen;
 import com.alexandria.view.screens.ArchiveScreen;
 import com.alexandria.view.screens.LibraryScreen;
 import com.alexandria.view.screens.ProfileScreen;
@@ -37,6 +38,7 @@ public class MainController {
     private final CompareController compareController;
     private final ArchiveController archiveController;
     private final LibraryController libraryController;
+    private CompareScreen compareScreen;
     private Text firstComparisonText;
     private File firstComparisonSourceFile;
 
@@ -92,7 +94,10 @@ public class MainController {
     }
 
     private CompareController configureComparison() {
-		// TODO Add comparison screen here
+        compareScreen = (CompareScreen) Route.COMPARE.createScreen();
+        compareScreen.setOnSaveFindings(() -> {
+            // TODO save comparison findings
+        });
         return new CompareController();
     }
 
@@ -246,6 +251,16 @@ public class MainController {
 
         firstComparisonText = null;
         firstComparisonSourceFile = null;
+
+        List<Text> openedTexts = outcome.texts();
+        List<File> openedFiles = compareController.getCurrentFiles();
+
+        compareScreen.loadTexts(
+                openedTexts.get(0),
+                openedFiles.size() > 0 ? openedFiles.get(0) : null,
+                openedTexts.get(1),
+                openedFiles.size() > 1 ? openedFiles.get(1) : null);
+
         mainView.navigateTo(Route.COMPARE);
     }
 
