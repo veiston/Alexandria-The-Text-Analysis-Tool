@@ -13,13 +13,15 @@ import com.alexandria.view.components.shared.form.validation.PasswordValidator;
 public class ChangePasswordForm extends VBox {
     private static final double MAX_WIDTH = 380;
     private final Form form;
-    private Consumer<String> onChangePassword = password -> {};
+    private Consumer<String> onChangePassword = password -> {
+    };
 
     public ChangePasswordForm() {
         getStyleClass().add("modal-card");
         setSpacing(20);
         setPadding(new Insets(24));
         setMaxWidth(MAX_WIDTH);
+        setPrefWidth(420);
 
         Label title = new Label("Change Password");
         title.getStyleClass().add("heading-lg");

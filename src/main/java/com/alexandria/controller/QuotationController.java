@@ -35,6 +35,14 @@ public class QuotationController {
         if (!canSaveQuotations() || quotationText == null || quotationText.isBlank()) {
             return null;
         }
+        String trimmed = quotationText.strip();
+
+        for (Quotation existing : quotations) {
+            if (trimmed.equals(existing.getQuotationText())
+                    && Objects.equals(location, existing.getLocation())) {
+                return existing;
+            }
+        }
 
         Quotation quotation = quotationService.create(currentUserId, currentTextId, quotationText, location);
 
@@ -48,7 +56,7 @@ public class QuotationController {
             return false;
         }
 
-        return quotations.removeIf(quotation -> Objects.equals(quotation.getId(),quotationId));
+        return quotations.removeIf(quotation -> Objects.equals(quotation.getId(), quotationId));
     }
 
     public boolean updateQuotation(Quotation quotation) throws SQLException {
@@ -59,7 +67,7 @@ public class QuotationController {
         return quotationService.update(quotation, currentUserId);
     }
 
-	private boolean canSaveQuotations() {
+    private boolean canSaveQuotations() {
         return currentUserId != null && currentTextId != null;
     }
 

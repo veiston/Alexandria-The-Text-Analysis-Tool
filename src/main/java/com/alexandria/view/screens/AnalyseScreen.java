@@ -15,7 +15,9 @@ import com.alexandria.view.components.analyse_screen.TermDetailModal;
 import com.alexandria.view.components.analyse_screen.text_term_analyze.TextContextPanel;
 import com.alexandria.view.components.analyse_screen.text_term_analyze.TextTermFrequencyPanel;
 import com.alexandria.view.components.shared.modal.Modal;
+import com.alexandria.view.components.shared.SuccessToast;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -44,57 +46,60 @@ public class AnalyseScreen extends StackPane {
     private final BorderPane loadedState = new BorderPane();
     private final StackPane centerSwitcher = new StackPane();
     private final ScrollPane sidebarScroll = new ScrollPane();
+    private final SuccessToast successToast = new SuccessToast();
 
     private String activeSearchTerm;
     private List<SearchMatch> currentSearchMatches = List.of();
     private int currentSearchMatchIndex = -1;
-    private Runnable onSaveAnalysis = () -> {};
-    private Consumer<String> onTermDetailRequested = term -> {};
-    private BiFunction<String, String, Integer> onQuotationRequested = (quotationText, location) -> null;
-    private Consumer<Quotation> onQuotationDeleteRequested = quotation -> {};
-    private Consumer<Quotation> onQuotationEditRequested = quotation -> {};
-    private Consumer<String> onSearch = term -> {};
-    private Runnable onPreviousMatch = () -> {};
-    private Runnable onNextMatch = () -> {};
+    private Runnable onSaveAnalysis = () -> {
+    };
+    private Consumer<String> onTermDetailRequested = term -> {
+    };
+    private BiFunction<String, String, Integer> onQuotationRequested = (text, location) -> null;
+    private Consumer<Quotation> onQuotationDeleteRequested = quotation -> {
+    };
+    private Consumer<Quotation> onQuotationEditRequested = quotation -> {
+    };
+    private Consumer<String> onSearch = term -> {
+    };
+    private Runnable onPreviousMatch = () -> {
+    };
+    private Runnable onNextMatch = () -> {
+    };
+    private Consumer<String> onTrackedTermRemoved = term -> {
+    };
 
     public AnalyseScreen() {
         getStyleClass().add("analyse-screen");
-
         emptyState.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-
         loadedState.setTop(header);
         loadedState.setCenter(buildBody());
         loadedState.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-
-        getChildren().addAll(emptyState, loadedState, modal);
-
+        getChildren().addAll(emptyState, loadedState, modal, successToast);
         StackPane.setAlignment(emptyState, Pos.CENTER);
         StackPane.setAlignment(loadedState, Pos.CENTER);
         StackPane.setAlignment(modal, Pos.CENTER);
-
+        StackPane.setAlignment(successToast, Pos.TOP_CENTER);
+        StackPane.setMargin(successToast, new Insets(16, 0, 0, 0));
         loadedState.setVisible(false);
         loadedState.setManaged(false);
-
         wireCallbacks();
     }
 
     private HBox buildBody() {
-
         centerSwitcher.getChildren().setAll(documentView);
         centerSwitcher.setMinSize(0, 0);
         centerSwitcher.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-
         HBox.setHgrow(centerSwitcher, Priority.ALWAYS);
+
         VBox frequencyAndSearch = new VBox(18, textTermFrequencyPanel, searchView);
         frequencyAndSearch.getStyleClass().add("card");
 
         VBox rightColumn = new VBox(16, frequencyAndSearch, textContextPanel);
-
         rightColumn.getStyleClass().add("analyse-sidebar");
         rightColumn.setMinWidth(340);
         rightColumn.setPrefWidth(380);
         rightColumn.setMaxWidth(440);
-
         VBox.setVgrow(textContextPanel, Priority.ALWAYS);
 
         sidebarScroll.setContent(rightColumn);
@@ -111,7 +116,6 @@ public class AnalyseScreen extends StackPane {
         body.setFillHeight(true);
         body.setMinSize(0, 0);
         body.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-
         return body;
     }
 
@@ -119,115 +123,79 @@ public class AnalyseScreen extends StackPane {
         header.setOnSave(() -> onSaveAnalysis.run());
         header.setOnViewChange(this::showView);
         textTermFrequencyPanel.setOnRowClick(word -> onTermDetailRequested.accept(word));
-        textContextPanel.setOnJump(documentView::goToPage);
+        documentView.setOnQuotationRequested((text, location) -> onQuotationRequested.apply(text, location));
 
-        documentView.setOnQuotationRequested((quotationText, location) -> onQuotationRequested.apply(quotationText, location));
         quotationsView.setOnGoTo(this::goToQuotation);
         quotationsView.setOnDelete(quotation -> onQuotationDeleteRequested.accept(quotation));
         quotationsView.setOnEdit(quotation -> onQuotationEditRequested.accept(quotation));
 
-        searchView.setOnSearch(term -> {
-            onSearch.accept(term);
-            System.out.println(
-                    "Search submitted: " + term);
+        textContextPanel.setOnJump(fragment -> {
+            if (fragment == null || fragment.page() == null)
+                return;
+            showDocument();
+            documentView.jumpToPassage(fragment.page(), fragment.text());
         });
 
-        searchView.setOnPreviousMatch(() -> {
-            onPreviousMatch.run();
-            System.out.println(
-                    "Previous match");
-        });
-
-        searchView.setOnNextMatch(() -> {
-            onNextMatch.run();
-            System.out.println(
-                    "Next match");
-        });
+        searchView.setOnSearch(term -> onSearch.accept(term));
+        searchView.setOnPreviousMatch(() -> onPreviousMatch.run());
+        searchView.setOnNextMatch(() -> onNextMatch.run());
 
         searchView.getTrackedWordsList().setOnInfo(word -> onTermDetailRequested.accept(word));
-        searchView.getTrackedWordsList().setOnRemove(word -> 
-            {
-                searchView.getTrackedWordsList().remove(word);
+        searchView.getTrackedWordsList().setOnRemove(word -> {
+            searchView.getTrackedWordsList().remove(word);
+            onTrackedTermRemoved.accept(word);
+            if (word.equals(activeSearchTerm)) {
+                resetSearchState();
+                documentView.clearSearchHighlights();
+            }
+        });
+        searchView.getTrackedWordsList().setOnGoTo(word -> {
+            searchView.getSearchInput().textProperty().set(word);
+            onSearch.accept(word);
+        });
+    }
 
-                if (word.equals(activeSearchTerm)) {
-                    activeSearchTerm = null;
-                    currentSearchMatches = List.of();
-                    currentSearchMatchIndex = -1;
-                    documentView.clearSearchHighlights();
-                }
-            });
-
-        searchView.getTrackedWordsList().setOnGoTo(word -> 
-            {
-                searchView.getSearchInput().textProperty().set(word);
-                onSearch.accept(word);
-            });
+    private void resetSearchState() {
+        activeSearchTerm = null;
+        currentSearchMatches = List.of();
+        currentSearchMatchIndex = -1;
     }
 
     private void showView(int index) {
-        switch (index) {
-            case 1 -> centerSwitcher.getChildren().setAll(quotationsView);
-            default -> centerSwitcher.getChildren().setAll(documentView);
-        }
+        centerSwitcher.getChildren().setAll(index == 1 ? quotationsView : documentView);
     }
 
-    public void setOnQuotationEditRequested(Consumer<Quotation> handler) {
-        onQuotationEditRequested = handler == null
-                        ? quotation -> {
-                        }
-                        : handler;
+    private void showDocument() {
+        header.resetToReader();
+        centerSwitcher.getChildren().setAll(documentView);
     }
 
     private VBox buildEmptyState() {
         Label title = new Label("No document open");
         title.getStyleClass().add("heading-lg");
-        
-        Label subtitle = new Label(
-                        "Start a new project or open one from your Library to begin analysing.");
+        Label subtitle = new Label("Start a new project or open one from your Library to begin analysing.");
         subtitle.getStyleClass().add("text-muted");
-
         VBox box = new VBox(8, title, subtitle);
         box.getStyleClass().add("analyse-empty-state");
         box.setAlignment(Pos.CENTER);
-
         return box;
     }
 
-    public void loadDocument(
-            String projectTitle,
-            String fileName,
-            String content,
-            FileType fileType,
-            Path sourcePath,
-            List<Integer> pageOffsets) {
+    public void loadDocument(String projectTitle, String fileName, String content,
+            FileType fileType, Path sourcePath, List<Integer> pageOffsets) {
 
-        header.setTitle(
-                projectTitle,
-                fileName + (pageOffsets != null
-                        && !pageOffsets.isEmpty()
-                        ? " · "
-                        + pageOffsets.size()
-                        + " Pages"
-                        : ""));
-
+        boolean hasPages = pageOffsets != null && !pageOffsets.isEmpty();
+        header.setTitle(projectTitle, fileName + (hasPages ? " · " + pageOffsets.size() + " Pages" : ""));
         header.resetToReader();
-
         documentView.loadDocument(content, fileType, sourcePath);
-        activeSearchTerm = null;
-        currentSearchMatches = List.of();
-        currentSearchMatchIndex = -1;
-
+        resetSearchState();
         searchView.reset();
-
         textTermFrequencyPanel.setResults(List.of());
         textContextPanel.setResults(List.of());
-
         emptyState.setVisible(false);
         emptyState.setManaged(false);
-
         loadedState.setVisible(true);
         loadedState.setManaged(true);
-
         showView(0);
     }
 
@@ -243,26 +211,55 @@ public class AnalyseScreen extends StackPane {
         loadedState.setManaged(false);
         emptyState.setVisible(true);
         emptyState.setManaged(true);
+        resetSearchState();
+    }
 
-        activeSearchTerm = null;
-        currentSearchMatches = List.of();
-        currentSearchMatchIndex = -1;
+    public void showSaved(int savedCount) {
+        successToast.show(savedCount > 0 ? "Analysis saved" : "Analysis already saved");
+    }
+
+    private static <T> Consumer<T> orNoop(Consumer<T> handler) {
+        return handler == null ? value -> {
+        } : handler;
     }
 
     public void setOnTermDetailRequested(Consumer<String> handler) {
-        onTermDetailRequested = handler == null ? term -> {} : handler;
+        onTermDetailRequested = orNoop(handler);
     }
 
-    public void setOnSaveAnalysis(Runnable handler) {
-        onSaveAnalysis = handler == null ? () -> {} : handler;
+    public void setOnTrackedTermRemoved(Consumer<String> handler) {
+        onTrackedTermRemoved = orNoop(handler);
     }
 
-    public void setOnQuotationRequested(BiFunction<String, String, Integer> handler) {
-        onQuotationRequested = handler == null ? (quotationText, location) -> null : handler;
+    public void setOnQuotationEditRequested(Consumer<Quotation> handler) {
+        onQuotationEditRequested = orNoop(handler);
     }
 
     public void setOnQuotationDeleteRequested(Consumer<Quotation> handler) {
-        onQuotationDeleteRequested = handler == null ? quotation -> {} : handler;
+        onQuotationDeleteRequested = orNoop(handler);
+    }
+
+    public void setOnSearch(Consumer<String> handler) {
+        onSearch = orNoop(handler);
+    }
+
+    public void setOnSaveAnalysis(Runnable handler) {
+        onSaveAnalysis = handler == null ? () -> {
+        } : handler;
+    }
+
+    public void setOnPreviousMatch(Runnable handler) {
+        onPreviousMatch = handler == null ? () -> {
+        } : handler;
+    }
+
+    public void setOnNextMatch(Runnable handler) {
+        onNextMatch = handler == null ? () -> {
+        } : handler;
+    }
+
+    public void setOnQuotationRequested(BiFunction<String, String, Integer> handler) {
+        onQuotationRequested = handler == null ? (text, location) -> null : handler;
     }
 
     public void setQuotations(List<Quotation> quotations) {
@@ -273,16 +270,16 @@ public class AnalyseScreen extends StackPane {
         documentView.removeQuotationHighlight(quotationId);
     }
 
-    public void showTermDetail(
-            String term,
-            TermAnalysisResult analysis,
-            List<SearchMatch> matches) {
-
-        termDetailModal.setData(term, analysis, matches,
-                index -> {
-                    // TODO: documentView.jumpToMatch(index)
-                });
-
+    public void showTermDetail(String term, TermAnalysisResult analysis, List<SearchMatch> matches) {
+        termDetailModal.setData(term, analysis, matches, index -> {
+            if (matches == null || index < 0 || index >= matches.size())
+                return;
+            SearchMatch match = matches.get(index);
+            modal.hide();
+            showDocument();
+            documentView.goToPage(match.page(), match.paragraph());
+            documentView.showSearchMatches(matches, index);
+        });
         modal.show(termDetailModal);
     }
 
@@ -310,90 +307,49 @@ public class AnalyseScreen extends StackPane {
         return header;
     }
 
-    public void setOnSearch(Consumer<String> handler) {
-        onSearch = handler == null ? term -> {} : handler;
-    }
-
-    public void setOnPreviousMatch(Runnable handler) {
-        onPreviousMatch = handler == null ? () -> {}: handler;
-    }
-
-    public void setOnNextMatch(Runnable handler) {
-        onNextMatch = handler == null ? () -> {} : handler;
-    }
-
-    public void showSearchResults(
-            String term,
-            List<SearchMatch> matches,
-            TermAnalysisResult termAnalysis) {
-
+    public void showSearchResults(String term, List<SearchMatch> matches, TermAnalysisResult termAnalysis) {
         if (matches == null || matches.isEmpty()) {
-
-            activeSearchTerm = null;
-            currentSearchMatches = List.of();
-            currentSearchMatchIndex = -1;
-
+            resetSearchState();
             documentView.clearSearchHighlights();
             return;
         }
-
         activeSearchTerm = term;
         currentSearchMatches = List.copyOf(matches);
         currentSearchMatchIndex = 0;
-
         searchView.getTrackedWordsList().addOrUpdate(term, matches.size());
         searchView.getTrackedWordsList().setActiveTerm(term);
         showSearchMatch(currentSearchMatches, currentSearchMatchIndex);
     }
 
     public void showSearchMatch(List<SearchMatch> matches, int activeIndex) {
-        if (matches == null || matches.isEmpty()) {
+        if (matches == null || matches.isEmpty())
             return;
-        }
-
         int safeIndex = Math.max(0, Math.min(activeIndex, matches.size() - 1));
         SearchMatch activeMatch = matches.get(safeIndex);
         currentSearchMatches = List.copyOf(matches);
-
         currentSearchMatchIndex = safeIndex;
-        if (activeMatch.page() != null) {
+        if (activeMatch.page() != null)
             documentView.goToPage(activeMatch.page(), activeMatch.paragraph());
-        }
-
         documentView.showSearchMatches(matches, safeIndex);
     }
 
     public void showSearchMatch(SearchMatch match) {
-        if (match == null) {
+        if (match == null)
             return;
-        }
-
-        if (currentSearchMatches.isEmpty()) {
-            if (match.page() != null) {
-                documentView.goToPage(match.page(), match.paragraph());
-            }
-            return;
-        }
-
         int index = currentSearchMatches.indexOf(match);
         if (index < 0) {
-            if (match.page() != null) {
+            if (match.page() != null)
                 documentView.goToPage(match.page(), match.paragraph());
-            }
             return;
         }
-
         currentSearchMatchIndex = index;
-        showSearchMatch(currentSearchMatches,index);
+        showSearchMatch(currentSearchMatches, index);
     }
 
     private void goToQuotation(Quotation quotation) {
-        if (quotation == null) {
+        if (quotation == null)
             return;
-        }
-
-        header.resetToReader();
-        centerSwitcher.getChildren().setAll(documentView);
+        showDocument();
         documentView.goToPage(
                 QuotationLocation.parsePage(quotation.getLocation()),
                 QuotationLocation.parseStartOffset(quotation.getLocation()));

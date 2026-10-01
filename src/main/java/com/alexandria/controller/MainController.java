@@ -57,7 +57,7 @@ public class MainController {
         libraryController = configureLibrary();
         configureProject();
         configureUserGuideTour();
-		
+
         openInitialRoute();
     }
 
@@ -126,7 +126,7 @@ public class MainController {
                     UserGuideTourData.TEXT);
 
             mainView.closeProjectModal();
-			
+
             openAnalysis(tourText, List.of(), null);
         });
 
@@ -263,8 +263,13 @@ public class MainController {
                 sourceFile);
 
         analyseScreen.setOnSaveAnalysis(() -> {
-            // TODO: saving preview + confirm submission.
-            // No persistence concept for the final analysis exists yet.
+            AnalyseController.SaveOutcome outcome = analyseController.saveAnalysis();
+
+            if (outcome.success()) {
+                analyseScreen.showSaved(outcome.savedCount());
+            } else {
+                System.err.println(outcome.message());
+            }
         });
 
         mainView.navigateTo(Route.ANALYZE);

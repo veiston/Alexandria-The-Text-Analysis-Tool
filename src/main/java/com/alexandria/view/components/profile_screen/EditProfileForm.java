@@ -17,13 +17,15 @@ import com.alexandria.view.components.shared.form.validation.TextValidator;
 public class EditProfileForm extends VBox {
     private static final double MAX_WIDTH = 380;
     private final Form form;
-    private Consumer<Map<String, String>> onSave = values -> {};
+    private Consumer<Map<String, String>> onSave = values -> {
+    };
 
     public EditProfileForm() {
         getStyleClass().add("modal-card");
         setSpacing(20);
         setPadding(new Insets(24));
         setMaxWidth(MAX_WIDTH);
+        setPrefWidth(420);
 
         Label title = new Label("Edit Profile");
         title.getStyleClass().add("heading-lg");
@@ -47,7 +49,8 @@ public class EditProfileForm extends VBox {
     }
 
     public void prefill(User user) {
-        if (user == null) return;
+        if (user == null)
+            return;
 
         form.setValue("name", user.getName());
         form.setValue("email", user.getEmail());
@@ -66,4 +69,3 @@ public class EditProfileForm extends VBox {
         form.reset();
     }
 }
-
