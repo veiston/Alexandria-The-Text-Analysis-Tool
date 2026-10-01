@@ -18,7 +18,8 @@ public class TextContextPanel extends VBox {
 
     private final VBox cardsHost = new VBox(10);
     private final Label emptyLabel = new Label("Open a document to see relevant paragraphs.");
-    private BiConsumer<Integer, Integer> onJump = (page, paragraph) -> {};
+    private BiConsumer<Integer, Integer> onJump = (page, paragraph) -> {
+    };
 
     public TextContextPanel() {
         getStyleClass().addAll("card", "text-context-panel");
@@ -26,7 +27,7 @@ public class TextContextPanel extends VBox {
         setPadding(new Insets(16));
 
         Label heading = new Label("Key Paragraphs");
-        heading.getStyleClass().add("heading-sm");
+        heading.getStyleClass().add("heading-md");
         emptyLabel.getStyleClass().add("text-muted");
 
         getChildren().addAll(heading, cardsHost);
@@ -35,8 +36,12 @@ public class TextContextPanel extends VBox {
 
     public void setResults(List<TextFragment> fragments) {
         cardsHost.getChildren().clear();
-        if (fragments == null || fragments.isEmpty()) { showEmpty(); return; }
-        for (int i = 0; i < fragments.size(); i++) cardsHost.getChildren().add(buildCard(i + 1, fragments.get(i)));
+        if (fragments == null || fragments.isEmpty()) {
+            showEmpty();
+            return;
+        }
+        for (int i = 0; i < fragments.size(); i++)
+            cardsHost.getChildren().add(buildCard(i + 1, fragments.get(i)));
     }
 
     private VBox buildCard(int rank, TextFragment fragment) {
@@ -63,22 +68,33 @@ public class TextContextPanel extends VBox {
         return card;
     }
 
-    public void setOnJump(BiConsumer<Integer, Integer> handler) { this.onJump = handler; }
-    private void showEmpty() { cardsHost.getChildren().setAll(emptyLabel); }
+    public void setOnJump(BiConsumer<Integer, Integer> handler) {
+        this.onJump = handler;
+    }
+
+    private void showEmpty() {
+        cardsHost.getChildren().setAll(emptyLabel);
+    }
 
     private static String formatPageLabel(Integer page, Integer paragraph) {
-        if (page != null && paragraph != null) return "Page " + page + " · Para " + paragraph;
-        if (page != null) return "Page " + page;
-        if (paragraph != null) return "Para " + paragraph;
+        if (page != null && paragraph != null)
+            return "Page " + page + " · Para " + paragraph;
+        if (page != null)
+            return "Page " + page;
+        if (paragraph != null)
+            return "Para " + paragraph;
         return "";
     }
 
     private static String truncateToSnippet(String text) {
-        if (text == null) return "";
-        if (text.length() <= SNIPPET_CHAR_BUDGET) return text;
+        if (text == null)
+            return "";
+        if (text.length() <= SNIPPET_CHAR_BUDGET)
+            return text;
 
         int cut = text.lastIndexOf(' ', SNIPPET_CHAR_BUDGET);
-        if (cut <= 0) cut = SNIPPET_CHAR_BUDGET;
+        if (cut <= 0)
+            cut = SNIPPET_CHAR_BUDGET;
 
         return text.substring(0, cut).stripTrailing() + "…";
     }

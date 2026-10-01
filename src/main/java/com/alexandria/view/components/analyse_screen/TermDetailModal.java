@@ -40,7 +40,7 @@ public class TermDetailModal extends VBox {
         statsLabel.getStyleClass().add("text-muted");
 
         Label neighborsHeading = new Label("Nearby Words");
-        neighborsHeading.getStyleClass().add("heading-sm");
+        neighborsHeading.getStyleClass().add("heading-md");
         Label occurrencesHeading = new Label("Occurrences");
         occurrencesHeading.getStyleClass().add("heading-sm");
 
@@ -51,22 +51,19 @@ public class TermDetailModal extends VBox {
         getChildren().addAll(
                 titleLabel, statsLabel,
                 neighborsHeading, neighborsHost,
-                occurrencesHeading, occurrencesScroll
-        );
+                occurrencesHeading, occurrencesScroll);
     }
 
     public void setData(
             String term,
             TermAnalysisResult analysis,
             List<SearchMatch> matches,
-            IntConsumer onJumpToMatch
-    ) {
+            IntConsumer onJumpToMatch) {
         titleLabel.setText("\"" + term + "\"");
         statsLabel.setText(String.format(
                 "%d occurrences · %.1f per 1,000 words · %d sentences · %d paragraphs",
                 analysis.totalOccurrences(), analysis.relativeFrequency(),
-                analysis.sentenceCount(), analysis.paragraphCount()
-        ));
+                analysis.sentenceCount(), analysis.paragraphCount()));
 
         neighborsHost.getChildren().clear();
         if (analysis.neighboringWords().isEmpty()) {
@@ -122,7 +119,6 @@ public class TermDetailModal extends VBox {
         return row;
     }
 
-
     private Label mutedLabel(String text) {
         Label label = new Label(text);
         label.getStyleClass().add("text-muted");
@@ -130,9 +126,12 @@ public class TermDetailModal extends VBox {
     }
 
     private static String formatPageLabel(Integer page, Integer paragraph) {
-        if (page != null && paragraph != null) return "Page " + page + " · Para " + paragraph;
-        if (page != null) return "Page " + page;
-        if (paragraph != null) return "Para " + paragraph;
+        if (page != null && paragraph != null)
+            return "Page " + page + " · Para " + paragraph;
+        if (page != null)
+            return "Page " + page;
+        if (paragraph != null)
+            return "Para " + paragraph;
         return "";
     }
 }

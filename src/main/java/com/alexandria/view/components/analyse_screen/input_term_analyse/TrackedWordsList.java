@@ -43,7 +43,7 @@ public class TrackedWordsList extends VBox {
         setSpacing(8);
         setPadding(new Insets(8, 0, 0, 0));
 
-        headingLabel.getStyleClass().add("heading-sm");
+        headingLabel.getStyleClass().add("heading-md");
         countBadge.getStyleClass().add("text-muted");
 
         toggleIcon.getStyleClass().add("text-muted");

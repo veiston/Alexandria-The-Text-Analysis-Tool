@@ -17,14 +17,15 @@ public class TextTermFrequencyPanel extends VBox {
 
     private final VBox rowsHost = new VBox(10);
     private final Label emptyLabel = new Label("Open a document to see frequent words.");
-    private Consumer<String> onRowClick = word -> {};
+    private Consumer<String> onRowClick = word -> {
+    };
 
     public TextTermFrequencyPanel() {
         getStyleClass().add("text-term-frequency-panel");
         setSpacing(12);
 
         Label heading = new Label("Term Frequency (Top 5)");
-        heading.getStyleClass().add("heading-sm");
+        heading.getStyleClass().add("heading-md");
         emptyLabel.getStyleClass().add("text-muted");
 
         getChildren().addAll(heading, rowsHost);
@@ -86,7 +87,8 @@ public class TextTermFrequencyPanel extends VBox {
     }
 
     public void setOnRowClick(Consumer<String> handler) {
-        onRowClick = handler == null ? word -> {} : handler;
+        onRowClick = handler == null ? word -> {
+        } : handler;
     }
 
     private void showEmpty() {
