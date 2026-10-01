@@ -1,3 +1,107 @@
+/* Shared document viewer — used by DocumentView on the Analyse AND Compare
+   screens. Moved out of analyse-screen.css. Register this stylesheet the
+   same way global.css / analyse-screen.css are registered. */
+
+.document-view {
+    -fx-background-color: -fx-document-background;
+    -fx-border-color:
+        transparent
+        -fx-border-subtle
+        transparent
+        transparent;
+    -fx-border-width: 0 1px 0 0;
+}
+
+/* pdf page */
+
+.pdf-page-host {
+    -fx-background-color: transparent;
+}
+
+.pdf-page-host > .image-view {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.12), 16, 0, 0, 4);
+}
+
+/* text document */
+
+.document-pages {
+    -fx-background-color: transparent;
+    -fx-padding: 30px;
+}
+
+.document-page {
+    -fx-background-color: -fx-surface;
+    -fx-border-color: -fx-border-subtle;
+    -fx-border-width: 1px;
+    -fx-background-radius: 2px;
+    -fx-border-radius: 2px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 12, 0, 0, 2);
+    -fx-padding: 58px 64px;
+    -fx-pref-width: 620px;
+    -fx-min-width: 620px;
+}
+
+.document-page-text {
+    -fx-font-family: -fx-font-serif;
+    -fx-font-size: 12px;
+    -fx-line-spacing: 4px;
+    -fx-fill: -fx-foreground;
+}
+
+.document-page-content {
+    -fx-fill: -fx-foreground;
+}
+
+/* toolbar */
+
+.viewer-toolbar {
+    -fx-background-color: -fx-surface;
+    -fx-border-color: -fx-border-subtle transparent transparent transparent;
+    -fx-border-width: 1px 0 0 0;
+    -fx-padding: 6px 12px;
+}
+
+.viewer-nav-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-text-fill: -fx-foreground;
+    -fx-min-width: 28px;
+    -fx-min-height: 26px;
+    -fx-padding: 3px 8px;
+    -fx-font-size: 12px;
+}
+
+.viewer-nav-button:hover {
+    -fx-background-color: -fx-surface-hover;
+}
+
+.viewer-nav-button:disabled {
+    -fx-text-fill: -fx-foreground-faint;
+    -fx-opacity: 1;
+}
+
+.viewer-page-label {
+    -fx-font-family: -fx-font-sans;
+    -fx-font-size: 12px;
+    -fx-text-fill: -fx-foreground-muted;
+    -fx-padding: 0 8px;
+}
+
+.viewer-status {
+    -fx-font-family: -fx-font-sans;
+    -fx-font-size: 12px;
+    -fx-text-fill: -fx-success;
+    -fx-padding: 0 8px;
+}
+
+.pdf-error {
+    -fx-text-fill: -fx-danger;
+    -fx-font-family: -fx-font-sans;
+    -fx-font-size: 12px;
+    -fx-padding: 30px;
+    -fx-wrap-text: true;
+}
+
 /* Document selection & highlighting */
 
 /* --- PDF ------------------------------------------------------------ */
@@ -95,3 +199,4 @@
 .selection-popup-toggle:pressed {
     -fx-background-color: -fx-border-subtle;
 }
+
