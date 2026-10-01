@@ -28,7 +28,7 @@ public class TextComparisonService implements TextComparisonServiceINT {
         var wordFrequencies = extractedWords.entrySet().stream()
             .collect(Collectors.toMap(Map.Entry::getKey, e -> countWordFrequencies(e.getValue())));
 
-        var intersection = wordFrequencies.values().stream()
+        var intersection = wordFrequencies.values().stream() // A "shared vocabulary" between texts, so both are taken into account.
             .map(Map::keySet)
             .reduce((s1, s2) -> {
                 Set<String> temp = new HashSet<>(s1);
