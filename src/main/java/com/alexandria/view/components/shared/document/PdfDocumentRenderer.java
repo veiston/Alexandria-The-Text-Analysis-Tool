@@ -286,9 +286,6 @@ public class PdfDocumentRenderer {
         if (!pageMatchIndices.isEmpty()) {
             String term = matches.get(pageMatchIndices.get(0)).text();
             List<int[]> ranges = currentLayout.findAllGlyphRanges(term);
-
-            // If the counts differ, no occurrence is marked active rather than
-            // risk marking the wrong one.
             boolean countsMatch = ranges.size() == pageMatchIndices.size();
 
             for (int i = 0; i < ranges.size(); i++) {

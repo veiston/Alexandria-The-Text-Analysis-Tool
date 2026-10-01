@@ -15,13 +15,6 @@ import javafx.scene.layout.VBox;
 import java.util.List;
 import java.util.function.IntConsumer;
 
-/**
- * Shows term statistics, nearby words, and located occurrences with a
- * "Go to →" button per occurrence. The go-to handler is supplied by the
- * caller (see setData) so this modal has no dependency on how navigation
- * is actually implemented — in PR1 it's a no-op placeholder; PR3 wires it
- * to DocumentView.jumpToMatch once real document navigation exists.
- */
 public class TermDetailModal extends VBox {
 
     private final Label titleLabel = new Label();
