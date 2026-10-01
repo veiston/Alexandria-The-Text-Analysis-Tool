@@ -241,10 +241,34 @@ public class PdfDocumentRenderer {
         restoreQuotationHighlights();
     }
 
+    private void drawGlyphRange(int[] range, String styleClass) {
+        for (double[] raster : currentLayout.selectionRectangles(range[0], range[1])) {
+            double[] d = rasterToDisplay(raster);
+            Rectangle rectangle = new Rectangle(d[0], d[1], d[2], d[3]);
+            rectangle.setManaged(false);
+            rectangle.setMouseTransparent(true);
+            rectangle.getStyleClass().add(styleClass);
+            pageHost.getChildren().add(rectangle);
+        }
+        imageView.toBack();
+    }
+
+    public void highlightPassage(String passage) {
+        clearHighlights();
+
+        if (currentLayout != null && passage != null) {
+            int[] range = currentLayout.findGlyphRange(passage);
+            if (range != null)
+                drawGlyphRange(range, PdfHighlight.SEARCH_STYLE_CLASS);
+        }
+
+        restoreQuotationHighlights();
+    }
+
     public void highlightSearchMatches(List<SearchMatch> matches, int activeIndex) {
         clearHighlights();
 
-        if (document == null || currentImage == null || matches == null || matches.isEmpty()) {
+        if (currentLayout == null || matches == null || matches.isEmpty()) {
             restoreQuotationHighlights();
             return;
         }
@@ -253,44 +277,24 @@ public class PdfDocumentRenderer {
 
         List<Integer> pageMatchIndices = new ArrayList<>();
         for (int i = 0; i < matches.size(); i++) {
-         SearchMatch match = matches.get(i);
+            SearchMatch match = matches.get(i);
             if (match != null && match.page() != null && match.page() == pageNumber) {
                 pageMatchIndices.add(i);
             }
         }
 
-        if (pageMatchIndices.isEmpty()) {
-            restoreQuotationHighlights();
-            return;
-        }
+        if (!pageMatchIndices.isEmpty()) {
+            String term = matches.get(pageMatchIndices.get(0)).text();
+            List<int[]> ranges = currentLayout.findAllGlyphRanges(term);
+            boolean countsMatch = ranges.size() == pageMatchIndices.size();
 
-        String term = matches.get(pageMatchIndices.get(0)).text();
-
-        try {
-            List<Rectangle> rectangles = PdfHighlight.findHighlights(
-                document, currentPage, term, BASE_DPI, null);
-
-        // Extraction-order mismatch (rare, shouldn't normally happen for a
-        // single term on one page) — fall back to uniform highlighting
-        // rather than risk marking the wrong occurrence as active.
-            boolean countsMatch = rectangles.size() == pageMatchIndices.size();
-
-            for (int i = 0; i < rectangles.size(); i++) {
-                Rectangle rectangle = rectangles.get(i);
-                convertRasterRectangleToDisplay(rectangle);
-                rectangle.setManaged(false);
-                rectangle.setMouseTransparent(true);
-
+            for (int i = 0; i < ranges.size(); i++) {
                 String styleClass = PdfHighlight.SEARCH_STYLE_CLASS;
                 if (countsMatch && pageMatchIndices.get(i) == activeIndex) {
                     styleClass = PdfHighlight.ACTIVE_SEARCH_STYLE_CLASS;
                 }
-                rectangle.getStyleClass().add(styleClass);
+                drawGlyphRange(ranges.get(i), styleClass);
             }
-
-            pageHost.getChildren().addAll(rectangles);
-            imageView.toBack();
-        } catch (IOException | RuntimeException ignored) {
         }
 
         restoreQuotationHighlights();

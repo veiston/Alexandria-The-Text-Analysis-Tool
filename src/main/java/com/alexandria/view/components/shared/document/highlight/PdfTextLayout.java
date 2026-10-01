@@ -90,12 +90,30 @@ public final class PdfTextLayout {
         double[] lineTop = new double[lineCount];
         double[] lineBottom = new double[lineCount];
 
-        Arrays.fill(lineTop, Double.MAX_VALUE);
-        Arrays.fill(lineBottom, -Double.MAX_VALUE);
+        int from = 0;
+        while (from < result.size()) {
+            int lineIndex = result.get(from).line();
+            int to = from;
+            while (to < result.size() && result.get(to).line() == lineIndex) {
+                to++;
+            }
 
-        for (Glyph g : result) {
-            lineTop[g.line()] = Math.min(lineTop[g.line()], g.y());
-            lineBottom[g.line()] = Math.max(lineBottom[g.line()], g.y() + g.height());
+            double[] heights = new double[to - from];
+            double[] baselines = new double[to - from];
+            for (int i = from; i < to; i++) {
+                heights[i - from] = result.get(i).height();
+                baselines[i - from] = result.get(i).y() + result.get(i).height();
+            }
+            Arrays.sort(heights);
+            Arrays.sort(baselines);
+
+            double medianHeight = heights[heights.length / 2];
+            double medianBaseline = baselines[baselines.length / 2];
+
+            lineBottom[lineIndex] = medianBaseline;
+            lineTop[lineIndex] = medianBaseline - medianHeight;
+
+            from = to;
         }
 
         return new PdfTextLayout(result, lineTop, lineBottom);
@@ -181,7 +199,7 @@ public final class PdfTextLayout {
         double height = bottom - top;
         double padding = height * LINE_HEIGHT_PADDING_RATIO / 2.0;
 
-        return new double[]{
+        return new double[] {
                 minX,
                 top - padding,
                 maxX - minX,
@@ -189,7 +207,7 @@ public final class PdfTextLayout {
         };
     }
 
-      public String textFor(int indexA, int indexB) {
+    public String textFor(int indexA, int indexB) {
         if (glyphs.isEmpty()) {
             return "";
         }
@@ -224,5 +242,84 @@ public final class PdfTextLayout {
         }
 
         return sb.toString().strip();
+    }
+
+    public int[] findGlyphRange(String passage) {
+        if (glyphs.isEmpty() || passage == null)
+            return null;
+
+        StringBuilder flat = new StringBuilder();
+        List<Integer> map = new ArrayList<>();
+
+        for (int i = 0; i < glyphs.size(); i++) {
+            for (char c : glyphs.get(i).unicode().toCharArray()) {
+                if (!Character.isWhitespace(c)) {
+                    flat.append(Character.toLowerCase(c));
+                    map.add(i);
+                }
+            }
+        }
+
+        StringBuilder needleBuilder = new StringBuilder();
+        for (char c : passage.toCharArray()) {
+            if (!Character.isWhitespace(c))
+                needleBuilder.append(Character.toLowerCase(c));
+        }
+        String needle = needleBuilder.toString();
+        if (needle.isEmpty())
+            return null;
+
+        int start = flat.indexOf(needle);
+        int end;
+
+        if (start >= 0) {
+            end = start + needle.length() - 1;
+        } else {
+            int probe = Math.min(40, needle.length());
+            start = flat.indexOf(needle.substring(0, probe));
+            if (start < 0)
+                return null;
+
+            int tail = flat.indexOf(needle.substring(needle.length() - probe), start);
+            end = tail >= 0 ? tail + probe - 1 : start + probe - 1;
+        }
+
+        return new int[] { map.get(start), map.get(end) };
+    }
+
+    public List<int[]> findAllGlyphRanges(String term) {
+        List<int[]> result = new ArrayList<>();
+        if (glyphs.isEmpty() || term == null)
+            return result;
+
+        StringBuilder flat = new StringBuilder();
+        List<Integer> map = new ArrayList<>();
+
+        for (int i = 0; i < glyphs.size(); i++) {
+            for (char c : glyphs.get(i).unicode().toCharArray()) {
+                if (!Character.isWhitespace(c)) {
+                    flat.append(Character.toLowerCase(c));
+                    map.add(i);
+                }
+            }
+        }
+
+        StringBuilder needleBuilder = new StringBuilder();
+        for (char c : term.toCharArray()) {
+            if (!Character.isWhitespace(c))
+                needleBuilder.append(Character.toLowerCase(c));
+        }
+        String needle = needleBuilder.toString();
+        if (needle.isEmpty())
+            return result;
+
+        int from = 0;
+        int idx;
+        while ((idx = flat.indexOf(needle, from)) >= 0) {
+            result.add(new int[] { map.get(idx), map.get(idx + needle.length() - 1) });
+            from = idx + needle.length();
+        }
+
+        return result;
     }
 }

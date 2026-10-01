@@ -19,7 +19,7 @@
 
 .document-name {
     -fx-font-family: -fx-font-sans;
-    -fx-font-size: 11px;
+    -fx-font-size: 12px;
     -fx-text-fill: -fx-foreground-muted;
 }
 
@@ -95,7 +95,7 @@
 
 .document-page-text {
     -fx-font-family: -fx-font-serif;
-    -fx-font-size: 13px;
+    -fx-font-size: 12px;
     -fx-line-spacing: 4px;
     -fx-fill: -fx-foreground;
 }
@@ -134,14 +134,14 @@
 
 .viewer-page-label {
     -fx-font-family: -fx-font-sans;
-    -fx-font-size: 11px;
+    -fx-font-size: 12px;
     -fx-text-fill: -fx-foreground-muted;
     -fx-padding: 0 8px;
 }
 
 .viewer-status {
     -fx-font-family: -fx-font-sans;
-    -fx-font-size: 10px;
+    -fx-font-size: 12px;
     -fx-text-fill: -fx-success;
     -fx-padding: 0 8px;
 }
@@ -208,14 +208,14 @@
     -fx-background-color: transparent;
     -fx-border-color: transparent;
     -fx-padding: 6px 8px;
-    -fx-font-size: 11px;
+    -fx-font-size: 12px;
 }
 
 .search-navigation-button {
     -fx-background-color: transparent;
     -fx-border-color: transparent;
     -fx-padding: 3px 6px;
-    -fx-font-size: 10px;
+    -fx-font-size: 12px;
 }
 
 .search-navigation-button:hover {
@@ -244,12 +244,12 @@
 }
 
 .search-result-term {
-    -fx-font-size: 11px;
+    -fx-font-size: 12px;
 }
 
 .search-result-count {
     -fx-font-family: -fx-font-sans;
-    -fx-font-size: 10px;
+    -fx-font-size: 12px;
     -fx-text-fill: -fx-foreground-muted;
 }
 
@@ -276,13 +276,13 @@
 
 .context-match-page {
     -fx-font-family: -fx-font-sans-bold;
-    -fx-font-size: 9px;
+    -fx-font-size: 10px;
     -fx-text-fill: -fx-foreground-muted;
 }
 
 .context-match-snippet {
     -fx-font-family: -fx-font-serif;
-    -fx-font-size: 10px;
+    -fx-font-size: 12px;
     -fx-line-spacing: 2px;
     -fx-text-fill: -fx-foreground;
 }
@@ -300,14 +300,14 @@
 
 .passage-citation-caption {
     -fx-font-family: -fx-font-sans-bold;
-    -fx-font-size: 9px;
+    -fx-font-size: 12px;
     -fx-text-fill: -fx-foreground-muted;
 }
 
 .passage-citation-text {
     -fx-font-family: -fx-font-serif;
     -fx-font-style: italic;
-    -fx-font-size: 11px;
+    -fx-font-size: 12px;
     -fx-text-fill: -fx-foreground;
 }
 
@@ -334,28 +334,6 @@
 
 .analyse-sidebar-scroll > .scroll-bar:vertical > .thumb:hover {
     -fx-background-color: -fx-foreground-faint;
-}
-
-/* search */
-
-.search-section {
-    -fx-padding: 10px 0 0 0;
-}
-
-.search-box {
-    -fx-background-color: -fx-surface;
-    -fx-border-color: -fx-border-subtle;
-    -fx-border-width: 1px;
-    -fx-background-radius: 5px;
-    -fx-border-radius: 5px;
-    -fx-padding: 0;
-}
-
-.search-box .text-field {
-    -fx-background-color: transparent;
-    -fx-border-color: transparent;
-    -fx-padding: 6px 8px;
-    -fx-font-size: 11px;
 }
 
 /* SearchView */
@@ -389,10 +367,7 @@
 .search-navigation-button:pressed {
     -fx-background-color: -fx-border-subtle;
 }
-
-/* The actual FontAwesome icon */
-
 .search-navigation-button .ikonli-font-icon {
     -fx-icon-color: -fx-foreground-muted;
-    -fx-icon-size: 12px;
+    -fx-icon-size: 14px;
 }

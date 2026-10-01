@@ -19,6 +19,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.geometry.Bounds;
 
 import java.util.HashMap;
 import java.util.List;
@@ -186,6 +187,34 @@ public class TextDocumentRenderer {
             updatePageSizes();
             centerPage(pageNode);
         });
+    }
+
+    public void highlightPassage(Integer page, String passage) {
+        clearSearchHighlights();
+        if (page == null || passage == null || passage.isBlank())
+            return;
+
+        int pageIndex = page - 1;
+        String pageText = pageTexts.get(pageIndex);
+        TextFlow flow = pageFlows.get(pageIndex);
+        Pane overlay = pageOverlays.get(pageIndex);
+        if (pageText == null || flow == null || overlay == null)
+            return;
+
+        String needle = passage.strip();
+        int start = pageText.indexOf(needle);
+        if (start < 0) {
+            needle = needle.substring(0, Math.min(40, needle.length()));
+            start = pageText.indexOf(needle);
+        }
+        if (start < 0)
+            return;
+
+        Node shape = TxtTextLayout.shapeFor(
+                flow, start, start + needle.length(),
+                TxtHighlight.SEARCH_STYLE_CLASS);
+        overlay.getChildren().add(shape);
+        scrollToShape(shape);
     }
 
     private void centerPage(Node pageNode) {
@@ -654,12 +683,12 @@ public class TextDocumentRenderer {
                     ? TxtHighlight.ACTIVE_SEARCH_STYLE_CLASS
                     : TxtHighlight.SEARCH_STYLE_CLASS;
 
-            overlay.getChildren().add(
-                    TxtTextLayout.shapeFor(
-                            flow,
-                            localStart,
-                            localEnd,
-                            styleClass));
+            Node shape = TxtTextLayout.shapeFor(flow, localStart, localEnd, styleClass);
+            overlay.getChildren().add(shape);
+
+            if (i == activeIndex) {
+                scrollToShape(shape);
+            }
         }
     }
 
@@ -716,6 +745,19 @@ public class TextDocumentRenderer {
                         localStart,
                         localEnd,
                         TxtHighlight.ACTIVE_SEARCH_STYLE_CLASS));
+    }
+
+    private void scrollToShape(Node shape) {
+        Platform.runLater(() -> {
+            Bounds b = pagesHost.sceneToLocal(shape.localToScene(shape.getBoundsInLocal()));
+            double viewportHeight = scrollPane.getViewportBounds().getHeight();
+            double maxY = Math.max(0, pagesHost.getHeight() - viewportHeight);
+
+            if (b == null || maxY == 0)
+                return;
+
+            scrollPane.setVvalue(clamp((b.getMinY() - viewportHeight / 3.0) / maxY));
+        });
     }
 
     public void clearSearchHighlights() {

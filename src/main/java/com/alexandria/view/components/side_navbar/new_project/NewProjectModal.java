@@ -49,7 +49,7 @@ public class NewProjectModal extends VBox {
         getStyleClass().add("modal-card");
         setSpacing(20);
         setPadding(new Insets(24));
-        setPrefWidth(440);
+        setPrefWidth(380);
 
         Label heading = new Label("New Project");
         heading.getStyleClass().add("heading-lg");
@@ -131,11 +131,9 @@ public class NewProjectModal extends VBox {
     }
 
     private void configureDestinationToggles() {
-        uploadDestinationToggle.setOnToggle(index ->
-                pasteDestinationToggle.setSelectedIndex(index));
+        uploadDestinationToggle.setOnToggle(index -> pasteDestinationToggle.setSelectedIndex(index));
 
-        pasteDestinationToggle.setOnToggle(index ->
-                uploadDestinationToggle.setSelectedIndex(index));
+        pasteDestinationToggle.setOnToggle(index -> uploadDestinationToggle.setSelectedIndex(index));
     }
 
     private void showUpload() {
@@ -155,10 +153,9 @@ public class NewProjectModal extends VBox {
             String textContent,
             File file) {
 
-        Destination destination =
-                uploadDestinationToggle.getSelectedIndex() == 0
-                        ? Destination.ANALYSE
-                        : Destination.COMPARE;
+        Destination destination = uploadDestinationToggle.getSelectedIndex() == 0
+                ? Destination.ANALYSE
+                : Destination.COMPARE;
 
         CreatedProject project = new CreatedProject(
                 title,
