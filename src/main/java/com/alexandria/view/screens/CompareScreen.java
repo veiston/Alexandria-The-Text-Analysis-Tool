@@ -52,7 +52,7 @@ public class CompareScreen extends StackPane {
         wireCallbacks();
     }
 
-    private static final double SIDE_PANEL_WIDTH_RATIO = 0.380;
+    private static final double SIDE_PANEL_WIDTH_RATIO = 0.360;
 
     private HBox buildBody() {
         centerSwitcher.getChildren().setAll(documentView);
