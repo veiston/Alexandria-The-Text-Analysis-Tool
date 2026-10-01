@@ -146,13 +146,6 @@ public class DocumentView extends BorderPane {
                 });
         }
 
-        private static String firstWords(String text) {
-                if (text == null || text.length() <= 60)
-                        return text;
-                int cut = text.lastIndexOf(' ', 60);
-                return text.substring(0, cut > 0 ? cut : 60);
-        }
-
         private void setZoom(double value) {
                 zoom = Math.max(0.75, Math.min(2.0, value));
                 if (showingPdf && pdfRenderer != null) {
