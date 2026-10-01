@@ -268,4 +268,40 @@ public final class PdfTextLayout {
 
         return new int[] { map.get(start), map.get(end) };
     }
+
+    public List<int[]> findAllGlyphRanges(String term) {
+        List<int[]> result = new ArrayList<>();
+        if (glyphs.isEmpty() || term == null)
+            return result;
+
+        StringBuilder flat = new StringBuilder();
+        List<Integer> map = new ArrayList<>();
+
+        for (int i = 0; i < glyphs.size(); i++) {
+            for (char c : glyphs.get(i).unicode().toCharArray()) {
+                if (!Character.isWhitespace(c)) {
+                    flat.append(Character.toLowerCase(c));
+                    map.add(i);
+                }
+            }
+        }
+
+        StringBuilder needleBuilder = new StringBuilder();
+        for (char c : term.toCharArray()) {
+            if (!Character.isWhitespace(c))
+                needleBuilder.append(Character.toLowerCase(c));
+        }
+        String needle = needleBuilder.toString();
+        if (needle.isEmpty())
+            return result;
+
+        int from = 0;
+        int idx;
+        while ((idx = flat.indexOf(needle, from)) >= 0) {
+            result.add(new int[] { map.get(idx), map.get(idx + needle.length() - 1) });
+            from = idx + needle.length();
+        }
+
+        return result;
+    }
 }
