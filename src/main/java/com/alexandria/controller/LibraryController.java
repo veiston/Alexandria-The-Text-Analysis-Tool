@@ -2,9 +2,9 @@ package com.alexandria.controller;
 
 import java.sql.SQLException;
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 import com.alexandria.dao.TextDAO;
 import com.alexandria.model.Text;
@@ -20,6 +20,8 @@ public class LibraryController {
     private final LibraryScreen libraryScreen;
     private final FileStorageService fileStorageService;
     private final BiConsumer<Text, File> onOpenInAnalysis;
+    private final BiConsumer<List<Text>, List<File>> onCompare;
+    private final BiConsumer<Text, File> onAddNewComparisonText;
     private final UserSessionController session = UserSessionController.getInstance();
 
     public LibraryController(
@@ -27,18 +29,22 @@ public class LibraryController {
             LibraryScreen libraryScreen,
             FileStorageService fileStorageService,
             BiConsumer<Text, File> onOpenInAnalysis,
-            Consumer<Text> onCompare,
+            BiConsumer<List<Text>, List<File>> onCompare,
+            BiConsumer<Text, File> onAddNewComparisonText,
             Runnable onNewProject) {
 
         this.textDAO = textDAO;
         this.libraryScreen = libraryScreen;
         this.fileStorageService = fileStorageService;
         this.onOpenInAnalysis = onOpenInAnalysis;
+        this.onCompare = onCompare;
+        this.onAddNewComparisonText = onAddNewComparisonText;
 
         libraryScreen.setOnShown(this::loadTexts);
         libraryScreen.setOnDeleteText(this::deleteText);
         libraryScreen.setOnOpenInAnalysis(this::openInAnalysis);
-        libraryScreen.setOnCompare(onCompare);
+        libraryScreen.setOnCompare(this::openInComparison);
+        libraryScreen.setOnAddNewComparisonText(this::openNewComparisonText);
         libraryScreen.setOnNewProject(onNewProject);
 
         session.addListener(user -> {
@@ -55,6 +61,40 @@ public class LibraryController {
         }
 
         onOpenInAnalysis.accept(text, sourceFile);
+    }
+
+    private void openInComparison(Text firstText, Text secondText) {
+        File firstSourceFile = firstText.getFileType() == FileType.MANUAL ? null : fileStorageService.getFile(firstText.getFilePath());
+
+        if (firstText.getFileType() != FileType.MANUAL && firstSourceFile == null) {
+            ErrorAlert.show("The source file is not available on this device.");
+            return;
+        }
+
+        File secondSourceFile = secondText.getFileType() == FileType.MANUAL ? null : fileStorageService.getFile(secondText.getFilePath());
+
+        if (secondText.getFileType() != FileType.MANUAL && secondSourceFile == null) {
+            ErrorAlert.show("The source file is not available on this device.");
+            return;
+        }
+
+        onCompare.accept(Arrays.asList(firstText, secondText), Arrays.asList(firstSourceFile, secondSourceFile));
+    }
+
+    public void startComparison(Text firstText) {
+        libraryScreen.showComparisonTextModal(firstText);
+    }
+
+    private void openNewComparisonText(Text firstText) {
+        File sourceFile = firstText.getFileType() == FileType.MANUAL
+                ? null
+                : fileStorageService.getFile(firstText.getFilePath());
+        if (firstText.getFileType() != FileType.MANUAL && sourceFile == null) {
+            ErrorAlert.show("The source file is not available on this device.");
+            return;
+        }
+
+        onAddNewComparisonText.accept(firstText, sourceFile);
     }
 
     void loadTexts() {
