@@ -420,3 +420,24 @@
     -fx-icon-color: -fx-success;
     -fx-icon-size: 14px;
 }
+
+/* screen header (Analyse + Compare) */
+
+.screen-header {
+    -fx-background-color: -fx-surface;
+    -fx-padding: 10px 12px;
+    -fx-border-color: transparent transparent -fx-border-subtle transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+
+/* horizontal meter (similarity index, any future progress bar) */
+
+.meter-track {
+    -fx-background-color: -fx-border-subtle;
+    -fx-background-radius: 3px;
+}
+
+.meter-fill {
+    -fx-background-color: -fx-foreground;
+    -fx-background-radius: 3px;
+}
