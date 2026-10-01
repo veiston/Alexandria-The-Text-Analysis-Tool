@@ -12,6 +12,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.Node;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
@@ -76,6 +77,7 @@ public final class FormRenderer {
         Button chooseButton = new Button("Choose File");
         chooseButton.getStyleClass().addAll("button", "secondary");
         chooseButton.setOnAction(e -> chooseFile(container, field, fileLabel));
+        chooseButton.setMinWidth(Region.USE_PREF_SIZE);
 
         return new HBox(10, chooseButton, fileLabel);
     }
