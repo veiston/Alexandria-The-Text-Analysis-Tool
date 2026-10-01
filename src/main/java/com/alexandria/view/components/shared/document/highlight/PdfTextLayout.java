@@ -181,7 +181,7 @@ public final class PdfTextLayout {
         double height = bottom - top;
         double padding = height * LINE_HEIGHT_PADDING_RATIO / 2.0;
 
-        return new double[]{
+        return new double[] {
                 minX,
                 top - padding,
                 maxX - minX,
@@ -189,7 +189,7 @@ public final class PdfTextLayout {
         };
     }
 
-      public String textFor(int indexA, int indexB) {
+    public String textFor(int indexA, int indexB) {
         if (glyphs.isEmpty()) {
             return "";
         }
@@ -224,5 +224,48 @@ public final class PdfTextLayout {
         }
 
         return sb.toString().strip();
+    }
+
+    public int[] findGlyphRange(String passage) {
+        if (glyphs.isEmpty() || passage == null)
+            return null;
+
+        StringBuilder flat = new StringBuilder();
+        List<Integer> map = new ArrayList<>();
+
+        for (int i = 0; i < glyphs.size(); i++) {
+            for (char c : glyphs.get(i).unicode().toCharArray()) {
+                if (!Character.isWhitespace(c)) {
+                    flat.append(Character.toLowerCase(c));
+                    map.add(i);
+                }
+            }
+        }
+
+        StringBuilder needleBuilder = new StringBuilder();
+        for (char c : passage.toCharArray()) {
+            if (!Character.isWhitespace(c))
+                needleBuilder.append(Character.toLowerCase(c));
+        }
+        String needle = needleBuilder.toString();
+        if (needle.isEmpty())
+            return null;
+
+        int start = flat.indexOf(needle);
+        int end;
+
+        if (start >= 0) {
+            end = start + needle.length() - 1;
+        } else {
+            int probe = Math.min(40, needle.length());
+            start = flat.indexOf(needle.substring(0, probe));
+            if (start < 0)
+                return null;
+
+            int tail = flat.indexOf(needle.substring(needle.length() - probe), start);
+            end = tail >= 0 ? tail + probe - 1 : start + probe - 1;
+        }
+
+        return new int[] { map.get(start), map.get(end) };
     }
 }

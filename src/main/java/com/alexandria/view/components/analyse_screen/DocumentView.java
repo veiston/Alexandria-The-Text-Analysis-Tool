@@ -11,6 +11,7 @@ import javafx.scene.control.ToolBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.application.Platform;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -124,6 +125,32 @@ public class DocumentView extends BorderPane {
                 } else if (textRenderer != null) {
                         textRenderer.goToPage(page, paragraph);
                 }
+        }
+
+        public void jumpToPassage(Integer page, String passage) {
+                if (page == null)
+                        return;
+
+                goToPage(page, null);
+
+                Platform.runLater(() -> {
+                        try {
+                                if (showingPdf && pdfRenderer != null) {
+                                        pdfRenderer.highlightPassage(passage);
+                                } else if (textRenderer != null) {
+                                        textRenderer.highlightPassage(page, passage);
+                                }
+                        } catch (RuntimeException e) {
+                                e.printStackTrace();
+                        }
+                });
+        }
+
+        private static String firstWords(String text) {
+                if (text == null || text.length() <= 60)
+                        return text;
+                int cut = text.lastIndexOf(' ', 60);
+                return text.substring(0, cut > 0 ? cut : 60);
         }
 
         private void setZoom(double value) {

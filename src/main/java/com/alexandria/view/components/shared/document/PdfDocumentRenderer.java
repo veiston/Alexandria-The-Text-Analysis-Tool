@@ -241,6 +241,28 @@ public class PdfDocumentRenderer {
         restoreQuotationHighlights();
     }
 
+    public void highlightPassage(String passage) {
+        clearHighlights();
+
+        if (currentLayout != null && passage != null) {
+            int[] range = currentLayout.findGlyphRange(passage);
+
+            if (range != null) {
+                for (double[] raster : currentLayout.selectionRectangles(range[0], range[1])) {
+                    double[] d = rasterToDisplay(raster);
+                    Rectangle rectangle = new Rectangle(d[0], d[1], d[2], d[3]);
+                    rectangle.setManaged(false);
+                    rectangle.setMouseTransparent(true);
+                    rectangle.getStyleClass().add(PdfHighlight.SEARCH_STYLE_CLASS);
+                    pageHost.getChildren().add(rectangle);
+                }
+                imageView.toBack();
+            }
+        }
+
+        restoreQuotationHighlights();
+    }
+
     public void highlightSearchMatches(List<SearchMatch> matches, int activeIndex) {
         clearHighlights();
 
@@ -253,7 +275,7 @@ public class PdfDocumentRenderer {
 
         List<Integer> pageMatchIndices = new ArrayList<>();
         for (int i = 0; i < matches.size(); i++) {
-         SearchMatch match = matches.get(i);
+            SearchMatch match = matches.get(i);
             if (match != null && match.page() != null && match.page() == pageNumber) {
                 pageMatchIndices.add(i);
             }
@@ -268,11 +290,11 @@ public class PdfDocumentRenderer {
 
         try {
             List<Rectangle> rectangles = PdfHighlight.findHighlights(
-                document, currentPage, term, BASE_DPI, null);
+                    document, currentPage, term, BASE_DPI, null);
 
-        // Extraction-order mismatch (rare, shouldn't normally happen for a
-        // single term on one page) — fall back to uniform highlighting
-        // rather than risk marking the wrong occurrence as active.
+            // Extraction-order mismatch (rare, shouldn't normally happen for a
+            // single term on one page) — fall back to uniform highlighting
+            // rather than risk marking the wrong occurrence as active.
             boolean countsMatch = rectangles.size() == pageMatchIndices.size();
 
             for (int i = 0; i < rectangles.size(); i++) {

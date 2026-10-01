@@ -11,14 +11,14 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import java.util.List;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class TextContextPanel extends VBox {
     private static final int SNIPPET_CHAR_BUDGET = 180;
 
     private final VBox cardsHost = new VBox(10);
     private final Label emptyLabel = new Label("Open a document to see relevant paragraphs.");
-    private BiConsumer<Integer, Integer> onJump = (page, paragraph) -> {
+    private Consumer<TextFragment> onJump = fragment -> {
     };
 
     public TextContextPanel() {
@@ -27,7 +27,7 @@ public class TextContextPanel extends VBox {
         setPadding(new Insets(16));
 
         Label heading = new Label("Key Paragraphs");
-        heading.getStyleClass().add("heading-md");
+        heading.getStyleClass().add("heading-sm");
         emptyLabel.getStyleClass().add("text-muted");
 
         getChildren().addAll(heading, cardsHost);
@@ -51,10 +51,9 @@ public class TextContextPanel extends VBox {
         HBox spacer = new HBox();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        // TODO go-to: wired to DocumentView.goToPage
         Hyperlink jumpLink = new Hyperlink("Go to →");
         jumpLink.getStyleClass().add("hyperlink");
-        jumpLink.setOnAction(e -> onJump.accept(fragment.page(), fragment.paragraph()));
+        jumpLink.setOnAction(e -> onJump.accept(fragment));
 
         HBox topRow = new HBox(rankLabel, spacer, jumpLink);
         topRow.setAlignment(Pos.CENTER_LEFT);
@@ -68,8 +67,9 @@ public class TextContextPanel extends VBox {
         return card;
     }
 
-    public void setOnJump(BiConsumer<Integer, Integer> handler) {
-        this.onJump = handler;
+    public void setOnJump(Consumer<TextFragment> handler) {
+        this.onJump = handler == null ? fragment -> {
+        } : handler;
     }
 
     private void showEmpty() {
