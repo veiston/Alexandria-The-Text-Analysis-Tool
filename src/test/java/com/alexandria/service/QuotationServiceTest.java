@@ -97,6 +97,6 @@ public class QuotationServiceTest {
     }
 
     private Text text(int userId) {
-        return new Text(1, userId, "Text", "text.txt", FileType.TXT, "Content", null);
+        return new Text(1, userId, "Text", "text.txt", null, FileType.TXT, "Content", null);
     }
 }

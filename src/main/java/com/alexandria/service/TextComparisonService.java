@@ -10,7 +10,7 @@ import static com.alexandria.service.AnalysisUtils.*;
 
 
 
-public class TextComparisonService {
+public class TextComparisonService implements TextComparisonServiceINT {
 
     public TextComparisonResult compareTexts(Map<Integer, String> textsById, int limit) {
         if (textsById == null || textsById.isEmpty()) {

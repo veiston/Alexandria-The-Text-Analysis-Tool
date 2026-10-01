@@ -19,6 +19,7 @@ import com.alexandria.dao.TextDAO;
 import com.alexandria.model.FileType;
 import com.alexandria.model.Text;
 import com.alexandria.model.User;
+import com.alexandria.service.FileStorageService;
 import com.alexandria.view.screens.LibraryScreen;
 
 import javafx.application.Platform;
@@ -81,7 +82,14 @@ public class LibraryControllerTest {
     }
 
     private LibraryController newController() {
-        return new LibraryController(textDAO, libraryScreen, text -> {}, text -> {}, () -> {});
+        return new LibraryController(
+                textDAO,
+                libraryScreen,
+                new FileStorageService(),
+                (text, file) -> {},
+                (texts, files) -> {},
+                (text, file) -> {},
+                () -> {});
     }
 
     private User user() {
@@ -89,6 +97,6 @@ public class LibraryControllerTest {
     }
 
     private Text sampleText(int id, String title) {
-        return new Text(id, 1, title, "meditations.pdf", FileType.PDF, "content", LocalDateTime.now());
+        return new Text(id, 1, title, "meditations.pdf", null, FileType.PDF, "content", LocalDateTime.now());
     }
 }

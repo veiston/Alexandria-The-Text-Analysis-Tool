@@ -2,6 +2,7 @@ package com.alexandria.view.screens;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -12,6 +13,7 @@ import com.alexandria.view.components.shared.EmptyState;
 import com.alexandria.view.components.shared.SearchInput;
 import com.alexandria.view.components.shared.modal.ConfirmationAlert;
 import com.alexandria.view.components.shared.modal.Modal;
+import com.alexandria.view.components.library_screen.ComparisonTextModal;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -35,11 +37,13 @@ public class LibraryScreen extends StackPane {
     private final BorderPane libraryLayout = new BorderPane();
     private final VBox libraryBody = buildBody();
     private final Modal modal = new Modal();
+    private final ComparisonTextModal comparisonTextModal = new ComparisonTextModal();
 
     private List<Text> texts = List.of();
 
     private Consumer<Text> onOpenInAnalysis = text -> {};
-    private Consumer<Text> onCompare = text -> {};
+    private BiConsumer<Text, Text> onCompare = (firstText, secondText) -> {};
+    private Consumer<Text> onAddNewComparisonText = text -> {};
     private Consumer<Integer> onDeleteText = id -> {};
     private Runnable onNewProject = () -> {};
     private Runnable onShown = () -> {};
@@ -59,6 +63,15 @@ public class LibraryScreen extends StackPane {
         modal.prefHeightProperty().bind(heightProperty());
 
         configureActions();
+        comparisonTextModal.setOnCompare((firstText, secondText) -> {
+            modal.hide();
+            onCompare.accept(firstText, secondText);
+        });
+        comparisonTextModal.setOnCancel(modal::hide);
+        comparisonTextModal.setOnAddNewText(firstText -> {
+            modal.hide();
+            onAddNewComparisonText.accept(firstText);
+        });
         showTexts();
 
         // Refresh when router mounts screen into active scene
@@ -114,9 +127,15 @@ public class LibraryScreen extends StackPane {
         }
     }
 
-    public void setOnCompare(Consumer<Text> handler) {
+    public void setOnCompare(BiConsumer<Text, Text> handler) {
         if (handler != null) {
             onCompare = handler;
+        }
+    }
+
+    public void setOnAddNewComparisonText(Consumer<Text> handler) {
+        if (handler != null) {
+            onAddNewComparisonText = handler;
         }
     }
 
@@ -274,8 +293,7 @@ public class LibraryScreen extends StackPane {
         compareBtn.getStyleClass().addAll("button", "secondary");
         compareBtn.setMaxWidth(Double.MAX_VALUE);
         compareBtn.setOnAction(e -> {
-            modal.hide();
-            onCompare.accept(text);
+            showComparisonTextModal(text);
         });
 
         VBox content = new VBox(16, new VBox(4, title, subtitle), new VBox(10, analysisBtn, compareBtn));
@@ -284,6 +302,11 @@ public class LibraryScreen extends StackPane {
         content.setPrefWidth(340);
 
         modal.show(content);
+    }
+
+    public void showComparisonTextModal(Text firstText) {
+        comparisonTextModal.setTexts(firstText, texts);
+        modal.show(comparisonTextModal);
     }
 
     private String titleText(Text text) {

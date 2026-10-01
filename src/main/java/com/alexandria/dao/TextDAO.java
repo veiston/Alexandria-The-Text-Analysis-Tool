@@ -14,15 +14,16 @@ import java.util.List;
 
 public class TextDAO {
 	public Text create(Text text) throws SQLException {
-		String sql = "INSERT INTO texts (user_id, title, file_name, file_type, content) VALUES (?, ?, ?, ?, ?)";
+		String sql = "INSERT INTO texts (user_id, title, file_name, file_path, file_type, content) VALUES (?, ?, ?, ?, ?, ?)";
 
 		try (Connection connection = DatabaseConnection.getConnection();
 				PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 			statement.setInt(1, text.getUserId());
 			statement.setString(2, text.getTitle());
 			statement.setString(3, text.getFileName());
-			statement.setString(4, text.getFileType().name());
-			statement.setString(5, text.getContent());
+			statement.setString(4, text.getFilePath());
+			statement.setString(5, text.getFileType().name());
+			statement.setString(6, text.getContent());
 
 			statement.executeUpdate();
 
@@ -52,6 +53,7 @@ public class TextDAO {
 							resultSet.getInt("user_id"),
 							resultSet.getString("title"),
 							resultSet.getString("file_name"),
+							resultSet.getString("file_path"),
 							FileType.valueOf(fileType),
 							resultSet.getString("content"),
 							resultSet.getTimestamp("created_at").toLocalDateTime());
@@ -80,6 +82,7 @@ public class TextDAO {
 							resultSet.getInt("user_id"),
 							resultSet.getString("title"),
 							resultSet.getString("file_name"),
+							resultSet.getString("file_path"),
 							FileType.valueOf(fileType),
 							resultSet.getString("content"),
 							resultSet.getTimestamp("created_at").toLocalDateTime());
@@ -93,16 +96,16 @@ public class TextDAO {
 	}
 
 	public boolean update(Text text) throws SQLException {
-		String sql = "UPDATE texts SET title = ?, file_name = ?, file_type = ?, content = ? WHERE id = ?";
+		String sql = "UPDATE texts SET title = ?, file_name = ?, file_path = ?, file_type = ?, content = ? WHERE id = ?";
 
 		try (Connection connection = DatabaseConnection.getConnection();
 				PreparedStatement statement = connection.prepareStatement(sql)) {
 			statement.setString(1, text.getTitle());
 			statement.setString(2, text.getFileName());
-
-			statement.setString(3, text.getFileType().name());
-			statement.setString(4, text.getContent());
-			statement.setInt(5, text.getId());
+			statement.setString(3, text.getFilePath());
+			statement.setString(4, text.getFileType().name());
+			statement.setString(5, text.getContent());
+			statement.setInt(6, text.getId());
 
 			int updatedRows = statement.executeUpdate();
 
