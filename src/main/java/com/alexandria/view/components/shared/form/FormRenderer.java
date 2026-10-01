@@ -20,7 +20,6 @@ public final class FormRenderer {
 
     private final Map<String, TextInputControl> inputs = new LinkedHashMap<>();
     private final Map<String, File> files = new LinkedHashMap<>();
-    private final Map<String, Label> fileLabels = new LinkedHashMap<>();
     private final Map<String, Node> fieldNodes = new LinkedHashMap<>();
 
     public void render(VBox container, List<FormField> fields) {
@@ -70,7 +69,6 @@ public final class FormRenderer {
     private HBox buildFilePicker(VBox container, FormField field) {
         Label fileLabel = new Label("No file selected");
         fileLabel.getStyleClass().add("file-name");
-        fileLabels.put(field.key(), fileLabel);
 
 
         Button chooseButton = new Button("Choose File");
@@ -159,13 +157,6 @@ public final class FormRenderer {
     public void reset() {
         inputs.values().forEach(TextInputControl::clear);
         files.clear();
-        fileLabels.values().forEach(fileLabel -> {
-            fileLabel.setText("No file selected");
-            fileLabel.getStyleClass().remove("file-name-selected");
-            if (!fileLabel.getStyleClass().contains("file-name")) {
-                fileLabel.getStyleClass().add("file-name");
-            }
-        });
     }
 
     private boolean isFileField(FormField field) {
