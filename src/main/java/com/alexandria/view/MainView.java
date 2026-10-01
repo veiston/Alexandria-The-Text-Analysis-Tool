@@ -67,6 +67,11 @@ public class MainView extends StackPane {
         modal.hide();
     }
 
+    public void showSecondComparisonTextModal(String firstTextTitle) {
+        newProjectModal.showSecondComparisonTextForm(firstTextTitle);
+        modal.show(newProjectModal);
+    }
+
     public void startUserGuide() {
         userGuideTour.start();
     }
