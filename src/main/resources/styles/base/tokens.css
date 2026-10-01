@@ -11,6 +11,13 @@
     -fx-foreground-muted: #9aa0ab;
     -fx-foreground-faint: #c2c6cf;
 
+    -fx-success-soft: #dcfce7;
+    -fx-success-text: #15803d;
+    -fx-warning-soft: #fef3c7;
+    -fx-warning-text: #b45309;
+    -fx-danger-soft: #fee2e2;
+    -fx-danger-text: #b91c1c;
+
     /* Colors — semantic */
     -fx-accent: #3b82f6;          /* active nav item, links */
     -fx-accent-soft: #eff6ff;
@@ -51,6 +58,13 @@
     -fx-accent-soft: #1e3a5f;
     -fx-highlight: #86efac;
     -fx-highlight-soft: #164a35;
+
+    -fx-success-soft: #164a35;
+    -fx-success-text: #86efac;
+    -fx-warning-soft: #4a3410;
+    -fx-warning-text: #fcd34d;
+    -fx-danger-soft: #4a1d1d;
+    -fx-danger-text: #fca5a5;
 
     -fx-card-shadow: dropshadow(gaussian, rgba(0,0,0,0.30), 12, 0, 0, 2);
 }
