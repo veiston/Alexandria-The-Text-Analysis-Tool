@@ -6,6 +6,7 @@ import java.util.List;
 import com.alexandria.dao.TextDAO;
 import com.alexandria.dao.UserDAO;
 import com.alexandria.model.Text;
+import com.alexandria.service.FileStorageService;
 import com.alexandria.service.PdfService;
 import com.alexandria.service.SearchService;
 import com.alexandria.service.TermAnalysisService;
@@ -89,6 +90,7 @@ public class MainController {
         return new LibraryController(
                 new TextDAO(),
                 libraryScreen,
+                new FileStorageService(),
                 this::openLibraryText,
                 text -> {
                     mainView.navigateTo(Route.COMPARE);
@@ -96,13 +98,12 @@ public class MainController {
                 mainView::showNewProjectModal);
     }
 
-    private void openLibraryText(Text text) {
-        // Get source file for PDF rendering, // TODO: Fix This
+    private void openLibraryText(Text text, File sourceFile) {
         List<Integer> pageOffsets = List.of();
         if (text.getContent() != null && !text.getContent().isBlank()) {
             pageOffsets = TextPaginator.paginate(text.getContent(), TextPaginator.CHARS_PER_PAGE);
         }
-        openAnalysis(text, pageOffsets, null);
+        openAnalysis(text, pageOffsets, sourceFile);
     }
 
     private void configureUserGuideTour() {

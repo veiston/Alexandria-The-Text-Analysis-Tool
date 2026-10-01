@@ -42,7 +42,7 @@ public class ArchiveTermAnalysisServiceTest {
 
 	@Test
 	public void savesTermAnalysis() throws SQLException {
-		Text text = new Text(1, 1, "Test text", "test.txt", FileType.TXT, "Test text.", null);
+		Text text = new Text(1, 1, "Test text", "test.txt", null, FileType.TXT, "Test text.", null);
 		TermAnalysisResult result = new TermAnalysisResult("test", 1, 500.0, 1, 1, List.of());
 		TermAnalysis expectedSavedTermAnalysis = new TermAnalysis(1, 1, 1, "test", "{}", null);
 
@@ -123,7 +123,7 @@ public class ArchiveTermAnalysisServiceTest {
 	}
 
 	private Text text() {
-		return new Text(1, 1, "Test text", "test.txt", FileType.TXT, "Test text.", null);
+		return new Text(1, 1, "Test text", "test.txt", null, FileType.TXT, "Test text.", null);
 	}
 
 	private TermAnalysis savedTermAnalysis() {

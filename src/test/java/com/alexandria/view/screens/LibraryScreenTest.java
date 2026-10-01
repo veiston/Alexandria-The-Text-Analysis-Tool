@@ -127,6 +127,6 @@ public class LibraryScreenTest {
     }
 
     private Text sampleText(int id, String title) {
-        return new Text(id, 1, title, "doc.pdf", FileType.PDF, "content", LocalDateTime.now());
+        return new Text(id, 1, title, "doc.pdf", null, FileType.PDF, "content", LocalDateTime.now());
     }
 }
