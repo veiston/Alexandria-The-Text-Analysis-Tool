@@ -15,7 +15,7 @@ public record TextComparisonResult(
 	List<Integer> textIds,
 	List<TextComparisonRow> commonWords,
 	double similarityScore,
-	String similarityBand,
+	String similarityAmount,
 	List<ParagraphMatch> similarParagraphs
 ) {
 	public record TextComparisonRow(
@@ -40,14 +40,14 @@ public record TextComparisonResult(
 		}
 	}
 
-	public enum SimilarityBand {
+	public enum SimilarityAmount {
 		LOW("Low"),
 		MODERATE("Moderate"),
 		HIGH("High");
 
 		private final String label;
 
-		SimilarityBand(String label) {
+		SimilarityAmount(String label) {
 			this.label = label;
 		}
 
@@ -56,7 +56,7 @@ public record TextComparisonResult(
 		}
 
 			// These can be optimized later
-		public static SimilarityBand fromScore(double score) {
+		public static SimilarityAmount fromScore(double score) {
 			if (score >= 67.0) {
 				return HIGH;
 			}

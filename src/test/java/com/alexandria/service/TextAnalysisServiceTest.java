@@ -133,7 +133,7 @@ public class TextAnalysisServiceTest {
         TextComparisonResult result = textComparisonService.compareTexts(texts, Collections.emptyMap(), 10);
         assertNotNull(result);
         assertEquals(100.0, result.similarityScore(), 0.01);
-        assertEquals("High", result.similarityBand());
+        assertEquals("High", result.similarityAmount());
         assertFalse(result.commonWords().isEmpty());
     }
 
@@ -144,7 +144,7 @@ public class TextAnalysisServiceTest {
         TextComparisonResult result = textComparisonService.compareTexts(texts, Collections.emptyMap(), 10);
         assertNotNull(result);
         assertEquals(0.0, result.similarityScore(), 0.001);
-        assertEquals("Low", result.similarityBand());
+        assertEquals("Low", result.similarityAmount());
         assertTrue(result.commonWords().isEmpty());
         assertTrue(result.similarParagraphs().isEmpty());
     }

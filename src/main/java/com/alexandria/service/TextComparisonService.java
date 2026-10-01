@@ -43,7 +43,7 @@ public class TextComparisonService implements TextComparisonServiceINT {
             similarityScore = calculateCosineSimilarity(iterator.next(), iterator.next());
         }
 
-        String similarityBand = TextComparisonResult.SimilarityBand.fromScore(similarityScore).label();
+        String similarityAmount = TextComparisonResult.SimilarityAmount.fromScore(similarityScore).label();
 
         long maxRows = Long.MAX_VALUE;
         if (limit > 0) {
@@ -58,7 +58,7 @@ public class TextComparisonService implements TextComparisonServiceINT {
 
         List<TextComparisonResult.ParagraphMatch> similarParagraphs = findSimilarParagraphs(textsById, pageOffsetsById, intersection);
 
-        return new TextComparisonResult(new ArrayList<>(textsById.keySet()), rows, similarityScore, similarityBand, similarParagraphs);
+        return new TextComparisonResult(new ArrayList<>(textsById.keySet()), rows, similarityScore, similarityAmount, similarParagraphs);
     }
 
     private double calculateCosineSimilarity(Map<String, Long> vec1, Map<String, Long> vec2) {
