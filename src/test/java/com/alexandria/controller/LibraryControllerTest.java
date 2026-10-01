@@ -87,7 +87,7 @@ public class LibraryControllerTest {
                 libraryScreen,
                 new FileStorageService(),
                 (text, file) -> {},
-                text -> {},
+                (firstText, secondText) -> {},
                 () -> {});
     }
 
