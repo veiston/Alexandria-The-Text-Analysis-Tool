@@ -90,12 +90,30 @@ public final class PdfTextLayout {
         double[] lineTop = new double[lineCount];
         double[] lineBottom = new double[lineCount];
 
-        Arrays.fill(lineTop, Double.MAX_VALUE);
-        Arrays.fill(lineBottom, -Double.MAX_VALUE);
+        int from = 0;
+        while (from < result.size()) {
+            int lineIndex = result.get(from).line();
+            int to = from;
+            while (to < result.size() && result.get(to).line() == lineIndex) {
+                to++;
+            }
 
-        for (Glyph g : result) {
-            lineTop[g.line()] = Math.min(lineTop[g.line()], g.y());
-            lineBottom[g.line()] = Math.max(lineBottom[g.line()], g.y() + g.height());
+            double[] heights = new double[to - from];
+            double[] baselines = new double[to - from];
+            for (int i = from; i < to; i++) {
+                heights[i - from] = result.get(i).height();
+                baselines[i - from] = result.get(i).y() + result.get(i).height();
+            }
+            Arrays.sort(heights);
+            Arrays.sort(baselines);
+
+            double medianHeight = heights[heights.length / 2];
+            double medianBaseline = baselines[baselines.length / 2];
+
+            lineBottom[lineIndex] = medianBaseline;
+            lineTop[lineIndex] = medianBaseline - medianHeight;
+
+            from = to;
         }
 
         return new PdfTextLayout(result, lineTop, lineBottom);
