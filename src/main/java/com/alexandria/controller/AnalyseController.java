@@ -11,7 +11,13 @@ import com.alexandria.service.analysis.TermAnalysisServiceINT;
 import com.alexandria.service.analysis.TextAnalysisResult;
 import com.alexandria.service.analysis.TextAnalysisServiceINT;
 import com.alexandria.view.screens.AnalyseScreen;
-
+import com.alexandria.service.ArchiveTermAnalysisService;
+import com.alexandria.service.ArchiveTextAnalysisService;
+import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 import java.io.File;
 import java.util.List;
 
@@ -22,7 +28,13 @@ public class AnalyseController {
     private final TextAnalysisServiceINT textAnalysisService;
     private final QuotationController quotationController;
     private final UserSessionController session = UserSessionController.getInstance();
+    private final ArchiveTextAnalysisService archiveTextAnalysisService = new ArchiveTextAnalysisService();
+    private final ArchiveTermAnalysisService archiveTermAnalysisService = new ArchiveTermAnalysisService();
+    private final Map<String, TermAnalysisResult> trackedTerms = new LinkedHashMap<>();
+    private final Set<String> savedTerms = new HashSet<>();
 
+    private TextAnalysisResult currentTextAnalysis;
+    private boolean textAnalysisSaved;
     private Text currentText;
     private List<Integer> currentPageOffsets = List.of();
     private List<SearchMatch> currentSearchMatches = List.of();
@@ -51,7 +63,6 @@ public class AnalyseController {
             Integer userId = user == null ? null : user.getId();
             Integer textId = text.getId();
 
-
             if (!java.util.Objects.equals(userId, text.getUserId())) {
                 userId = null;
                 textId = null;
@@ -59,6 +70,9 @@ public class AnalyseController {
 
             quotationController.openText(userId, textId);
             clearSearchState();
+            textAnalysisSaved = false;
+            trackedTerms.clear();
+            savedTerms.clear();
             return TextAnalysisOutcome.ok(computeTextAnalysis());
         } catch (Exception e) {
             return TextAnalysisOutcome.error(
@@ -111,11 +125,63 @@ public class AnalyseController {
         if (outcome.success()) {
             currentSearchMatches = outcome.matches();
             currentSearchMatchIndex = currentSearchMatches.isEmpty() ? -1 : 0;
+            if (!currentSearchMatches.isEmpty()) {
+                trackedTerms.put(term, outcome.termAnalysis());
+            }
         } else {
             clearSearchState();
         }
 
         return outcome;
+    }
+
+    public void untrackTerm(String term) {
+        trackedTerms.remove(term);
+        savedTerms.remove(term);
+    }
+
+    public record SaveOutcome(boolean success, String message, int savedCount) {
+
+        static SaveOutcome ok(int savedCount) {
+            return new SaveOutcome(true, null, savedCount);
+        }
+
+        static SaveOutcome error(String message) {
+            return new SaveOutcome(false, message, 0);
+        }
+    }
+
+    public SaveOutcome saveAnalysis() {
+        if (currentText == null) {
+            return SaveOutcome.error("No text is currently open.");
+        }
+
+        if (currentText.getUserId() == null || currentText.getId() == null) {
+            return SaveOutcome.error("Log in and save the project to keep its analysis.");
+        }
+
+        int saved = 0;
+
+        try {
+            if (currentTextAnalysis != null && !textAnalysisSaved) {
+                archiveTextAnalysisService.save(currentText, currentTextAnalysis);
+                textAnalysisSaved = true;
+                saved++;
+            }
+
+            for (Map.Entry<String, TermAnalysisResult> entry : trackedTerms.entrySet()) {
+                if (savedTerms.contains(entry.getKey())) {
+                    continue;
+                }
+                archiveTermAnalysisService.save(currentText, entry.getValue());
+                savedTerms.add(entry.getKey());
+                saved++;
+            }
+        } catch (SQLException | RuntimeException e) {
+            return SaveOutcome.error("Could not save analysis: " + e.getMessage());
+        }
+
+        return SaveOutcome.ok(saved);
     }
 
     public SearchOutcome search(
@@ -186,14 +252,8 @@ public class AnalyseController {
     }
 
     private TextAnalysisResult computeTextAnalysis() {
-        TextAnalysisResult result = textAnalysisService.analyzeText(
-                currentText.getContent(),
-                currentPageOffsets);
-
-        // TODO: Persist text analysis/statistics.
-        // Currently analysis is calculated in memory only.
-        // IMPORTANT: do not remove in memory it is used for guests
-
+        TextAnalysisResult result = textAnalysisService.analyzeText(currentText.getContent(), currentPageOffsets);
+        currentTextAnalysis = result;
         return result;
     }
 
@@ -338,6 +398,8 @@ public class AnalyseController {
                         currentSearchMatchIndex);
             }
         });
+
+        analyseScreen.setOnTrackedTermRemoved(this::untrackTerm);
     }
 
     public record TextAnalysisOutcome(
