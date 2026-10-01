@@ -5,6 +5,7 @@ import com.alexandria.model.FileType;
 import com.alexandria.model.Text;
 import com.alexandria.model.User;
 import com.alexandria.service.PdfService;
+import com.alexandria.service.FileStorageService;
 import com.alexandria.view.components.side_navbar.new_project.NewProjectModal;
 
 import org.junit.After;
@@ -16,6 +17,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -345,6 +347,56 @@ public class ProjectControllerTest {
                                                                 && text.getFileType() == FileType.MANUAL
                                                                 && text.getContent()
                                                                                 .equals("Hello")));
+        }
+
+        @Test
+        public void createUploadedProjectCopiesFileAndStoresItsPath()
+                        throws Exception {
+
+                session.login(new User(1, "Lua", "lua@example.com", null, null, "hash"));
+                Path uploadsDirectory = Files.createTempDirectory("alexandria-uploads");
+                File sourceFile = File.createTempFile("source", ".txt");
+                Files.writeString(sourceFile.toPath(), "Stored file content");
+
+                try {
+                        when(textDAO.create(any(Text.class))).thenAnswer(invocation -> {
+                                Text text = invocation.getArgument(0);
+                                text.setId(10);
+                                return text;
+                        });
+
+                        ProjectController storageController = new ProjectController(
+                                        textDAO,
+                                        new PdfService(),
+                                        new FileStorageService(uploadsDirectory));
+                        NewProjectModal.CreatedProject project = new NewProjectModal.CreatedProject(
+                                        "Uploaded text",
+                                        NewProjectModal.SourceType.UPLOAD,
+                                        "",
+                                        null,
+                                        sourceFile,
+                                        NewProjectModal.Destination.ANALYSE);
+
+                        ProjectController.Result result = storageController.createProject(project);
+
+                        assertTrue(result.success());
+                        assertNotNull(result.text().getFilePath());
+                        Path storedFile = Path.of(result.text().getFilePath());
+                        assertTrue(Files.exists(storedFile));
+                        assertEquals("Stored file content", Files.readString(storedFile));
+                        assertTrue(storedFile.startsWith(uploadsDirectory));
+                } finally {
+                        Files.deleteIfExists(sourceFile.toPath());
+                        try (var files = Files.walk(uploadsDirectory)) {
+                                files.sorted(java.util.Comparator.reverseOrder())
+                                                .forEach(path -> {
+                                                        try {
+                                                                Files.deleteIfExists(path);
+                                                        } catch (java.io.IOException ignored) {
+                                                        }
+                                                });
+                        }
+                }
         }
 
         @Test

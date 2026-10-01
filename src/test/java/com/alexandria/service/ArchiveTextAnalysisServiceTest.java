@@ -42,7 +42,7 @@ public class ArchiveTextAnalysisServiceTest {
 
 	@Test
 	public void savesTextAnalysis() throws SQLException {
-		Text text = new Text(1, 1, "Test text", "test.txt", FileType.TXT, "Test text.", null);
+		Text text = new Text(1, 1, "Test text", "test.txt", null, FileType.TXT, "Test text.", null);
 		TextAnalysisResult result = new TextAnalysisResult(2, 2, 1, 1, List.of(), List.of());
 		TextAnalysis expectedSavedTextAnalysis = new TextAnalysis(1, 1, 1, "{}", null);
 
@@ -123,7 +123,7 @@ public class ArchiveTextAnalysisServiceTest {
 	}
 
 	private Text text() {
-		return new Text(1, 1, "Test text", "test.txt", FileType.TXT, "Test text.", null);
+		return new Text(1, 1, "Test text", "test.txt", null, FileType.TXT, "Test text.", null);
 	}
 
 	private TextAnalysis savedTextAnalysis() {

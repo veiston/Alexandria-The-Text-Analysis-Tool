@@ -2,6 +2,7 @@ package com.alexandria.service;
 
 import com.alexandria.service.analysis.TermComparisonResult;
 import com.alexandria.service.analysis.TermComparisonResult.TermTextOccurrence;
+import com.alexandria.service.analysis.TermComparisonServiceINT;
 
 import java.util.*;
 import java.util.regex.*;
@@ -10,7 +11,7 @@ import static com.alexandria.service.AnalysisUtils.*;
 
 
 
-public class TermComparisonService {
+public class TermComparisonService implements TermComparisonServiceINT {
 
     public TermComparisonResult compareTerm(Map<Integer, String> textsById, Map<Integer, String> titlesById, String term) {
         return compareTerm(textsById, titlesById, term, false);

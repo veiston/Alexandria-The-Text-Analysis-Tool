@@ -28,12 +28,29 @@ public class NewProjectModal extends VBox {
             String fileName,
             String textContent,
             File file,
-            Destination destination) {
+            Destination destination,
+            boolean addingSecondComparisonText) {
+
+        public CreatedProject(
+                String title,
+                SourceType sourceType,
+                String fileName,
+                String textContent,
+                File file,
+                Destination destination) {
+
+            this(title, sourceType, fileName, textContent, file, destination, false);
+        }
     }
 
     private final Toggle sourceToggle;
     private final Toggle uploadDestinationToggle;
     private final Toggle pasteDestinationToggle;
+    private final VBox uploadDestinationBox;
+    private final VBox pasteDestinationBox;
+    private final Label heading;
+    private final Label subtitle;
+    private final VBox header;
 
     private final VBox formHost;
 
@@ -41,6 +58,7 @@ public class NewProjectModal extends VBox {
     private final PasteTextForm pasteForm;
 
     private final LoadingIndicator loadingIndicator;
+    private boolean addingSecondComparisonText;
 
     private Consumer<CreatedProject> onCreated = project -> {
     };
@@ -49,10 +67,16 @@ public class NewProjectModal extends VBox {
         getStyleClass().add("modal-card");
         setSpacing(20);
         setPadding(new Insets(24));
-        setPrefWidth(440);
+        setPrefWidth(380);
 
-        Label heading = new Label("New Project");
+        heading = new Label("New Project");
         heading.getStyleClass().add("heading-lg");
+
+        subtitle = new Label();
+        subtitle.getStyleClass().add("text-muted");
+        subtitle.setVisible(false);
+        subtitle.setManaged(false);
+        header = new VBox(4, heading, subtitle);
 
         sourceToggle = new Toggle("Upload File", "Paste Text");
 
@@ -61,11 +85,12 @@ public class NewProjectModal extends VBox {
 
         formHost = new VBox();
 
-        uploadForm = new UploadPdfForm(
-                createDestinationBox(uploadDestinationToggle));
+        uploadDestinationBox = createDestinationBox(uploadDestinationToggle);
+        pasteDestinationBox = createDestinationBox(pasteDestinationToggle);
 
-        pasteForm = new PasteTextForm(
-                createDestinationBox(pasteDestinationToggle));
+        uploadForm = new UploadPdfForm(uploadDestinationBox);
+
+        pasteForm = new PasteTextForm(pasteDestinationBox);
 
         loadingIndicator = new LoadingIndicator();
         loadingIndicator.setMaxSize(28, 28);
@@ -83,7 +108,7 @@ public class NewProjectModal extends VBox {
         formHost.getChildren().add(uploadForm);
 
         getChildren().addAll(
-                heading,
+                header,
                 sourceToggle,
                 formStack);
     }
@@ -131,11 +156,9 @@ public class NewProjectModal extends VBox {
     }
 
     private void configureDestinationToggles() {
-        uploadDestinationToggle.setOnToggle(index ->
-                pasteDestinationToggle.setSelectedIndex(index));
+        uploadDestinationToggle.setOnToggle(index -> pasteDestinationToggle.setSelectedIndex(index));
 
-        pasteDestinationToggle.setOnToggle(index ->
-                uploadDestinationToggle.setSelectedIndex(index));
+        pasteDestinationToggle.setOnToggle(index -> uploadDestinationToggle.setSelectedIndex(index));
     }
 
     private void showUpload() {
@@ -155,10 +178,9 @@ public class NewProjectModal extends VBox {
             String textContent,
             File file) {
 
-        Destination destination =
-                uploadDestinationToggle.getSelectedIndex() == 0
-                        ? Destination.ANALYSE
-                        : Destination.COMPARE;
+        Destination destination = uploadDestinationToggle.getSelectedIndex() == 0
+                ? Destination.ANALYSE
+                : Destination.COMPARE;
 
         CreatedProject project = new CreatedProject(
                 title,
@@ -166,7 +188,8 @@ public class NewProjectModal extends VBox {
                 fileName,
                 textContent,
                 file,
-                destination);
+                destination,
+                addingSecondComparisonText);
 
         onCreated.accept(project);
     }
@@ -193,6 +216,17 @@ public class NewProjectModal extends VBox {
     }
 
     public void reset() {
+        addingSecondComparisonText = false;
+        heading.setText("New Project");
+        subtitle.setText("");
+        subtitle.setVisible(false);
+        subtitle.setManaged(false);
+        uploadDestinationBox.setVisible(true);
+        uploadDestinationBox.setManaged(true);
+        pasteDestinationBox.setVisible(true);
+        pasteDestinationBox.setManaged(true);
+        uploadForm.getForm().getSubmitButton().setText("Create Project");
+        pasteForm.getForm().getSubmitButton().setText("Create Project");
         uploadForm.reset();
         pasteForm.reset();
 
@@ -200,6 +234,25 @@ public class NewProjectModal extends VBox {
         uploadDestinationToggle.setSelectedIndex(0);
         pasteDestinationToggle.setSelectedIndex(0);
 
+        showUpload();
+        setLoading(false);
+    }
+
+    public void showSecondComparisonTextForm(String firstTextTitle) {
+        addingSecondComparisonText = true;
+        heading.setText("Compare \"" + firstTextTitle + "\" with:");
+        subtitle.setText("Add a second text to compare");
+        subtitle.setVisible(true);
+        subtitle.setManaged(true);
+        uploadDestinationBox.setVisible(false);
+        uploadDestinationBox.setManaged(false);
+        pasteDestinationBox.setVisible(false);
+        pasteDestinationBox.setManaged(false);
+        uploadForm.getForm().getSubmitButton().setText("Add to comparison");
+        pasteForm.getForm().getSubmitButton().setText("Add to comparison");
+        uploadForm.reset();
+        pasteForm.reset();
+        sourceToggle.setSelectedIndex(0);
         showUpload();
         setLoading(false);
     }

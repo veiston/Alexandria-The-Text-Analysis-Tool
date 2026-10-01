@@ -1,11 +1,13 @@
 package com.alexandria.controller;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 
 import com.alexandria.dao.TextDAO;
 import com.alexandria.dao.UserDAO;
 import com.alexandria.model.Text;
+import com.alexandria.service.FileStorageService;
 import com.alexandria.service.PdfService;
 import com.alexandria.service.SearchService;
 import com.alexandria.service.TermAnalysisService;
@@ -13,6 +15,7 @@ import com.alexandria.service.TextAnalysisService;
 import com.alexandria.utils.UserGuideSettings;
 import com.alexandria.view.MainView;
 import com.alexandria.view.components.shared.document.highlight.TextPaginator;
+import com.alexandria.view.components.shared.modal.ErrorAlert;
 import com.alexandria.view.components.side_navbar.new_project.NewProjectModal;
 import com.alexandria.view.components.user_guide.UserGuideTour;
 import com.alexandria.view.components.user_guide.UserGuideTourData;
@@ -31,8 +34,11 @@ public class MainController {
     private final UserDAO userDAO;
     private final UserSessionController session = UserSessionController.getInstance();
     private final AnalyseController analyseController;
+    private final CompareController compareController;
     private final ArchiveController archiveController;
     private final LibraryController libraryController;
+    private Text firstComparisonText;
+    private File firstComparisonSourceFile;
 
     public MainController() {
         userDAO = new UserDAO();
@@ -47,10 +53,11 @@ public class MainController {
 
         configureProfile();
         archiveController = configureArchive();
+        compareController = configureComparison();
         libraryController = configureLibrary();
         configureProject();
         configureUserGuideTour();
-		
+
         openInitialRoute();
     }
 
@@ -84,25 +91,29 @@ public class MainController {
         return new ArchiveController(archiveScreen);
     }
 
+    private CompareController configureComparison() {
+		// TODO Add comparison screen here
+        return new CompareController();
+    }
+
     private LibraryController configureLibrary() {
         LibraryScreen libraryScreen = (LibraryScreen) Route.LIBRARY.createScreen();
         return new LibraryController(
                 new TextDAO(),
                 libraryScreen,
+                new FileStorageService(),
                 this::openLibraryText,
-                text -> {
-                    mainView.navigateTo(Route.COMPARE);
-                },
+                this::openLibraryComparison,
+                this::addNewComparisonText,
                 mainView::showNewProjectModal);
     }
 
-    private void openLibraryText(Text text) {
-        // Get source file for PDF rendering, // TODO: Fix This
+    private void openLibraryText(Text text, File sourceFile) {
         List<Integer> pageOffsets = List.of();
         if (text.getContent() != null && !text.getContent().isBlank()) {
             pageOffsets = TextPaginator.paginate(text.getContent(), TextPaginator.CHARS_PER_PAGE);
         }
-        openAnalysis(text, pageOffsets, null);
+        openAnalysis(text, pageOffsets, sourceFile);
     }
 
     private void configureUserGuideTour() {
@@ -115,7 +126,7 @@ public class MainController {
                     UserGuideTourData.TEXT);
 
             mainView.closeProjectModal();
-			
+
             openAnalysis(tourText, List.of(), null);
         });
 
@@ -129,6 +140,7 @@ public class MainController {
         ProjectController projectController = new ProjectController(new TextDAO(), new PdfService());
 
         mainView.setOnProjectCreated(created -> {
+            boolean addingSecondComparisonText = created.addingSecondComparisonText();
             mainView.setNewProjectLoading(true);
 
             Task<ProjectController.Result> task = new Task<>() {
@@ -150,11 +162,16 @@ public class MainController {
 
                 mainView.closeProjectModal();
                 libraryController.loadTexts();
-                routeToDestination(
-                        result.text(),
-                        result.pageOffsets(),
-                        result.sourceFile(),
-                        created.destination());
+
+                if (addingSecondComparisonText) {
+                    openComparisonWithNewSecondText(result.text(), result.sourceFile());
+                } else {
+                    routeToDestination(
+                            result.text(),
+                            result.pageOffsets(),
+                            result.sourceFile(),
+                            created.destination());
+                }
             });
 
             task.setOnFailed(e -> {
@@ -179,8 +196,57 @@ public class MainController {
             NewProjectModal.Destination destination) {
         switch (destination) {
             case ANALYSE -> openAnalysis(text, pageOffsets, sourceFile);
-            case COMPARE -> mainView.navigateTo(Route.COMPARE);
+            case COMPARE -> openNewProjectComparison(text, sourceFile);
         }
+    }
+
+    private void openNewProjectComparison(Text firstText, File firstSourceFile) {
+        firstComparisonText = firstText;
+        firstComparisonSourceFile = firstSourceFile;
+
+        if (session.isLoggedIn()) {
+            mainView.navigateTo(Route.LIBRARY);
+            libraryController.startComparison(firstText);
+        } else {
+            mainView.showSecondComparisonTextModal(comparisonTextTitle(firstText));
+        }
+    }
+
+    private void addNewComparisonText(Text firstText, File firstSourceFile) {
+        firstComparisonText = firstText;
+        firstComparisonSourceFile = firstSourceFile;
+        mainView.showSecondComparisonTextModal(comparisonTextTitle(firstText));
+    }
+
+    private void openComparisonWithNewSecondText(Text secondText, File secondSourceFile) {
+        if (firstComparisonText == null) {
+            ErrorAlert.show("Choose the first text for comparison.");
+            return;
+        }
+
+        openLibraryComparison(
+                List.of(firstComparisonText, secondText),
+                Arrays.asList(firstComparisonSourceFile, secondSourceFile));
+    }
+
+    private String comparisonTextTitle(Text text) {
+        if (text.getTitle() != null && !text.getTitle().isBlank()) {
+            return text.getTitle();
+        }
+        return text.getFileName();
+    }
+
+    private void openLibraryComparison(List<Text> texts, List<File> sourceFiles) {
+        CompareController.ComparisonTextsOutcome outcome = compareController.openTexts(texts, sourceFiles);
+
+        if (!outcome.success()) {
+            ErrorAlert.show(outcome.message());
+            return;
+        }
+
+        firstComparisonText = null;
+        firstComparisonSourceFile = null;
+        mainView.navigateTo(Route.COMPARE);
     }
 
     private void openAnalysis(
@@ -197,8 +263,13 @@ public class MainController {
                 sourceFile);
 
         analyseScreen.setOnSaveAnalysis(() -> {
-            // TODO: saving preview + confirm submission.
-            // No persistence concept for the final analysis exists yet.
+            AnalyseController.SaveOutcome outcome = analyseController.saveAnalysis();
+
+            if (outcome.success()) {
+                analyseScreen.showSaved(outcome.savedCount());
+            } else {
+                System.err.println(outcome.message());
+            }
         });
 
         mainView.navigateTo(Route.ANALYZE);

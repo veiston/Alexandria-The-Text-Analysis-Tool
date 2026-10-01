@@ -2,12 +2,14 @@ package com.alexandria.controller;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import com.alexandria.dao.TextDAO;
 import com.alexandria.model.FileType;
 import com.alexandria.model.Text;
 import com.alexandria.model.User;
+import com.alexandria.service.FileStorageService;
 import com.alexandria.service.PdfService;
 import com.alexandria.view.components.shared.document.highlight.TextPaginator;
 import com.alexandria.view.components.side_navbar.new_project.NewProjectModal;
@@ -16,11 +18,17 @@ public class ProjectController {
 
     private final TextDAO textDAO;
     private final PdfService pdfService;
+    private final FileStorageService fileStorageService;
     private final UserSessionController session = UserSessionController.getInstance();
 
     public ProjectController(TextDAO textDAO, PdfService pdfService) {
+        this(textDAO, pdfService, new FileStorageService());
+    }
+
+    ProjectController(TextDAO textDAO, PdfService pdfService, FileStorageService fileStorageService) {
         this.textDAO = textDAO;
         this.pdfService = pdfService;
+        this.fileStorageService = fileStorageService;
     }
 
     public Result createProject(NewProjectModal.CreatedProject created) {
@@ -28,6 +36,7 @@ public class ProjectController {
             String content;
             List<Integer> pageOffsets = List.of();
             File sourceFile = null;
+            Path storedFile = null;
 
             if (created.sourceType() == NewProjectModal.SourceType.PASTE) {
                 content = created.textContent();
@@ -66,10 +75,20 @@ public class ProjectController {
             }
 
             // Logged-in user: persist project.
-            Text text = new Text(user.getId(), created.title(), fileName, fileType, content);
+            if (created.sourceType() == NewProjectModal.SourceType.UPLOAD) {
+                storedFile = fileStorageService.saveFile(created.file(), user.getId());
+            }
+
+            Text text = new Text(
+                    user.getId(),
+                    created.title(),
+                    fileName,
+                    storedFile == null ? null : storedFile.toString(),
+                    fileType,
+                    content);
             Text persisted = textDAO.create(text);
 
-            return Result.ok(persisted, pageOffsets, sourceFile);
+            return Result.ok(persisted, pageOffsets, storedFile == null ? sourceFile : storedFile.toFile());
 
         } catch (Exception e) {
             return Result.error("Could not create project: " + e.getMessage());

@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS texts (
     user_id INT NOT NULL,
     title VARCHAR(255) NOT NULL,
     file_name VARCHAR(255),
+    file_path VARCHAR(1024),
     file_type VARCHAR(20) NOT NULL,
     content LONGTEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -22,6 +23,8 @@ CREATE TABLE IF NOT EXISTS texts (
     PRIMARY KEY (id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+ALTER TABLE texts ADD COLUMN IF NOT EXISTS file_path VARCHAR(1024) AFTER file_name;
 
 CREATE TABLE IF NOT EXISTS search_results (
     id INT NOT NULL AUTO_INCREMENT,
