@@ -1,10 +1,12 @@
 package com.alexandria.service;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
@@ -82,9 +84,11 @@ public class TextAnalysisServiceTest {
         texts.put(1, "The quick brown fox jumps.");
         texts.put(2, "The lazy dog sleeps.");
 
-        TextComparisonResult result = textComparisonService.compareTexts(texts, 10);
+        TextComparisonResult result = textComparisonService.compareTexts(texts, Collections.emptyMap(), 10);
         assertNotNull(result);
         assertEquals(2, result.textIds().size());
+        assertEquals(0.0, result.similarityScore(), 0.001);
+        assertTrue(result.similarParagraphs().isEmpty());
     }
 
     @Test
@@ -93,7 +97,7 @@ public class TextAnalysisServiceTest {
         texts.put(1, "marcus marcus marcus romulus remus nero augustus peach");
         texts.put(2, "first first first second second third third fourth fourth fifth fifth marcus");
 
-        TextComparisonResult result = textComparisonService.compareTexts(texts, 10);
+        TextComparisonResult result = textComparisonService.compareTexts(texts, Collections.emptyMap(), 10);
         assertNotNull(result);
 
         TextComparisonResult.TextComparisonRow marcusRow = result.commonWords().stream()
@@ -105,6 +109,44 @@ public class TextAnalysisServiceTest {
         assertEquals(Integer.valueOf(3), marcusRow.countsByTextId().get(1));
         assertEquals(Integer.valueOf(1), marcusRow.countsByTextId().get(2));
         assertTrue(marcusRow.relativeFreqByTextId().get(2) > 0.0);
+    }
+
+    @Test
+    public void testCompareTextsSimilarityScoreAndParagraphs() {
+        Map<Integer, String> texts = new HashMap<>();
+        texts.put(1, "The ancient library of Alexandria was famous for genious'.\n\nPhilosophy and mathematics were studied across Greece.");
+        texts.put(2, "Roman architecture and engineering was magnificent.\n\nGenious' traveled to the ancient library of Alexandria to research.");
+
+        TextComparisonResult result = textComparisonService.compareTexts(texts, Collections.emptyMap(), 10);
+        assertNotNull(result);
+        assertTrue(result.similarityScore() > 0.0);
+        assertEquals(1, result.similarParagraphs().size());
+        assertTrue(result.similarParagraphs().get(0).first().text().contains("Alexandria"));
+        assertTrue(result.similarParagraphs().get(0).second().text().contains("Alexandria"));
+    }
+
+    @Test
+    public void testCompareTextsIdenticalDocuments() {
+        String content = "The library was famous in the latin world. The Romans were great at Physics and mathematics.";
+        Map<Integer, String> texts = Map.of(1, content, 2, content);
+
+        TextComparisonResult result = textComparisonService.compareTexts(texts, Collections.emptyMap(), 10);
+        assertNotNull(result);
+        assertEquals(100.0, result.similarityScore(), 0.01);
+        assertEquals("High", result.similarityBand());
+        assertFalse(result.commonWords().isEmpty());
+    }
+
+    @Test
+    public void testCompareTextsEmptyDocuments() {
+        Map<Integer, String> texts = Map.of(1, "", 2, "   ");
+
+        TextComparisonResult result = textComparisonService.compareTexts(texts, Collections.emptyMap(), 10);
+        assertNotNull(result);
+        assertEquals(0.0, result.similarityScore(), 0.001);
+        assertEquals("Low", result.similarityBand());
+        assertTrue(result.commonWords().isEmpty());
+        assertTrue(result.similarParagraphs().isEmpty());
     }
 
     @Test

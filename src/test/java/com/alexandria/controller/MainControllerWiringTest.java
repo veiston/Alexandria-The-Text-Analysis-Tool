@@ -61,7 +61,7 @@ public class MainControllerWiringTest {
 
             // configureLibrary() and configureProject() each construct a TextDAO.
             assertEquals(2, textDaoConstruction.constructed().size());
-            assertEquals(1, pdfServiceConstruction.constructed().size());
+            assertEquals(2, pdfServiceConstruction.constructed().size());
             assertEquals(1, projectControllerConstruction.constructed().size());
 
             // AnalyseController built directly in the constructor

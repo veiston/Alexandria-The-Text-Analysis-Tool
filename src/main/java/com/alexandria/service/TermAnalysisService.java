@@ -11,6 +11,14 @@ public class TermAnalysisService implements TermAnalysisServiceINT {
 
     @Override
     public TermAnalysisResult analyzeTerm(String content, String term) {
+        if (content == null || content.isBlank() || term == null || term.isBlank()) {
+            String safeTerm = "";
+            if (term != null) {
+                safeTerm = term;
+            }
+            return new TermAnalysisResult(safeTerm, 0, 0.0, 0, 0, Collections.emptyList());
+        }
+
         var words = extractWords(content);
         var target = term.strip().toLowerCase(Locale.ROOT);
         var termPattern = Pattern.compile("\\b" + Pattern.quote(target) + "\\b", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);

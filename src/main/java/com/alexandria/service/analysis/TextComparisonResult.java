@@ -13,7 +13,10 @@ import java.util.Map;
  */
 public record TextComparisonResult(
 	List<Integer> textIds,
-	List<TextComparisonRow> commonWords
+	List<TextComparisonRow> commonWords,
+	double similarityScore,
+	String similarityBand,
+	List<ParagraphMatch> similarParagraphs
 ) {
 	public record TextComparisonRow(
 		String word,
@@ -37,6 +40,47 @@ public record TextComparisonResult(
 		}
 	}
 
+	public enum SimilarityBand {
+		LOW("Low"),
+		MODERATE("Moderate"),
+		HIGH("High");
+
+		private final String label;
+
+		SimilarityBand(String label) {
+			this.label = label;
+		}
+
+		public String label() {
+			return label;
+		}
+
+			// These can be optimized later
+		public static SimilarityBand fromScore(double score) {
+			if (score >= 67.0) {
+				return HIGH;
+			}
+			if (score >= 34.0) {
+				return MODERATE;
+			}
+			return LOW;
+		}
+	}
+
+	public record ParagraphSnippet(
+		String text,
+		int charStart,
+		int charEnd,
+		Integer page,
+		int paragraphIndex
+	) {}
+
+	public record ParagraphMatch(
+		ParagraphSnippet first,
+		ParagraphSnippet second,
+		double scorePercent
+	) {}
+
 	public TextComparisonResult {
 		if (textIds != null) {
 			textIds = List.copyOf(textIds);
@@ -47,6 +91,11 @@ public record TextComparisonResult(
 			commonWords = List.copyOf(commonWords);
 		} else {
 			commonWords = Collections.emptyList();
+		}
+		if (similarParagraphs != null) {
+			similarParagraphs = List.copyOf(similarParagraphs);
+		} else {
+			similarParagraphs = Collections.emptyList();
 		}
 	}
 }
