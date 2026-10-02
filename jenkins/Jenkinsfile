@@ -120,7 +120,7 @@ pipeline {
 
         stage('Test Docker Image') {
             steps {
-                sh 'docker run --rm --entrypoint java "$DOCKERHUB_REPO:$DOCKER_IMAGE_TAG" --version'
+                sh 'docker run --rm --platform linux/amd64 --entrypoint java "$DOCKERHUB_REPO:$DOCKER_IMAGE_TAG" --version'
             }
         }
 
@@ -144,7 +144,9 @@ pipeline {
 
         stage('Run Docker Compose') {
             steps {
-                sh 'docker compose -f docker/docker-compose.yml up -d'
+                withEnv(['HOST_FILES_DIR=/tmp']) {
+                    sh 'docker compose -f docker/docker-compose.yml up -d'
+                }
             }
         }
     }
