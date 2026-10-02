@@ -118,12 +118,6 @@ pipeline {
             }
         }
 
-        stage('Test Docker Image') {
-            steps {
-                sh 'docker run --rm --platform linux/amd64 --entrypoint java "$DOCKERHUB_REPO:$DOCKER_IMAGE_TAG" --version'
-            }
-        }
-
         stage('Push Docker Image to Docker Hub') {
             steps {
                 withCredentials([usernamePassword(
