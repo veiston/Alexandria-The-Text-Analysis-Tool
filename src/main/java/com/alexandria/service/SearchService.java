@@ -15,6 +15,10 @@ public class SearchService implements SearchServiceINT {
             return Collections.emptyList();
         }
 
+        if (setting == null) {
+            setting = SearchSettings.defaults();
+        }
+
         if (setting.ignoreStopWords() && STOP_WORDS.contains(term.toLowerCase(Locale.ROOT))) {
             return Collections.emptyList();
         }
@@ -53,5 +57,21 @@ public class SearchService implements SearchServiceINT {
                     return new SearchMatch(content.substring(m.start(), m.end()), m.start(), m.end(), page, paragraph, ctx);
                 })
                 .toList();
+    }
+
+    @Override
+    public Map<Integer, List<SearchMatch>> searchMultiple(Map<Integer, String> contentsById, String term, SearchSettings settings, Map<Integer, List<Integer>> pageOffsetsById) {
+        if (contentsById == null || contentsById.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        if (pageOffsetsById == null) {
+            pageOffsetsById = Collections.emptyMap();
+        }
+        Map<Integer, List<SearchMatch>> results = new LinkedHashMap<>();
+        for (Map.Entry<Integer, String> entry : contentsById.entrySet()) {
+            int id = entry.getKey();
+            results.put(id, search(entry.getValue(), term, settings, pageOffsetsById.getOrDefault(id, Collections.emptyList())));
+        }
+        return results;
     }
 }
