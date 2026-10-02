@@ -133,3 +133,54 @@ docker compose -f docker/docker-compose.yml down -v
 
 Use `-v` only when the existing database must be deleted. It removes
 `mariadb_data` and therefore removes all saved accounts and authorization data.
+
+## 6. Demonstration flow
+
+Use the following sequence to demonstrate the Docker deployment.
+
+1. Show `docker/Dockerfile` and `docker/docker-compose.yml`. The Dockerfile
+   provides Java, the Linux GUI dependencies, and JavaFX. Compose deploys the
+   published application image with MariaDB and waits for the database
+   healthcheck.
+2. Build the JAR and local image with the commands in steps 1 and 2.
+3. Run the command in step 3 to demonstrate that the JavaFX GUI image opens.
+   This is a GUI-only test; it does not include MariaDB.
+4. Show the `1.0.0` and `latest` tags in the public `ksenishl/alexandria`
+   Docker Hub repository, then run the `docker pull` command from step 5.
+5. Start the complete application with Compose and demonstrate login and file
+   analysis. The Compose deployment is the full test because it includes both
+   the JavaFX application and MariaDB.
+
+### macOS
+
+Start XQuartz before the demonstration. If its network-client setting was
+changed, restart XQuartz first. Then run:
+
+```bash
+export DISPLAY=:0
+xhost +
+export HOST_FILES_DIR="$HOME"
+docker compose -f docker/docker-compose.yml up -d
+docker compose -f docker/docker-compose.yml ps
+```
+
+The JavaFX window opens through XQuartz. In the file chooser, select a file
+under `/host/Desktop`, `/host/Documents`, or another folder below `/host`.
+
+### Windows
+
+Start Xming or VcXsrv before the demonstration and allow connections from
+Docker Desktop. In PowerShell, run:
+
+```powershell
+$env:HOST_FILES_DIR = $env:USERPROFILE
+docker compose -f docker/docker-compose.yml up -d
+docker compose -f docker/docker-compose.yml ps
+```
+
+The same `/host` folder is available in the file chooser. For example,
+`/host/Desktop` corresponds to the Windows user's Desktop folder.
+
+After the demonstration, stop the containers with the `docker compose ... down`
+command from step 5. Do not add `-v` unless the demonstration database must be
+deleted.
