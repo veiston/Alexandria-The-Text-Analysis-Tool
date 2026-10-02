@@ -1,7 +1,7 @@
 package com.alexandria.view.components.shared.document;
 
 import com.alexandria.service.analysis.SearchMatch;
-import com.alexandria.view.components.analyse_screen.QuotationLocation;
+import com.alexandria.view.components.shared.quotation.QuotationLocation;
 import com.alexandria.view.components.shared.document.highlight.TextPaginator;
 import com.alexandria.view.components.shared.document.highlight.TxtHighlight;
 import com.alexandria.view.components.shared.document.highlight.TxtTextLayout;

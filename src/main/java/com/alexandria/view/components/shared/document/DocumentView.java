@@ -1,9 +1,7 @@
-package com.alexandria.view.components.analyse_screen;
+package com.alexandria.view.components.shared.document;
 
 import com.alexandria.model.FileType;
 import com.alexandria.service.analysis.SearchMatch;
-import com.alexandria.view.components.shared.document.PdfDocumentRenderer;
-import com.alexandria.view.components.shared.document.TextDocumentRenderer;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;

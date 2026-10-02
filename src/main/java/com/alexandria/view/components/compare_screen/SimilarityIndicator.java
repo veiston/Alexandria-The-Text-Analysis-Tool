@@ -11,9 +11,6 @@ import javafx.scene.layout.VBox;
 
 public class SimilarityIndicator extends HBox {
 
-    private static final double HIGH_THRESHOLD = 70;
-    private static final double MODERATE_THRESHOLD = 40;
-
     private static final String HIGH = "similarity-badge-high";
     private static final String MODERATE = "similarity-badge-moderate";
     private static final String LOW = "similarity-badge-low";
@@ -52,7 +49,7 @@ public class SimilarityIndicator extends HBox {
         clear();
     }
 
-    public void setSimilarity(Double percent) {
+    public void setSimilarity(Double percent, String similarityAmount) {
         if (percent == null || percent.isNaN()) {
             clear();
             return;
@@ -65,15 +62,19 @@ public class SimilarityIndicator extends HBox {
 
         levelBadge.getStyleClass().removeAll(HIGH, MODERATE, LOW);
 
-        if (value >= HIGH_THRESHOLD) {
+        if ("High".equalsIgnoreCase(similarityAmount)) {
             levelBadge.setText("HIGH CORRELATION");
             levelBadge.getStyleClass().add(HIGH);
-        } else if (value >= MODERATE_THRESHOLD) {
+        } else if ("Moderate".equalsIgnoreCase(similarityAmount)) {
             levelBadge.setText("MODERATE CORRELATION");
             levelBadge.getStyleClass().add(MODERATE);
-        } else {
+        } else if ("Low".equalsIgnoreCase(similarityAmount)) {
             levelBadge.setText("LOW CORRELATION");
             levelBadge.getStyleClass().add(LOW);
+        } else {
+            levelBadge.setVisible(false);
+            levelBadge.setManaged(false);
+            return;
         }
 
         levelBadge.setVisible(true);

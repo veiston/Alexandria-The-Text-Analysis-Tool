@@ -1,0 +1,92 @@
+/* Reusable search, frequency and passage-preview components. */
+
+.frequency-row {
+    -fx-cursor: hand;
+    -fx-padding: 0 5px;
+    -fx-background-color: transparent;
+    -fx-background-radius: 4px;
+    -fx-border-color: transparent;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+}
+
+.frequency-row:hover {
+    -fx-background-color: -fx-surface-hover;
+    -fx-border-color: -fx-border-subtle;
+}
+
+.search-view {
+    -fx-spacing: 6px;
+}
+
+.search-navigation-buttons {
+    -fx-spacing: 6px;
+}
+
+.search-navigation-button {
+    -fx-min-width: 36px;
+    -fx-pref-width: 36px;
+    -fx-min-height: 36px;
+    -fx-pref-height: 36px;
+    -fx-padding: 0;
+    -fx-background-color: transparent;
+    -fx-background-radius: 5px;
+    -fx-border-color: -fx-border-subtle;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+    -fx-alignment: CENTER;
+}
+
+.search-navigation-button:hover {
+    -fx-background-color: -fx-surface-hover;
+}
+
+.search-navigation-button:pressed {
+    -fx-background-color: -fx-border-subtle;
+}
+
+.search-navigation-button .ikonli-font-icon {
+    -fx-icon-color: -fx-foreground-muted;
+    -fx-icon-size: 14px;
+}
+
+.tracked-words-panel {
+    -fx-padding: 10px 0 0 0;
+    -fx-border-color: -fx-border-subtle transparent transparent transparent;
+    -fx-border-width: 1px 0 0 0;
+}
+
+.tracked-word-row {
+    -fx-background-color: transparent;
+    -fx-padding: 6px 2px;
+}
+
+.tracked-word-row:hover {
+    -fx-background-color: -fx-surface-hover;
+}
+
+.context-match-card {
+    -fx-background-color: -fx-surface;
+    -fx-border-color: -fx-border-subtle;
+    -fx-border-width: 1px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 10px;
+}
+
+.context-match-card:hover {
+    -fx-background-color: -fx-surface-hover;
+}
+
+.context-match-page {
+    -fx-font-family: -fx-font-sans-bold;
+    -fx-font-size: 10px;
+    -fx-text-fill: -fx-foreground-muted;
+}
+
+.context-match-snippet {
+    -fx-font-family: -fx-font-serif;
+    -fx-font-size: 12px;
+    -fx-line-spacing: 2px;
+    -fx-text-fill: -fx-foreground;
+}

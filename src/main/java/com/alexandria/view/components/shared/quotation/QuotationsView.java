@@ -1,4 +1,4 @@
-package com.alexandria.view.components.analyse_screen;
+package com.alexandria.view.components.shared.quotation;
 
 import com.alexandria.model.Quotation;
 

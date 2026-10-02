@@ -1,6 +1,5 @@
-package com.alexandria.view.components.analyse_screen;
+package com.alexandria.view.components.shared.search;
 
-import com.alexandria.view.components.analyse_screen.input_term_analyse.TrackedWordsList;
 import com.alexandria.view.components.shared.SearchInput;
 
 import javafx.geometry.Insets;
