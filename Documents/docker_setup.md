@@ -98,7 +98,7 @@ Download the versioned image from Docker Hub. This verifies that the published
 image, rather than an untagged local build, can be used:
 
 ```bash
-docker pull ksenishl/alexandria:1.0.0
+docker pull --platform linux/amd64 ksenishl/alexandria:1.0.0
 ```
 
 Start the published Alexandria image and MariaDB. Compose starts the application

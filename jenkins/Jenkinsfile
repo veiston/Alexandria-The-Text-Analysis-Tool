@@ -10,6 +10,7 @@ pipeline {
     environment {
         DOCKERHUB_REPO = 'ksenishl/alexandria'
         DOCKER_IMAGE_TAG = '1.0.0'
+        DOCKER_IMAGE_LATEST_TAG = 'latest'
         DOCKERHUB_CREDENTIALS_ID = 'dockerhub-credentials'
     }
 
@@ -112,7 +113,14 @@ pipeline {
                         "${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}",
                         '--platform linux/amd64 -f docker/Dockerfile .'
                     )
+                    sh "docker tag ${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG} ${DOCKERHUB_REPO}:${DOCKER_IMAGE_LATEST_TAG}"
                 }
+            }
+        }
+
+        stage('Test Docker Image') {
+            steps {
+                sh 'docker run --rm --entrypoint java "$DOCKERHUB_REPO:$DOCKER_IMAGE_TAG" --version'
             }
         }
 
@@ -128,6 +136,7 @@ pipeline {
                             -u "$DOCKERHUB_USERNAME" \\
                             --password-stdin
                         docker push "$DOCKERHUB_REPO:$DOCKER_IMAGE_TAG"
+                        docker push "$DOCKERHUB_REPO:$DOCKER_IMAGE_LATEST_TAG"
                     '''
                 }
             }
