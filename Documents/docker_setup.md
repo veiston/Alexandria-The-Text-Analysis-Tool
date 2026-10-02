@@ -116,9 +116,17 @@ Stop the deployed application and database containers:
 docker compose -f docker/docker-compose.yml down
 ```
 
+This command does not remove the `mariadb_data` Docker volume. Accounts,
+password hashes, uploaded-file records, and other database data remain there,
+so the same users can log in after the next `docker compose ... up` command.
+The Jenkins deployment uses the same non-destructive `up -d` command.
+
 Remove the containers and database data when a completely fresh demonstration
 database is needed:
 
 ```bash
 docker compose -f docker/docker-compose.yml down -v
 ```
+
+Use `-v` only when the existing database must be deleted. It removes
+`mariadb_data` and therefore removes all saved accounts and authorization data.

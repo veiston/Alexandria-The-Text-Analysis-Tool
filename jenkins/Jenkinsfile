@@ -142,7 +142,7 @@ pipeline {
             }
         }
 
-        stage('Run Docker Compose') {
+        stage('Deploy Docker Compose (Keep Database)') {
             steps {
                 withEnv(['HOST_FILES_DIR=/tmp']) {
                     sh 'docker compose -f docker/docker-compose.yml up -d'
