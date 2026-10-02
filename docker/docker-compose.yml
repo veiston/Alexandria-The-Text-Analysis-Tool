@@ -1,1 +1,45 @@
-# docker-compose configuration
+services:
+  db:
+    image: mariadb:11
+    environment:
+      MARIADB_DATABASE: alexandria
+      MARIADB_USER: alexandria
+      MARIADB_PASSWORD: alexandria
+      MARIADB_ROOT_PASSWORD: root
+    volumes:
+      - ../database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ../database/data.sql:/docker-entrypoint-initdb.d/02-data.sql
+      - mariadb_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    platform: linux/amd64
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: alexandria:1.0.0
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DISPLAY: host.docker.internal:0.0
+    command:
+      [
+        "java",
+        "-Ddb.url=jdbc:mariadb://db:3306/alexandria",
+        "-Ddb.user=alexandria",
+        "-Ddb.password=alexandria",
+        "--module-path",
+        "/javafx-sdk/lib",
+        "--add-modules",
+        "javafx.controls,javafx.fxml,javafx.swing",
+        "-jar",
+        "app.jar"
+      ]
+
+volumes:
+  mariadb_data:

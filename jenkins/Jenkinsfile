@@ -7,6 +7,12 @@ pipeline {
         maven 'Maven3'
     }
 
+    environment {
+        DOCKERHUB_REPO = 'ksenishl/alexandria'
+        DOCKER_IMAGE_TAG = '1.0.0'
+        DOCKERHUB_CREDENTIALS_ID = 'dockerhub-credentials'
+    }
+
     stages {
         stage('Code Checkout') {
             steps {
@@ -19,9 +25,9 @@ pipeline {
             steps {
                 script {
                     if (isUnix()) {
-                        sh 'mvn clean compile'
+                        sh 'mvn clean package'
                     } else {
-                        bat 'mvn clean compile'
+                        bat 'mvn clean package'
                     }
                 }
             }
@@ -96,6 +102,40 @@ pipeline {
                         git push --force origin gh-pages
                     '''
                 }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    docker.build(
+                        "${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}",
+                        '--platform linux/amd64 -f docker/Dockerfile .'
+                    )
+                }
+            }
+        }
+
+        stage('Push Docker Image to Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: DOCKERHUB_CREDENTIALS_ID,
+                    usernameVariable: 'DOCKERHUB_USERNAME',
+                    passwordVariable: 'DOCKERHUB_PASSWORD'
+                )]) {
+                    sh '''
+                        echo "$DOCKERHUB_PASSWORD" | docker login \\
+                            -u "$DOCKERHUB_USERNAME" \\
+                            --password-stdin
+                        docker push "$DOCKERHUB_REPO:$DOCKER_IMAGE_TAG"
+                    '''
+                }
+            }
+        }
+
+        stage('Run Docker Compose') {
+            steps {
+                sh 'docker compose -f docker/docker-compose.yml up -d'
             }
         }
     }

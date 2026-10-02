@@ -1,17 +1,25 @@
-# It says to use Maven 3.9.6 with Eclipse Temurin Java 17
-FROM maven:3.9.6-eclipse-temurin-17
+FROM --platform=linux/amd64 eclipse-temurin:17-jdk
 
-# It says to set /app as the working directory inside the container
 WORKDIR /app
 
-# It says to copy pom.xml into the working directory
-COPY pom.xml .
+RUN apt-get update && apt-get install -y \
+    libx11-6 \
+    libxext6 \
+    libxrender1 \
+    libxtst6 \
+    libxi6 \
+    libgtk-3-0 \
+    wget \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
 
-# It says to copy the source code into the container
-COPY src ./src
+RUN wget https://download2.gluonhq.com/openjfx/17.0.2/openjfx-17.0.2_linux-x64_bin-sdk.zip \
+    && unzip openjfx-17.0.2_linux-x64_bin-sdk.zip \
+    && mv javafx-sdk-17.0.2 /javafx-sdk \
+    && rm openjfx-17.0.2_linux-x64_bin-sdk.zip
 
-# It says to build the project with Maven
-RUN mvn clean package -Pdocker
+COPY target/alexandria-1.0.0.jar app.jar
 
-# It says to run the generated JAR when the container starts
-CMD ["java", "-jar", "target/alexandria-1.0.0.jar"]
+ENV DISPLAY=host.docker.internal:0.0
+
+CMD ["java", "--module-path", "/javafx-sdk/lib", "--add-modules", "javafx.controls,javafx.fxml,javafx.swing", "-jar", "app.jar"]

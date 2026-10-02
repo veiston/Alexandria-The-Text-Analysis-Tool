@@ -1,38 +1,53 @@
 # Docker setup
 
-1. Open Docker Desktop.
-2. Open a terminal in the project folder.
+Open Docker Desktop and run the commands from the repository root. Start the
+X server used by your operating system first (XQuartz on macOS or XMing on
+Windows).
 
-## Build the image
+## Build and test
 
-On a Mac with Apple Silicon:
+Create the executable JAR that Docker copies into the application image:
 
 ```bash
-docker build --platform linux/amd64 -f docker/Dockerfile -t alexandria:1.0.0 .
+mvn clean package
 ```
 
-On Windows PowerShell:
+Build the Alexandria Docker image and give it the `alexandria:1.0.0` tag:
 
-```powershell
+```bash
 docker build -f docker/Dockerfile -t alexandria:1.0.0 .
 ```
 
-After the build finishes, find `alexandria:1.0.0` in Docker Desktop -> Images.
-
-## Run tests in the image
-
-On a Mac with Apple Silicon:
+Start the JavaFX application and MariaDB. The application starts after the
+MariaDB healthcheck succeeds:
 
 ```bash
-docker run --platform linux/amd64 --rm alexandria:1.0.0 mvn test -Pdocker
+docker compose -f docker/docker-compose.yml up --build
 ```
 
-On Windows PowerShell:
+Stop both containers:
 
-```powershell
-docker run --rm alexandria:1.0.0 mvn test -Pdocker
+```bash
+docker compose -f docker/docker-compose.yml down
 ```
 
-`BUILD SUCCESS` means that the Docker test run passed.
+## Docker Hub
 
-A basic Docker container has no graphical screen or MariaDB database. For this reason, the `docker` profile in `pom.xml` excludes JavaFX view tests and database tests for now. Jenkins runs the full test suite.
+Log in to the team's Docker Hub account. The image will be published in the
+public `ksenishl/alexandria` repository:
+
+```bash
+docker login
+docker tag alexandria:1.0.0 ksenishl/alexandria:1.0.0
+docker tag alexandria:1.0.0 ksenishl/alexandria:latest
+docker push ksenishl/alexandria:1.0.0
+docker push ksenishl/alexandria:latest
+```
+
+Create the public `alexandria` repository under the `ksenishl` account in
+Docker Hub before the first push. Verify the published image:
+
+```bash
+docker pull ksenishl/alexandria:1.0.0
+docker image inspect ksenishl/alexandria:1.0.0
+```
