@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 eclipse-temurin:17-jdk
+FROM --platform=linux/amd64 eclipse-temurin:17-jdk-jammy
 
 WORKDIR /app
 
@@ -9,6 +9,10 @@ RUN apt-get update && apt-get install -y \
     libxtst6 \
     libxi6 \
     libgtk-3-0 \
+    adwaita-icon-theme \
+    gdk-pixbuf2.0-bin \
+    librsvg2-common \
+    shared-mime-info \
     wget \
     unzip \
     && rm -rf /var/lib/apt/lists/*

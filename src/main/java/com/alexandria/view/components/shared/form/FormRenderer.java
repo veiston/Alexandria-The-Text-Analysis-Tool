@@ -89,6 +89,7 @@ public final class FormRenderer {
 
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Select " + field.label());
+        setInitialDirectory(chooser);
 
         switch (field.type()) {
             case IMG_FILE -> chooser.getExtensionFilters().add(
@@ -116,6 +117,13 @@ public final class FormRenderer {
 
         fileLabel.getStyleClass().remove("file-name");
         fileLabel.getStyleClass().add("file-name-selected");
+    }
+
+    private void setInitialDirectory(FileChooser chooser) {
+        File directory = new File(System.getProperty("alexandria.file.chooser.dir", "/host"));
+        if (directory.isDirectory()) {
+            chooser.setInitialDirectory(directory);
+        }
     }
 
     public Map<String, String> getValues() {
