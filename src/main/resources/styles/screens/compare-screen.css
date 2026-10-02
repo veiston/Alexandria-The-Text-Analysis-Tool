@@ -1,0 +1,104 @@
+/* compare screen — screen-specific only. Colors, fonts and the header
+   bar come from global.css tokens. */
+
+.compare-screen {
+    -fx-background-color: -fx-background;
+}
+
+.compare-body {
+    -fx-background-color: -fx-background;
+    -fx-padding: 0;
+    -fx-spacing: 0;
+}
+
+/* header left side: similarity index */
+
+.similarity-percent {
+    -fx-font-family: -fx-font-sans-bold;
+    -fx-font-size: 22px;
+    -fx-text-fill: -fx-foreground;
+}
+
+.similarity-badge {
+    -fx-font-family: -fx-font-sans-bold;
+    -fx-font-size: 10px;
+    -fx-padding: 4px 8px;
+    -fx-background-radius: 4px;
+}
+
+.similarity-badge-high {
+    -fx-background-color: -fx-success-soft;
+    -fx-text-fill: -fx-success-text;
+}
+
+.similarity-badge-moderate {
+    -fx-background-color: -fx-warning-soft;
+    -fx-text-fill: -fx-warning-text;
+}
+
+.similarity-badge-low {
+    -fx-background-color: -fx-danger-soft;
+    -fx-text-fill: -fx-danger-text;
+}
+
+/* document rows */
+
+.comparison-document-view {
+    -fx-background-color: transparent;
+}
+
+.comparison-document-row {
+    -fx-border-color: transparent transparent -fx-border-subtle transparent;
+    -fx-border-width: 0 0 1px 0;
+    -fx-min-height: 0;
+}
+
+.comparison-document-b {
+    -fx-border-width: 0;
+}
+
+.comparison-document-tag {
+    -fx-background-color: -fx-surface;
+    -fx-background-radius: 6px;
+    -fx-border-color: -fx-border-subtle;
+    -fx-border-radius: 6px;
+    -fx-border-width: 1px;
+    -fx-padding: 3px 8px;
+}
+
+.comparison-document-a .comparison-document-label {
+    -fx-text-fill: -fx-doc-a-color;
+}
+
+.comparison-document-b .comparison-document-label {
+    -fx-text-fill: -fx-doc-b-color;
+}
+
+/* right panel */
+
+.comparison-side-panel {
+    -fx-background-color: -fx-surface;
+    -fx-padding: 20px;
+}
+
+/* term frequency */
+
+.frequency-bar > .doc-a-bar {
+    -fx-background-color: -fx-doc-a-color;
+    -fx-background-radius: 4px 0 0 4px;
+}
+
+.frequency-bar > .doc-b-bar {
+    -fx-background-color: -fx-doc-b-color;
+    -fx-background-radius: 0 4px 4px 0;
+}
+
+.doc-a-swatch {
+    -fx-background-color: -fx-doc-a-color;
+    -fx-background-radius: 1px;
+}
+
+.doc-b-swatch {
+    -fx-background-color: -fx-doc-b-color;
+    -fx-background-radius: 1px;
+}
