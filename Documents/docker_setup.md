@@ -119,7 +119,10 @@ docker compose -f docker/docker-compose.yml down
 This command does not remove the `mariadb_data` Docker volume. Accounts,
 password hashes, uploaded-file records, and other database data remain there,
 so the same users can log in after the next `docker compose ... up` command.
-The Jenkins deployment uses the same non-destructive `up -d` command.
+
+Jenkins builds, tests, and publishes the image, but does not open the JavaFX
+application. Start Compose manually on the computer where the GUI will be used;
+that computer supplies `HOST_FILES_DIR`, so the file chooser can show its files.
 
 Remove the containers and database data when a completely fresh demonstration
 database is needed:
