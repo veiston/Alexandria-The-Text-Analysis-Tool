@@ -18,7 +18,12 @@ public class CompareHeader extends ScreenHeader {
 
     /** 0-100, or null while there is no result yet. */
     public void setSimilarity(Double percent) {
-        similarityIndicator.setSimilarity(percent);
+        similarityIndicator.setSimilarity(percent, null);
+    }
+
+    /** Uses the category calculated by TextComparisonService. */
+    public void setSimilarity(Double percent, String similarityAmount) {
+        similarityIndicator.setSimilarity(percent, similarityAmount);
     }
 
     public void setOnViewChange(IntConsumer handler) {

@@ -78,5 +78,33 @@
 
 .comparison-side-panel {
     -fx-background-color: -fx-surface;
-    -fx-padding: 20px;
+    -fx-padding: 0 0 0 1px;
+    -fx-spacing: 0;
+}
+
+.comparison-side-panel .card {
+    -fx-background-color: -fx-surface;
+    -fx-border-color: -fx-border-subtle;
+    -fx-border-width: 1px;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+    -fx-effect: none;
+    -fx-padding: 14px;
+}
+
+.shared-scroll.comparison-sidebar-scroll > .viewport {
+    -fx-background-color: -fx-surface;
+}
+
+.comparison-term-row {
+    -fx-padding: 5px;
+    -fx-background-radius: 4px;
+}
+
+.comparison-term-row:hover {
+    -fx-background-color: -fx-surface-hover;
+}
+
+.comparison-key-paragraphs {
+    -fx-padding: 14px;
 }

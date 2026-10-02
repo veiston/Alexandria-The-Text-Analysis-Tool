@@ -1,4 +1,4 @@
-package com.alexandria.view.components.analyse_screen.input_term_analyse;
+package com.alexandria.view.components.shared.search;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -7,8 +7,9 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+
+import com.alexandria.view.components.shared.FrequencyBar;
 
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -172,7 +173,7 @@ public class TrackedWordsList extends VBox {
     private final class Row {
         private final String word;
         private final HBox container;
-        private final Region bar;
+        private final FrequencyBar frequencyBar;
         private final Label countLabel;
 
         private int count;
@@ -185,21 +186,7 @@ public class TrackedWordsList extends VBox {
             termLabel.setMinWidth(80);
             termLabel.setPrefWidth(80);
 
-            Region track = new Region();
-            track.getStyleClass().add("track");
-
-            bar = new Region();
-            bar.getStyleClass().add("bar");
-
-            StackPane frequencyBar = new StackPane(track, bar);
-            frequencyBar.getStyleClass().add("frequency-bar");
-            frequencyBar.setMinWidth(0);
-            frequencyBar.setPrefHeight(7);
-            frequencyBar.setMaxHeight(7);
-
-            StackPane.setAlignment(track, Pos.CENTER_LEFT);
-            StackPane.setAlignment(bar, Pos.CENTER_LEFT);
-            bar.setMaxWidth(Region.USE_PREF_SIZE);
+            frequencyBar = new FrequencyBar();
 
             HBox.setHgrow(frequencyBar, Priority.ALWAYS);
 
@@ -227,9 +214,7 @@ public class TrackedWordsList extends VBox {
             countLabel.setText(String.valueOf(count));
 
             double ratio = maxCount <= 0 ? 0 : (double) count / maxCount;
-            bar.prefWidthProperty().unbind();
-            bar.prefWidthProperty().bind(
-                    ((StackPane) bar.getParent()).widthProperty().multiply(ratio));
+            frequencyBar.setRatio(ratio);
         }
 
         private Button createIconButton(FontAwesomeSolid icon, String styleClass) {

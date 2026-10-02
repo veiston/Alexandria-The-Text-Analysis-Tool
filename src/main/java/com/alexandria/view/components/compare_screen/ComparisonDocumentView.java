@@ -2,7 +2,7 @@ package com.alexandria.view.components.compare_screen;
 
 import com.alexandria.model.FileType;
 import com.alexandria.service.analysis.SearchMatch;
-import com.alexandria.view.components.analyse_screen.DocumentView;
+import com.alexandria.view.components.shared.document.DocumentView;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -170,6 +170,14 @@ public class ComparisonDocumentView extends VBox {
 
     public void setOnQuotationRequested(BiFunction<String, String, Integer> handler) {
         documentA.setOnQuotationRequested(handler);
+        documentB.setOnQuotationRequested(handler);
+    }
+
+    public void setOnDocumentAQuotationRequested(BiFunction<String, String, Integer> handler) {
+        documentA.setOnQuotationRequested(handler);
+    }
+
+    public void setOnDocumentBQuotationRequested(BiFunction<String, String, Integer> handler) {
         documentB.setOnQuotationRequested(handler);
     }
 

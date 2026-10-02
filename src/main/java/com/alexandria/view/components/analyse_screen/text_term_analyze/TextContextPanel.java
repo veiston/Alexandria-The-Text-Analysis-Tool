@@ -1,13 +1,12 @@
 package com.alexandria.view.components.analyse_screen.text_term_analyze;
 
 import com.alexandria.service.analysis.TextFragment;
+import com.alexandria.view.components.shared.ContextMatchCard;
+import com.alexandria.view.components.shared.PassagePreview;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import java.util.List;
@@ -45,26 +44,11 @@ public class TextContextPanel extends VBox {
     }
 
     private VBox buildCard(int rank, TextFragment fragment) {
-        Label rankLabel = new Label("#" + rank + " · " + formatPageLabel(fragment.page(), fragment.paragraph()));
-        rankLabel.getStyleClass().add("context-match-page");
-
-        HBox spacer = new HBox();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-
-        Hyperlink jumpLink = new Hyperlink("Go to →");
-        jumpLink.getStyleClass().add("hyperlink");
-        jumpLink.setOnAction(e -> onJump.accept(fragment));
-
-        HBox topRow = new HBox(rankLabel, spacer, jumpLink);
-        topRow.setAlignment(Pos.CENTER_LEFT);
-
-        Label snippet = new Label(truncateToSnippet(fragment.text()));
-        snippet.setWrapText(true);
-        snippet.getStyleClass().add("context-match-snippet");
-
-        VBox card = new VBox(4, topRow, snippet);
-        card.getStyleClass().add("context-match-card");
-        return card;
+        PassagePreview preview = new PassagePreview(
+                "#" + rank + " · " + formatPageLabel(fragment.page(), fragment.paragraph()),
+                truncateToSnippet(fragment.text()),
+                () -> onJump.accept(fragment));
+        return new ContextMatchCard(preview);
     }
 
     public void setOnJump(Consumer<TextFragment> handler) {

@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.alexandria.model.Text;
+import com.alexandria.model.Quotation;
+import com.alexandria.model.User;
 import com.alexandria.service.PdfService;
 import com.alexandria.service.TermComparisonService;
 import com.alexandria.service.TextComparisonService;
@@ -17,6 +19,7 @@ import com.alexandria.service.analysis.TermComparisonResult;
 import com.alexandria.service.analysis.TermComparisonServiceINT;
 import com.alexandria.service.analysis.TextComparisonResult;
 import com.alexandria.service.analysis.TextComparisonServiceINT;
+import com.alexandria.view.components.shared.document.highlight.TextPaginator;
 
 public class CompareController {
     private final TextComparisonServiceINT textComparisonService;
@@ -27,6 +30,9 @@ public class CompareController {
 
     private final PdfService pdfService = new PdfService();
     private final Map<Integer, List<Integer>> currentPageOffsetsById = new HashMap<>();
+    private final List<QuotationController> quotationControllers = List.of(
+            new QuotationController(), new QuotationController());
+    private final UserSessionController session = UserSessionController.getInstance();
 
     public CompareController() {
         this(new TextComparisonService(), new TermComparisonService(), new com.alexandria.service.SearchService());
@@ -52,6 +58,7 @@ public class CompareController {
             validateFiles(texts, files);
             currentTexts = List.copyOf(texts);
             currentFiles = files == null ? List.of() : new ArrayList<>(files);
+            configureQuotations();
             
             // Cache page data to avoid constant re-parsing of the files.
             currentPageOffsetsById.clear();
@@ -61,19 +68,20 @@ public class CompareController {
                 if (index < currentFiles.size()) {
                     file = currentFiles.get(index);
                 }
-                List<Integer> offsets = List.of();
+                List<Integer> offsets = TextPaginator.paginate(
+                        text.getContent(), TextPaginator.CHARS_PER_PAGE);
                 if (text.getFileType() != com.alexandria.model.FileType.MANUAL && file != null) {
                     try {
                         offsets = pdfService.extractTextWithPageBoundaries(file).pageOffsets();
                     } catch (Exception e) {
-                        // fallback to empty!
+                        // Stored content is still navigable if the original PDF is unavailable.
                     }
                 }
                 currentPageOffsetsById.put(comparisonTextId(text, index), offsets);
             }
 
             return ComparisonTextsOutcome.ok(currentTexts);
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
             currentTexts = List.of();
             currentFiles = List.of();
             currentPageOffsetsById.clear();
@@ -83,6 +91,55 @@ public class CompareController {
 
     public List<File> getCurrentFiles() {
         return new ArrayList<>(currentFiles);
+    }
+
+    public List<Text> getCurrentTexts() {
+        return List.copyOf(currentTexts);
+    }
+
+    public List<Quotation> getQuotations() {
+        List<Quotation> result = new ArrayList<>();
+        for (QuotationController controller : quotationControllers) {
+            result.addAll(controller.getQuotations());
+        }
+        return List.copyOf(result);
+    }
+
+    public Quotation addQuotation(int documentIndex, String quotationText, String location) throws java.sql.SQLException {
+        return quotationControllers.get(documentIndex).addQuotation(quotationText, location);
+    }
+
+    public boolean removeQuotation(Quotation quotation) throws java.sql.SQLException {
+        QuotationController controller = controllerFor(quotation);
+        return controller != null && quotation.getId() != null && controller.removeQuotation(quotation.getId());
+    }
+
+    public boolean updateQuotation(Quotation quotation) throws java.sql.SQLException {
+        QuotationController controller = controllerFor(quotation);
+        return controller != null && controller.updateQuotation(quotation);
+    }
+
+    private void configureQuotations() throws java.sql.SQLException {
+        User user = session.getCurrentUser();
+        for (int index = 0; index < currentTexts.size(); index++) {
+            Text text = currentTexts.get(index);
+            Integer userId = user == null || !java.util.Objects.equals(user.getId(), text.getUserId())
+                    ? null : user.getId();
+            Integer textId = userId == null ? null : text.getId();
+            quotationControllers.get(index).openText(userId, textId);
+        }
+    }
+
+    private QuotationController controllerFor(Quotation quotation) {
+        if (quotation == null || quotation.getTextId() == null) {
+            return null;
+        }
+        for (int index = 0; index < currentTexts.size(); index++) {
+            if (java.util.Objects.equals(currentTexts.get(index).getId(), quotation.getTextId())) {
+                return quotationControllers.get(index);
+            }
+        }
+        return null;
     }
 
     public TextComparisonOutcome compareTexts(int limit) {
