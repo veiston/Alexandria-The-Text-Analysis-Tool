@@ -12,6 +12,7 @@ pipeline {
         DOCKER_IMAGE_TAG = '1.0.0'
         DOCKER_IMAGE_LATEST_TAG = 'latest'
         DOCKERHUB_CREDENTIALS_ID = 'dockerhub-credentials'
+        DISPLAY = ':0'
     }
 
     stages {
