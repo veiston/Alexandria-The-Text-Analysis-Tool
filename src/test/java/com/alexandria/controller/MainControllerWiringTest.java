@@ -8,6 +8,7 @@ import com.alexandria.view.screens.ArchiveScreen;
 import com.alexandria.view.screens.LibraryScreen;
 import com.alexandria.view.screens.ProfileScreen;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
@@ -15,7 +16,19 @@ import org.mockito.MockedStatic;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import javafx.application.Platform;
+
 public class MainControllerWiringTest {
+
+    @BeforeClass
+    public static void startJavaFx() {
+        try {
+            Platform.startup(() -> {
+            });
+        } catch (IllegalStateException ignored) {
+            // JavaFX was initialized by another test class.
+        }
+    }
 
     @Test
     public void constructor_restoresSessionAndConstructsEveryCollaborator() throws Exception {
