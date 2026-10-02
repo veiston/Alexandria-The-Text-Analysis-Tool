@@ -1,34 +1,24 @@
-package com.alexandria.view.components.analyse_screen;
+package com.alexandria.view.components.compare_screen;
 
 import com.alexandria.view.components.shared.ScreenHeader;
 
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
-import javafx.scene.layout.VBox;
 
 import java.util.function.IntConsumer;
 
-public class AnalyseHeader extends ScreenHeader {
+public class CompareHeader extends ScreenHeader {
 
-    public enum ViewMode {
-        READER, QUOTATIONS
-    }
-
-    private final Label titleLabel = new Label();
-    private final Label subtitleLabel = new Label();
+    private final SimilarityIndicator similarityIndicator = new SimilarityIndicator();
     private final Actions actions = new Actions("Reader", "Quotations", "Save Findings");
 
-    public AnalyseHeader() {
-        titleLabel.getStyleClass().add("heading-lg");
-        subtitleLabel.getStyleClass().add("text-muted");
-
-        setContent(new VBox(2, titleLabel, subtitleLabel), actions);
+    public CompareHeader() {
+        setContent(similarityIndicator, actions);
     }
 
-    public void setTitle(String title, String subtitle) {
-        titleLabel.setText(title);
-        subtitleLabel.setText(subtitle != null ? subtitle : "");
+    /** 0-100, or null while there is no result yet. */
+    public void setSimilarity(Double percent) {
+        similarityIndicator.setSimilarity(percent);
     }
 
     public void setOnViewChange(IntConsumer handler) {
