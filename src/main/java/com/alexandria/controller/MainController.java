@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.alexandria.dao.TextDAO;
 import com.alexandria.dao.UserDAO;
+import com.alexandria.model.FileType;
 import com.alexandria.model.Text;
 import com.alexandria.service.FileStorageService;
 import com.alexandria.service.PdfService;
@@ -21,8 +22,8 @@ import com.alexandria.view.components.user_guide.UserGuideTour;
 import com.alexandria.view.components.user_guide.UserGuideTourData;
 import com.alexandria.view.router.Route;
 import com.alexandria.view.screens.AnalyseScreen;
-import com.alexandria.view.screens.CompareScreen;
 import com.alexandria.view.screens.ArchiveScreen;
+import com.alexandria.view.screens.CompareScreen;
 import com.alexandria.view.screens.LibraryScreen;
 import com.alexandria.view.screens.ProfileScreen;
 
@@ -41,6 +42,7 @@ public class MainController {
     private CompareScreen compareScreen;
     private Text firstComparisonText;
     private File firstComparisonSourceFile;
+    private final PdfService pdfService = new PdfService();
 
     public MainController() {
         userDAO = new UserDAO();
@@ -166,10 +168,15 @@ public class MainController {
                 mainView::showNewProjectModal);
     }
 
+    //Now taking PDF page breaks into account, instead of just processing it as a long string
     private void openLibraryText(Text text, File sourceFile) {
-        List<Integer> pageOffsets = List.of();
-        if (text.getContent() != null && !text.getContent().isBlank()) {
-            pageOffsets = TextPaginator.paginate(text.getContent(), TextPaginator.CHARS_PER_PAGE);
+        List<Integer> pageOffsets = TextPaginator.paginate(text.getContent(), TextPaginator.CHARS_PER_PAGE);
+        if (text.getFileType() == FileType.PDF && sourceFile != null) {
+            try {
+                pageOffsets = pdfService.extractTextWithPageBoundaries(sourceFile).pageOffsets();
+            } catch (Exception e) {
+                System.out.println("Failed to extract PDF page breaks. ERROR: " + e);
+            }
         }
         openAnalysis(text, pageOffsets, sourceFile);
     }
@@ -195,7 +202,7 @@ public class MainController {
     }
 
     private void configureProject() {
-        ProjectController projectController = new ProjectController(new TextDAO(), new PdfService());
+        ProjectController projectController = new ProjectController(new TextDAO(), pdfService);
 
         mainView.setOnProjectCreated(created -> {
             boolean addingSecondComparisonText = created.addingSecondComparisonText();
