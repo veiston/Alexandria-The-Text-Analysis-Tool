@@ -28,6 +28,7 @@ public class RegisterForm extends VBox {
                 .submitLabel("Create Account")
                 .build();
 
+        form.getSubmitButton().setDefaultButton(true);
         form.setOnSubmit(values -> onRegister.accept(values));
         getChildren().add(form);
     }

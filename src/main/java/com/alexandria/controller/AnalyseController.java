@@ -192,6 +192,18 @@ public class AnalyseController {
         return search(term, caseSensitive, fuzzy, wholeWordsOnly, false);
     }
 
+    public SearchOutcome search(String term, SearchSettings settings) {
+        if (settings == null) {
+            settings = SearchSettings.defaults();
+        }
+        return search(
+                term,
+                settings.caseSensitive(),
+                settings.fuzzy(),
+                settings.wholeWordsOnly(),
+                settings.ignoreStopWords());
+    }
+
     public SearchOutcome search(
             String term,
             boolean caseSensitive,
@@ -370,7 +382,7 @@ public class AnalyseController {
 
     private void configureSearch(AnalyseScreen analyseScreen) {
         analyseScreen.setOnSearch(term -> {
-            SearchOutcome outcome = search(term);
+            SearchOutcome outcome = search(term, analyseScreen.getSearchSettings());
 
             if (!outcome.success()) {
                 System.err.println(outcome.message());

@@ -3,11 +3,11 @@ package com.alexandria.view.components.profile_screen;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import javafx.scene.layout.VBox;
-
 import com.alexandria.view.components.shared.form.Form;
 import com.alexandria.view.components.shared.form.FormField;
 import com.alexandria.view.components.shared.form.validation.EmailValidator;
+
+import javafx.scene.layout.VBox;
 
 public class LoginForm extends VBox {
     private final Form form;
@@ -22,6 +22,8 @@ public class LoginForm extends VBox {
                 .submitLabel("Log In")
                 .build();
 
+        // Logins if user presses enter (Readymade listener in Javafx) 
+        form.getSubmitButton().setDefaultButton(true);
         form.setOnSubmit(values -> onLogin.accept(values));
         getChildren().add(form);
     }

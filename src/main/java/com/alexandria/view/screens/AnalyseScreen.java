@@ -4,6 +4,7 @@ import com.alexandria.model.FileType;
 import com.alexandria.model.Quotation;
 import com.alexandria.view.components.shared.quotation.QuotationLocation;
 import com.alexandria.service.analysis.SearchMatch;
+import com.alexandria.service.analysis.SearchSettings;
 import com.alexandria.service.analysis.TermAnalysisResult;
 import com.alexandria.service.analysis.TextFragment;
 import com.alexandria.service.analysis.WordFrequency;
@@ -241,6 +242,10 @@ public class AnalyseScreen extends StackPane {
 
     public void setOnSearch(Consumer<String> handler) {
         onSearch = orNoop(handler);
+    }
+
+    public SearchSettings getSearchSettings() {
+        return searchView.getSearchSettings();
     }
 
     public void setOnSaveAnalysis(Runnable handler) {
