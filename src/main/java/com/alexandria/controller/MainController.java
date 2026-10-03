@@ -143,7 +143,7 @@ public class MainController {
 
     private void showComparisonSearch(CompareController controller, String term) {
         CompareController.MultiSearchOutcome outcome = controller.search(
-                term, com.alexandria.service.analysis.SearchSettings.defaults());
+                term, compareScreen.getSearchSettings());
         if (!outcome.success()) {
             ErrorAlert.show(outcome.message());
             return;

@@ -453,7 +453,7 @@ public class PdfDocumentRenderer {
     }
 
     public void setZoom(double value) {
-        zoom = Math.max(0.5, Math.min(2.0, value));
+        zoom = Math.max(0.30, Math.min(2.0, value));
         updateImageSize();
     }
 
