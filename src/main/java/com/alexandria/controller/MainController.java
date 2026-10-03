@@ -169,16 +169,21 @@ public class MainController {
     }
 
     //Now taking PDF page breaks into account, instead of just processing it as a long string
+    // Optimistically show screen first, then calculate in backround
     private void openLibraryText(Text text, File sourceFile) {
         List<Integer> pageOffsets = TextPaginator.paginate(text.getContent(), TextPaginator.CHARS_PER_PAGE);
+        openAnalysis(text, pageOffsets, sourceFile); // Open analysis first  page offsets
+
         if (text.getFileType() == FileType.PDF && sourceFile != null) {
-            try {
-                pageOffsets = pdfService.extractTextWithPageBoundaries(sourceFile).pageOffsets();
-            } catch (Exception e) {
-                System.out.println("Failed to extract PDF page breaks. ERROR: " + e);
-            }
+            new Thread(() -> {
+                try {
+                    List<Integer> exactOffsets = pdfService.extractTextWithPageBoundaries(sourceFile).pageOffsets();
+                    analyseController.openText(text, exactOffsets);
+                } catch (Exception e) {
+                    System.out.println("Failed to extract PDF page breaks. ERROR: " + e);
+                }
+            }).start();
         }
-        openAnalysis(text, pageOffsets, sourceFile);
     }
 
     private void configureUserGuideTour() {

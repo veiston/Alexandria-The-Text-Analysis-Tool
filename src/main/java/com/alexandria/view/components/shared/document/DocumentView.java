@@ -160,7 +160,7 @@ public class DocumentView extends BorderPane {
         }
 
         private void setZoom(double value) {
-                zoom = Math.max(0.75, Math.min(2.0, value));
+                zoom = Math.max(0.30, Math.min(2.0, value));
                 if (showingPdf && pdfRenderer != null) {
                         pdfRenderer.setZoom(zoom);
                 } else if (textRenderer != null) {
