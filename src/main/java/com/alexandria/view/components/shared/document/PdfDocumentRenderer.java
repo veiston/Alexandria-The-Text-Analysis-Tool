@@ -1,10 +1,29 @@
 package com.alexandria.view.components.shared.document;
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.ImageType;
+import org.apache.pdfbox.rendering.PDFRenderer;
+
 import com.alexandria.service.analysis.SearchMatch;
-import com.alexandria.view.components.shared.quotation.QuotationLocation;
 import com.alexandria.view.components.shared.document.highlight.PdfHighlight;
 import com.alexandria.view.components.shared.document.highlight.PdfTextLayout;
+import com.alexandria.view.components.shared.quotation.QuotationLocation;
 import com.alexandria.view.components.shared.selection.QuotationSelectionPopup;
+
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Pos;
@@ -21,22 +40,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import org.apache.pdfbox.Loader;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.rendering.ImageType;
-import org.apache.pdfbox.rendering.PDFRenderer;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
 
 public class PdfDocumentRenderer {
     private static final float BASE_DPI = 144f;
@@ -162,14 +165,32 @@ public class PdfDocumentRenderer {
         hideQuotationPopup();
         dragActive = false;
 
-        RenderedPage page = renderPage(currentPage);
-        if (page == null) {
-            showError(
-                    "Could not render PDF page "
-                            + (currentPage + 1));
+        RenderedPage page = renderedPages.get(currentPage);
+        if (page != null) {
+            displayPage(page);
             return;
         }
 
+        // Rendering missing pages in backround so UI doesn't freeze
+        // Use async completableFuture
+        int current = currentPage;
+        CompletableFuture.supplyAsync(() -> renderPage(current))
+                .thenAcceptAsync(rendered -> {
+                    // Ignore if user already navigated to another page
+                    if (current != currentPage) {
+                        return;
+                    }
+                    if (rendered == null) {
+                        showError(
+                                "Could not render PDF page "
+                                        + (current + 1));
+                        return;
+                    }
+                    displayPage(rendered);
+                }, Platform::runLater);
+    }
+
+    private void displayPage(RenderedPage page) {
         currentImage = page.image();
         imageView.setImage(page.fxImage());
         currentLayout = page.layout();
