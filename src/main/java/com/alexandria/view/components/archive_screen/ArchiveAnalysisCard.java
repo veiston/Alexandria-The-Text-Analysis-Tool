@@ -11,8 +11,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class ArchiveAnalysisCard extends Card {
-    private static final DateTimeFormatter DATE_FORMAT =
-            DateTimeFormatter.ofPattern("d MMM uuuu");
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("d MMM uuuu");
 
     public ArchiveAnalysisCard(ArchiveTextAnalysis analysis) {
         super(titleText(analysis.getProjectTitle(), analysis.getSourceFileName()));
@@ -35,6 +34,23 @@ public class ArchiveAnalysisCard extends Card {
         termLabel.getStyleClass().add("archive-term-preview");
         termLabel.setWrapText(true);
         setExtraContent(termLabel);
+    }
+
+    public ArchiveAnalysisCard(ArchiveComparison comparison) {
+        super(titleText(comparison.title(), comparison.sources()));
+
+        boolean termComparison = comparison.term() != null;
+        setTypeText(termComparison ? "Term comparison" : "Text comparison");
+        setSourceText(comparison.sources());
+        setFooterText("Saved " + formatDate(comparison.createdAt()));
+        setActionText("Open");
+
+        if (termComparison) {
+            Label termLabel = new Label("Term: " + comparison.term());
+            termLabel.getStyleClass().add("archive-term-preview");
+            termLabel.setWrapText(true);
+            setExtraContent(termLabel);
+        }
     }
 
     public Button getOpenButton() {

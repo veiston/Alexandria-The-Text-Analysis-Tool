@@ -3,7 +3,9 @@ package com.alexandria.view.components.archive_screen;
 import com.alexandria.model.ArchiveTermAnalysis;
 import com.alexandria.model.ArchiveTextAnalysis;
 import com.alexandria.service.analysis.TermAnalysisResult;
+import com.alexandria.service.analysis.TermComparisonResult;
 import com.alexandria.service.analysis.TextAnalysisResult;
+import com.alexandria.service.analysis.TextComparisonResult;
 import com.alexandria.service.analysis.TextFragment;
 import com.alexandria.service.analysis.WordFrequency;
 import com.alexandria.view.components.shared.modal.Modal;
@@ -19,6 +21,8 @@ import javafx.scene.layout.VBox;
 import java.util.List;
 
 public class ArchiveAnalysisModal extends Modal {
+
+    private static final int SNIPPET_CHAR_BUDGET = 180;
 
     public void showTextAnalysis(ArchiveTextAnalysis analysis) {
         TextAnalysisResult result = analysis.getTextAnalysisResult();
@@ -93,6 +97,124 @@ public class ArchiveAnalysisModal extends Modal {
 
         content.getChildren().addAll(generalAnalysis, neighboringWords);
         showAnalysis(content);
+    }
+
+    public void showTextComparison(ArchiveComparison comparison) {
+        TextComparisonResult result = comparison.textResult();
+
+        Label title = new Label("Text comparison");
+        title.getStyleClass().addAll("heading-lg", "archive-modal-title");
+        Label texts = new Label(comparison.title());
+        texts.getStyleClass().add("text-muted");
+        texts.setWrapText(true);
+        VBox content = new VBox(20, new VBox(8, title, texts));
+
+        Label summaryTitle = new Label("Similarity");
+        summaryTitle.getStyleClass().addAll("heading-md", "archive-modal-section-title");
+        GridPane summaryTable = createTable("Statistic", "Value");
+        double score = result.similarityScore();
+        addTableRow(summaryTable, 1, "Similarity index", Math.round(score) + "%");
+        addTableRow(summaryTable, 2, "Correlation", result.similarityAmount());
+        VBox summary = new VBox(16, summaryTitle, summaryTable);
+
+        Label wordsTitle = new Label("Most frequent shared words");
+        wordsTitle.getStyleClass().addAll("heading-md", "archive-modal-section-title");
+        GridPane wordsTable = createTable("Word", "Doc A · Doc B");
+        int row = 1;
+        for (TextComparisonResult.TextComparisonRow word : result.commonWords()) {
+            addTableCell(wordsTable, 0, row, capitalize(word.word()), "archive-table-cell");
+            addTableCell(wordsTable, 1, row, countsForDocuments(word, result.textIds()), "archive-table-cell");
+            row++;
+        }
+        VBox sharedWords = new VBox(16, wordsTitle, wordsTable);
+
+        Label paragraphsTitle = new Label("Key paragraphs");
+        paragraphsTitle.getStyleClass().addAll("heading-md", "archive-modal-section-title");
+        VBox paragraphs = new VBox(12);
+        List<TextComparisonResult.ParagraphMatch> matches = result.similarParagraphs();
+        for (int index = 0; index < matches.size(); index++) {
+            TextComparisonResult.ParagraphMatch match = matches.get(index);
+            Label score1 = new Label(String.format("Similarity score: %.0f%%", match.scorePercent()));
+            score1.getStyleClass().add("heading-sm");
+            paragraphs.getChildren().addAll(
+                    score1,
+                    snippetLabel("Doc A", match.first()),
+                    snippetLabel("Doc B", match.second()));
+
+            if (index < matches.size() - 1) {
+                Separator divider = new Separator();
+                divider.getStyleClass().add("archive-fragment-divider");
+                paragraphs.getChildren().add(divider);
+            }
+        }
+        VBox keyParagraphs = new VBox(16, paragraphsTitle, paragraphs);
+
+        content.getChildren().addAll(summary, sharedWords, keyParagraphs);
+        showAnalysis(content);
+    }
+
+    public void showTermComparison(ArchiveComparison comparison) {
+        TermComparisonResult result = comparison.termResult();
+
+        Label title = new Label("Term comparison");
+        title.getStyleClass().addAll("heading-lg", "archive-modal-title");
+        Label comparedTermLabel = new Label("Compared term");
+        comparedTermLabel.getStyleClass().add("text-muted");
+        Label term = new Label(comparison.term());
+        term.getStyleClass().add("archive-modal-term");
+        VBox comparedTerm = new VBox(2, comparedTermLabel, term);
+        VBox content = new VBox(20, new VBox(16, title, comparedTerm));
+
+        Label occurrencesTitle = new Label("Occurrences per text");
+        occurrencesTitle.getStyleClass().addAll("heading-md", "archive-modal-section-title");
+        GridPane table = createTable("Text", "Occurrences");
+        int row = 1;
+        for (TermComparisonResult.TermTextOccurrence occurrence : result.occurrencesPerText()) {
+            addTableCell(table, 0, row, occurrence.textTitle(), "archive-table-cell");
+            addTableCell(table, 1, row,
+                    occurrence.occurrences() + " · "
+                            + String.format("%.2f / 1,000 words", occurrence.relativeFrequency()),
+                    "archive-table-cell");
+            row++;
+        }
+
+        content.getChildren().add(new VBox(16, occurrencesTitle, table));
+        showAnalysis(content);
+    }
+
+    private Label snippetLabel(String documentName, TextComparisonResult.ParagraphSnippet snippet) {
+        String page = snippet.page() == null ? "" : "Page " + snippet.page() + " · ";
+        Label label = new Label(documentName + " · " + page + "Para " + snippet.paragraphIndex()
+                + ": " + truncate(snippet.text()));
+        label.getStyleClass().add("archive-fragment");
+        label.setWrapText(true);
+        return label;
+    }
+
+    private String countsForDocuments(TextComparisonResult.TextComparisonRow row, List<Integer> textIds) {
+        if (textIds == null || textIds.isEmpty()) {
+            return String.valueOf(row.countsByTextId().values().stream().mapToInt(Integer::intValue).sum());
+        }
+        StringBuilder counts = new StringBuilder();
+        for (int index = 0; index < textIds.size(); index++) {
+            if (index > 0) {
+                counts.append(" · ");
+            }
+            counts.append(row.countsByTextId().getOrDefault(textIds.get(index), 0));
+        }
+        return counts.toString();
+    }
+
+    private String truncate(String text) {
+        if (text == null) {
+            return "";
+        }
+        String flat = text.replaceAll("\\s+", " ").strip();
+        if (flat.length() <= SNIPPET_CHAR_BUDGET) {
+            return flat;
+        }
+        int cut = flat.lastIndexOf(' ', SNIPPET_CHAR_BUDGET);
+        return flat.substring(0, cut <= 0 ? SNIPPET_CHAR_BUDGET : cut).stripTrailing() + "...";
     }
 
     private GridPane createTable(String firstHeader, String secondHeader) {
