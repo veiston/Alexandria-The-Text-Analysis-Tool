@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -59,6 +60,14 @@ public class ComparisonSidePanel extends VBox {
 
     public SearchView getSearchView() {
         return searchView;
+    }
+
+    public Node getCommonWordsPanel() {
+        return commonWordsPanel;
+    }
+
+    public Node getSimilarParagraphsPanel() {
+        return paragraphsPanel;
     }
 
     public void setOnCommonWordSelected(Consumer<String> handler) {
