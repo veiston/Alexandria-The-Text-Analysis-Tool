@@ -1,18 +1,21 @@
 package com.alexandria.view.components.shared.document;
 
+import java.nio.file.Path;
+import java.util.List;
+import java.util.function.BiFunction;
+
 import com.alexandria.model.FileType;
 import com.alexandria.service.analysis.SearchMatch;
+
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToolBar;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.application.Platform;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.function.BiFunction;
 
 public class DocumentView extends BorderPane {
         private final Label pageLabel = new Label("Page 1 / 1");
@@ -32,6 +35,18 @@ public class DocumentView extends BorderPane {
                 setMinSize(0, 0);
                 setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
                 configureToolbar();
+
+                // ctrl + scroll to zoom
+                addEventFilter(ScrollEvent.SCROLL, event -> {
+                        if (event.isControlDown()) {
+                                event.consume();
+                                if (event.getDeltaY() > 0) {
+                                        setZoom(zoom + 0.1);
+                                } else if (event.getDeltaY() < 0) {
+                                        setZoom(zoom - 0.1);
+                                }
+                        }
+                });
         }
 
         private void configureToolbar() {
@@ -145,7 +160,7 @@ public class DocumentView extends BorderPane {
         }
 
         private void setZoom(double value) {
-                zoom = Math.max(0.75, Math.min(2.0, value));
+                zoom = Math.max(0.30, Math.min(2.0, value));
                 if (showingPdf && pdfRenderer != null) {
                         pdfRenderer.setZoom(zoom);
                 } else if (textRenderer != null) {

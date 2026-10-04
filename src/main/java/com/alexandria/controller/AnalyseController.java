@@ -120,19 +120,7 @@ public class AnalyseController {
     }
 
     public SearchOutcome search(String term) {
-        SearchOutcome outcome = search(term, false, false, false);
-
-        if (outcome.success()) {
-            currentSearchMatches = outcome.matches();
-            currentSearchMatchIndex = currentSearchMatches.isEmpty() ? -1 : 0;
-            if (!currentSearchMatches.isEmpty()) {
-                trackedTerms.put(term, outcome.termAnalysis());
-            }
-        } else {
-            clearSearchState();
-        }
-
-        return outcome;
+        return search(term, SearchSettings.defaults());
     }
 
     public void untrackTerm(String term) {
@@ -190,6 +178,32 @@ public class AnalyseController {
             boolean fuzzy,
             boolean wholeWordsOnly) {
         return search(term, caseSensitive, fuzzy, wholeWordsOnly, false);
+    }
+
+    public SearchOutcome search(String term, SearchSettings settings) {
+        if (settings == null) {
+            settings = SearchSettings.defaults();
+        }
+        SearchOutcome outcome = search(
+                term,
+                settings.caseSensitive(),
+                settings.fuzzy(),
+                settings.wholeWordsOnly(),
+                settings.ignoreStopWords());
+
+        if (outcome.success()) {
+            currentSearchMatches = outcome.matches();
+            if (currentSearchMatches.isEmpty()) {
+                currentSearchMatchIndex = -1;
+            } else {
+                currentSearchMatchIndex = 0;
+                trackedTerms.put(term, outcome.termAnalysis());
+            }
+        } else {
+            clearSearchState();
+        }
+
+        return outcome;
     }
 
     public SearchOutcome search(
@@ -271,7 +285,7 @@ public class AnalyseController {
 
     private void configureTermDetail(AnalyseScreen analyseScreen) {
         analyseScreen.setOnTermDetailRequested(word -> {
-            SearchOutcome outcome = search(word, false, false, false);
+            SearchOutcome outcome = search(word, analyseScreen.getSearchSettings());
 
             if (!outcome.success()) {
                 System.err.println(outcome.message());
@@ -370,7 +384,7 @@ public class AnalyseController {
 
     private void configureSearch(AnalyseScreen analyseScreen) {
         analyseScreen.setOnSearch(term -> {
-            SearchOutcome outcome = search(term);
+            SearchOutcome outcome = search(term, analyseScreen.getSearchSettings());
 
             if (!outcome.success()) {
                 System.err.println(outcome.message());

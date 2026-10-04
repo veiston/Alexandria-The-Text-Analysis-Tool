@@ -1,10 +1,29 @@
 package com.alexandria.view.components.shared.document;
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.ImageType;
+import org.apache.pdfbox.rendering.PDFRenderer;
+
 import com.alexandria.service.analysis.SearchMatch;
-import com.alexandria.view.components.shared.quotation.QuotationLocation;
 import com.alexandria.view.components.shared.document.highlight.PdfHighlight;
 import com.alexandria.view.components.shared.document.highlight.PdfTextLayout;
+import com.alexandria.view.components.shared.quotation.QuotationLocation;
 import com.alexandria.view.components.shared.selection.QuotationSelectionPopup;
+
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Pos;
@@ -12,6 +31,7 @@ import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -20,26 +40,16 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import org.apache.pdfbox.Loader;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.rendering.ImageType;
-import org.apache.pdfbox.rendering.PDFRenderer;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
 
 public class PdfDocumentRenderer {
     private static final float BASE_DPI = 144f;
     private static final double BASE_PAGE_WIDTH = 620.0;
     private static final double PAGE_MARGIN = 30.0;
     private static final String LIVE_SELECTION_STYLE_CLASS = "pdf-selection-rect";
+
+    private record RenderedPage(BufferedImage image, Image fxImage, PdfTextLayout layout) {}
+    private final Map<Integer, RenderedPage> renderedPages = new LinkedHashMap<>();
+    private Runnable activeHighlight;
 
     private final BorderPane root = new BorderPane();
     private final ScrollPane scrollPane = new ScrollPane();
@@ -123,6 +133,37 @@ public class PdfDocumentRenderer {
         }
     }
 
+    // Renders a page and uses recently-used -caching
+    private synchronized RenderedPage renderPage(int pageIndex) {
+        if (renderer == null || document == null || pageIndex < 0 || pageIndex >= document.getNumberOfPages()) {
+            return null;
+        }
+
+        RenderedPage cached;
+        synchronized (renderedPages) {
+            cached = renderedPages.get(pageIndex);
+        }
+        if (cached != null) {
+            return cached;
+        }
+
+        try {
+            BufferedImage image = renderer.renderImageWithDPI(pageIndex, BASE_DPI, ImageType.RGB);
+            Image fxImage = SwingFXUtils.toFXImage(image, null);
+            PdfTextLayout layout = PdfTextLayout.forPage(document, pageIndex, BASE_DPI);
+            RenderedPage page = new RenderedPage(image, fxImage, layout);
+            synchronized (renderedPages) {
+                if (renderedPages.size() >= 12) { // Max amount of stored pages
+                    renderedPages.remove(renderedPages.keySet().iterator().next());
+                }
+                renderedPages.put(pageIndex, page);
+            }
+            return page;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     private void renderCurrentPage() {
         if (renderer == null || document == null)
             return;
@@ -130,27 +171,37 @@ public class PdfDocumentRenderer {
         hideQuotationPopup();
         dragActive = false;
 
-        try {
-            currentImage = renderer.renderImageWithDPI(currentPage, BASE_DPI, ImageType.RGB);
-            imageView.setImage(SwingFXUtils.toFXImage(currentImage, null));
-
-            try {
-                currentLayout = PdfTextLayout.forPage(document, currentPage, BASE_DPI);
-            } catch (IOException | RuntimeException e) {
-                currentLayout = null;
-            }
-
-            updateImageSize();
-            errorLabel.setVisible(false);
-            restorePageHost();
-            onVisiblePageChanged.accept(currentPage + 1);
-        } catch (IOException | RuntimeException e) {
+        RenderedPage page = renderPage(currentPage);
+        if (page == null) {
             showError(
                     "Could not render PDF page "
-                            + (currentPage + 1)
-                            + ":\n"
-                            + e.getMessage());
+                            + (currentPage + 1));
+            return;
         }
+
+        displayPage(page);
+    }
+
+    private void displayPage(RenderedPage page) {
+        currentImage = page.image();
+        imageView.setImage(page.fxImage());
+        currentLayout = page.layout();
+
+        updateImageSize();
+        errorLabel.setVisible(false);
+        restorePageHost();
+        onVisiblePageChanged.accept(currentPage + 1);
+
+        // Pre-fetch next 6 pages backround
+        int current = currentPage;
+        CompletableFuture.runAsync(() -> {
+            for (int i = 1; i <= 6; i++) { // Max pages to preload
+                if (current != currentPage) {
+                    return;
+                }
+                renderPage(current + i);
+            }
+        });
     }
 
     private double[] rasterToDisplay(double[] rasterBounds) {
@@ -237,6 +288,7 @@ public class PdfDocumentRenderer {
 
     public void highlightSearch(String searchTerm) {
         clearHighlights();
+        activeHighlight = () -> highlightSearch(searchTerm);
         highlight(searchTerm, PdfHighlight.SEARCH_STYLE_CLASS);
         restoreQuotationHighlights();
     }
@@ -255,11 +307,13 @@ public class PdfDocumentRenderer {
 
     public void highlightPassage(String passage) {
         clearHighlights();
+        activeHighlight = () -> highlightPassage(passage);
 
         if (currentLayout != null && passage != null) {
             int[] range = currentLayout.findGlyphRange(passage);
-            if (range != null)
+            if (range != null) {
                 drawGlyphRange(range, PdfHighlight.SEARCH_STYLE_CLASS);
+            }
         }
 
         restoreQuotationHighlights();
@@ -267,6 +321,7 @@ public class PdfDocumentRenderer {
 
     public void highlightSearchMatches(List<SearchMatch> matches, int activeIndex) {
         clearHighlights();
+        activeHighlight = () -> highlightSearchMatches(matches, activeIndex);
 
         if (currentLayout == null || matches == null || matches.isEmpty()) {
             restoreQuotationHighlights();
@@ -302,10 +357,12 @@ public class PdfDocumentRenderer {
 
     public void highlightQuotation(String quotedText) {
         clearHighlights();
+        activeHighlight = () -> highlightQuotation(quotedText);
         highlight(quotedText, PdfHighlight.QUOTATION_STYLE_CLASS);
     }
 
     public void clearHighlights() {
+        activeHighlight = null;
         pageHost.getChildren().removeIf(
                 node -> node instanceof Rectangle rectangle
                         && !rectangle.getStyleClass().contains(LIVE_SELECTION_STYLE_CLASS));
@@ -342,9 +399,13 @@ public class PdfDocumentRenderer {
         displayScaleX = pageWidth / currentImage.getWidth();
         displayScaleY = pageHeight / currentImage.getHeight();
 
-        clearHighlights();
         clearLiveSelectionRects();
         restoreQuotationHighlights();
+        if (activeHighlight != null) {
+            activeHighlight.run();
+        } else {
+            clearHighlights();
+        }
 
         Platform.runLater(this::centerPage);
     }
@@ -386,15 +447,21 @@ public class PdfDocumentRenderer {
         if (document == null || page == null || document.getNumberOfPages() == 0)
             return;
 
-        currentPage = Math.max(
+        int target = Math.max(
                 0,
                 Math.min(page - 1, document.getNumberOfPages() - 1));
 
+        if (target == currentPage) {
+            return;
+        }
+
+        activeHighlight = null;
+        currentPage = target;
         renderCurrentPage();
     }
 
     public void setZoom(double value) {
-        zoom = Math.max(0.5, Math.min(2.0, value));
+        zoom = Math.max(0.30, Math.min(2.0, value));
         updateImageSize();
     }
 
@@ -552,6 +619,9 @@ public class PdfDocumentRenderer {
     }
 
     private void closeDocument() {
+        activeHighlight = null;
+        renderedPages.clear();
+
         hideQuotationPopup();
         clearLiveSelectionRects();
         scrollPane.setPannable(true);

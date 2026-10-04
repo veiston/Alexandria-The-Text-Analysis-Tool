@@ -289,7 +289,7 @@ public class TextDocumentRenderer {
     }
 
     public void setZoom(double zoom) {
-        this.zoom = Math.max(0.75, Math.min(1.5, zoom));
+        this.zoom = Math.max(0.30, Math.min(1.5, zoom));
 
         updatePageSizes();
 

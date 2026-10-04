@@ -9,6 +9,7 @@ import com.alexandria.view.components.compare_screen.CompareHeader;
 import com.alexandria.view.components.compare_screen.ComparisonDocumentView;
 import com.alexandria.view.components.compare_screen.ComparisonSidePanel;
 import com.alexandria.service.analysis.SearchMatch;
+import com.alexandria.service.analysis.SearchSettings;
 import com.alexandria.service.analysis.TermComparisonResult;
 import com.alexandria.service.analysis.TextComparisonResult;
 
@@ -380,6 +381,10 @@ public class CompareScreen extends StackPane {
 
     public void goToDocumentBPage(Integer page, Integer paragraph) {
         documentView.goToPageB(page, paragraph);
+    }
+
+    public SearchSettings getSearchSettings() {
+        return comparisonSidePanel.getSearchView().getSearchSettings();
     }
 
     private void goToQuotation(Quotation quotation) {

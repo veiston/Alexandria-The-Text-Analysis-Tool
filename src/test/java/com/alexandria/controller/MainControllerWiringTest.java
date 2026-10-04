@@ -48,6 +48,8 @@ public class MainControllerWiringTest {
                 MockedConstruction<PdfService> pdfServiceConstruction = mockConstruction(PdfService.class);
                 MockedConstruction<ProjectController> projectControllerConstruction = mockConstruction(
                         ProjectController.class);
+                MockedConstruction<QuotationController> quotationControllerConstruction = mockConstruction(
+                        QuotationController.class);
                 MockedConstruction<AnalyseController> analyseControllerConstruction = mockConstruction(
                         AnalyseController.class)) {
 
@@ -110,6 +112,8 @@ public class MainControllerWiringTest {
                 MockedConstruction<PdfService> pdfServiceConstruction = mockConstruction(PdfService.class);
                 MockedConstruction<ProjectController> projectControllerConstruction = mockConstruction(
                         ProjectController.class);
+                MockedConstruction<QuotationController> quotationControllerConstruction = mockConstruction(
+                        QuotationController.class);
                 MockedConstruction<AnalyseController> analyseControllerConstruction = mockConstruction(
                         AnalyseController.class)) {
 
