@@ -1,5 +1,6 @@
 package com.alexandria.view.components.archive_screen;
 
+import com.alexandria.model.ArchiveComparison;
 import com.alexandria.model.ArchiveTermAnalysis;
 import com.alexandria.model.ArchiveTextAnalysis;
 import com.alexandria.service.analysis.TermAnalysisResult;

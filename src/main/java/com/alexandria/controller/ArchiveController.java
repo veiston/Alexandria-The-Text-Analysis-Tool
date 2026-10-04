@@ -16,7 +16,7 @@ import com.alexandria.service.ArchiveTextAnalysisService;
 import com.alexandria.service.analysis.TermComparisonResult;
 import com.alexandria.service.analysis.TextComparisonResult;
 import com.alexandria.utils.JsonMapper;
-import com.alexandria.view.components.archive_screen.ArchiveComparison;
+import com.alexandria.model.ArchiveComparison;
 import com.alexandria.view.components.shared.modal.ErrorAlert;
 import com.alexandria.view.screens.ArchiveScreen;
 
