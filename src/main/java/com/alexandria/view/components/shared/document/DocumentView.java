@@ -8,10 +8,14 @@ import com.alexandria.model.FileType;
 import com.alexandria.service.analysis.SearchMatch;
 
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollBar;
 import javafx.scene.control.ToolBar;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -26,6 +30,7 @@ public class DocumentView extends BorderPane {
         private PdfDocumentRenderer pdfRenderer;
         private TextDocumentRenderer textRenderer;
         private boolean showingPdf;
+        private boolean selectionEnabled = true;
         private int currentPage = 1;
         private double zoom = 1.0;
         private BiFunction<String, String, Integer> onQuotationRequested = (quotationText, location) -> null;
@@ -35,6 +40,19 @@ public class DocumentView extends BorderPane {
                 setMinSize(0, 0);
                 setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
                 configureToolbar();
+
+                // When text selection is disabled, mouse input on the document itself is
+                // swallowed before the
+                // renderers see it (no live selection, no citation popup). Scrollbars and the
+                // toolbar keep working.
+                EventHandler<MouseEvent> selectionBlocker = event -> {
+                        if (!selectionEnabled && isDocumentContentTarget(event.getTarget())) {
+                                event.consume();
+                        }
+                };
+                addEventFilter(MouseEvent.MOUSE_PRESSED, selectionBlocker);
+                addEventFilter(MouseEvent.MOUSE_DRAGGED, selectionBlocker);
+                addEventFilter(MouseEvent.MOUSE_RELEASED, selectionBlocker);
 
                 // ctrl + scroll to zoom
                 addEventFilter(ScrollEvent.SCROLL, event -> {
@@ -47,6 +65,30 @@ public class DocumentView extends BorderPane {
                                 }
                         }
                 });
+        }
+
+        /**
+         * Enables/disables selecting text in the document (and with it the
+         * citation/annotation popup).
+         */
+        public void setSelectionEnabled(boolean enabled) {
+                selectionEnabled = enabled;
+        }
+
+        private boolean isDocumentContentTarget(Object target) {
+                if (!(target instanceof Node node)) {
+                        return false;
+                }
+                boolean insideDocument = false;
+                for (Node current = node; current != null; current = current.getParent()) {
+                        if (current instanceof ScrollBar) {
+                                return false;
+                        }
+                        if (current == getCenter()) {
+                                insideDocument = true;
+                        }
+                }
+                return insideDocument;
         }
 
         private void configureToolbar() {

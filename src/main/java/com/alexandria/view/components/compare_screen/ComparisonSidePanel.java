@@ -1,12 +1,10 @@
 package com.alexandria.view.components.compare_screen;
 
-import com.alexandria.service.analysis.TermComparisonResult;
 import com.alexandria.service.analysis.TextComparisonResult;
 import com.alexandria.view.components.shared.search.SearchView;
 import com.alexandria.view.components.shared.FrequencyBar;
 import com.alexandria.view.components.shared.ContextMatchCard;
 import com.alexandria.view.components.shared.PassagePreview;
-import com.alexandria.view.components.shared.SearchInput;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -19,19 +17,22 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 /**
- * Comparison-specific result panels built with the same search, tracker and card
- * patterns as AnalyseScreen. The data differs: every row has a document A/B side.
+ * Comparison-specific result panels built with the same search, tracker and
+ * card
+ * patterns as AnalyseScreen. The data differs: every row has a document A/B
+ * side.
  */
 public class ComparisonSidePanel extends VBox {
     private final CommonWordsPanel commonWordsPanel = new CommonWordsPanel();
-    private final TermPanel termPanel = new TermPanel();
     private final SearchView searchView = new SearchView();
     private final SimilarParagraphsPanel paragraphsPanel = new SimilarParagraphsPanel();
 
-    private Consumer<String> onCommonWordSelected = word -> { };
-    private Consumer<String> onTermRequested = term -> { };
-    private Consumer<TextComparisonResult.ParagraphSnippet> onDocumentAParagraphSelected = snippet -> { };
-    private Consumer<TextComparisonResult.ParagraphSnippet> onDocumentBParagraphSelected = snippet -> { };
+    private Consumer<String> onCommonWordSelected = word -> {
+    };
+    private Consumer<TextComparisonResult.ParagraphSnippet> onDocumentAParagraphSelected = snippet -> {
+    };
+    private Consumer<TextComparisonResult.ParagraphSnippet> onDocumentBParagraphSelected = snippet -> {
+    };
 
     public ComparisonSidePanel() {
         getStyleClass().add("comparison-side-panel");
@@ -44,10 +45,9 @@ public class ComparisonSidePanel extends VBox {
         searchCard.getStyleClass().add("card");
         searchCard.setPadding(new Insets(14));
 
-        getChildren().addAll(commonWordsPanel, termPanel, searchCard, paragraphsPanel);
+        getChildren().addAll(commonWordsPanel, searchCard, paragraphsPanel);
 
         commonWordsPanel.setOnWordSelected(word -> onCommonWordSelected.accept(word));
-        termPanel.setOnSubmit(term -> onTermRequested.accept(term));
         paragraphsPanel.setOnDocumentASelected(snippet -> onDocumentAParagraphSelected.accept(snippet));
         paragraphsPanel.setOnDocumentBSelected(snippet -> onDocumentBParagraphSelected.accept(snippet));
     }
@@ -57,33 +57,27 @@ public class ComparisonSidePanel extends VBox {
         paragraphsPanel.setResults(result == null ? List.of() : result.similarParagraphs());
     }
 
-    public void setTermComparison(TermComparisonResult result) {
-        termPanel.setResult(result);
-    }
-
     public SearchView getSearchView() {
         return searchView;
     }
 
     public void setOnCommonWordSelected(Consumer<String> handler) {
-        onCommonWordSelected = handler == null ? word -> { } : handler;
-    }
-
-    public void setOnTermRequested(Consumer<String> handler) {
-        onTermRequested = handler == null ? term -> { } : handler;
+        onCommonWordSelected = handler == null ? word -> {
+        } : handler;
     }
 
     public void setOnDocumentAParagraphSelected(Consumer<TextComparisonResult.ParagraphSnippet> handler) {
-        onDocumentAParagraphSelected = handler == null ? snippet -> { } : handler;
+        onDocumentAParagraphSelected = handler == null ? snippet -> {
+        } : handler;
     }
 
     public void setOnDocumentBParagraphSelected(Consumer<TextComparisonResult.ParagraphSnippet> handler) {
-        onDocumentBParagraphSelected = handler == null ? snippet -> { } : handler;
+        onDocumentBParagraphSelected = handler == null ? snippet -> {
+        } : handler;
     }
 
     public void clear() {
         commonWordsPanel.setResult(null);
-        termPanel.setResult(null);
         paragraphsPanel.setResults(List.of());
         searchView.reset();
     }
@@ -97,7 +91,8 @@ public class ComparisonSidePanel extends VBox {
     private static final class CommonWordsPanel extends VBox {
         private final VBox rowsHost = new VBox(10);
         private final Label emptyLabel = new Label("Run comparison to see shared words.");
-        private Consumer<String> onWordSelected = word -> { };
+        private Consumer<String> onWordSelected = word -> {
+        };
 
         private CommonWordsPanel() {
             getStyleClass().add("card");
@@ -176,12 +171,15 @@ public class ComparisonSidePanel extends VBox {
     }
 
     private static final class SimilarParagraphsPanel extends VBox {
-        private static final int SNIPPET_CHAR_BUDGET = 180;
+        // Roughly two lines of the side panel; the full passage is read via "go to".
+        private static final int SNIPPET_CHAR_BUDGET = 100;
 
         private final VBox cardsHost = new VBox(10);
         private final Label emptyLabel = new Label("No similar paragraphs found.");
-        private Consumer<TextComparisonResult.ParagraphSnippet> onDocumentASelected = snippet -> { };
-        private Consumer<TextComparisonResult.ParagraphSnippet> onDocumentBSelected = snippet -> { };
+        private Consumer<TextComparisonResult.ParagraphSnippet> onDocumentASelected = snippet -> {
+        };
+        private Consumer<TextComparisonResult.ParagraphSnippet> onDocumentBSelected = snippet -> {
+        };
 
         private SimilarParagraphsPanel() {
             getStyleClass().add("comparison-key-paragraphs");
@@ -241,49 +239,17 @@ public class ComparisonSidePanel extends VBox {
             return page + "Para " + snippet.paragraphIndex();
         }
 
+        /** Keeps only the beginning of the paragraph, followed by "...". */
         private static String truncate(String text) {
-            if (text == null || text.length() <= SNIPPET_CHAR_BUDGET) {
-                return text == null ? "" : text;
+            if (text == null) {
+                return "";
             }
-            int cut = text.lastIndexOf(' ', SNIPPET_CHAR_BUDGET);
-            return text.substring(cut <= 0 ? SNIPPET_CHAR_BUDGET : cut).stripTrailing() + "…";
-        }
-    }
-
-    private static final class TermPanel extends VBox {
-        private final SearchInput input = new SearchInput("Compare a word or phrase");
-        private final VBox rowsHost = new VBox(6);
-        private Consumer<String> onSubmit = term -> { };
-
-        private TermPanel() {
-            getStyleClass().add("card");
-            setSpacing(12);
-            setPadding(new Insets(14));
-            input.setOnSearch(term -> onSubmit.accept(term));
-            getChildren().addAll(heading("Term comparison"), input, rowsHost);
-        }
-
-        private void setResult(TermComparisonResult result) {
-            rowsHost.getChildren().clear();
-            if (result == null) {
-                return;
+            String flat = text.replaceAll("\\s+", " ").strip();
+            if (flat.length() <= SNIPPET_CHAR_BUDGET) {
+                return flat;
             }
-            for (TermComparisonResult.TermTextOccurrence occurrence : result.occurrencesPerText()) {
-                Label title = new Label(occurrence.textTitle());
-                HBox.setHgrow(title, Priority.ALWAYS);
-                Label frequency = new Label(occurrence.occurrences()
-                        + " occurrences · "
-                        + String.format("%.2f / 1,000 words", occurrence.relativeFrequency()));
-                frequency.getStyleClass().add("text-muted");
-                HBox row = new HBox(8, title, frequency);
-                row.setAlignment(Pos.CENTER_LEFT);
-                row.getStyleClass().add("comparison-term-row");
-                rowsHost.getChildren().add(row);
-            }
-        }
-
-        private void setOnSubmit(Consumer<String> handler) {
-            onSubmit = handler;
+            int cut = flat.lastIndexOf(' ', SNIPPET_CHAR_BUDGET);
+            return flat.substring(0, cut <= 0 ? SNIPPET_CHAR_BUDGET : cut).stripTrailing() + "...";
         }
     }
 }

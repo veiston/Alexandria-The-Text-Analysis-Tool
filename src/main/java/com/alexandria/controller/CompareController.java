@@ -2,6 +2,7 @@ package com.alexandria.controller;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -9,8 +10,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.alexandria.dao.TermComparisonDAO;
+import com.alexandria.dao.TermComparisonTextDAO;
+import com.alexandria.dao.TextComparisonDAO;
+import com.alexandria.dao.TextComparisonTextDAO;
 import com.alexandria.model.Text;
-import com.alexandria.model.Quotation;
+import com.alexandria.model.TermComparison;
+import com.alexandria.model.TermComparisonText;
+import com.alexandria.model.TextComparison;
+import com.alexandria.model.TextComparisonText;
 import com.alexandria.model.User;
 import com.alexandria.service.PdfService;
 import com.alexandria.service.TermComparisonService;
@@ -19,20 +27,26 @@ import com.alexandria.service.analysis.TermComparisonResult;
 import com.alexandria.service.analysis.TermComparisonServiceINT;
 import com.alexandria.service.analysis.TextComparisonResult;
 import com.alexandria.service.analysis.TextComparisonServiceINT;
+import com.alexandria.utils.JsonMapper;
 import com.alexandria.view.components.shared.document.highlight.TextPaginator;
 
 public class CompareController {
+    public static final int COMMON_WORDS_LIMIT = 5;
+
     private final TextComparisonServiceINT textComparisonService;
     private final TermComparisonServiceINT termComparisonService;
     private final com.alexandria.service.analysis.SearchServiceINT searchService;
     private List<Text> currentTexts = List.of();
     private List<File> currentFiles = List.of();
+    private TextComparisonResult currentTextComparison;
 
     private final PdfService pdfService = new PdfService();
     private final Map<Integer, List<Integer>> currentPageOffsetsById = new HashMap<>();
-    private final List<QuotationController> quotationControllers = List.of(
-            new QuotationController(), new QuotationController());
     private final UserSessionController session = UserSessionController.getInstance();
+    private final TextComparisonDAO textComparisonDAO = new TextComparisonDAO();
+    private final TextComparisonTextDAO textComparisonTextDAO = new TextComparisonTextDAO();
+    private final TermComparisonDAO termComparisonDAO = new TermComparisonDAO();
+    private final TermComparisonTextDAO termComparisonTextDAO = new TermComparisonTextDAO();
 
     public CompareController() {
         this(new TextComparisonService(), new TermComparisonService(), new com.alexandria.service.SearchService());
@@ -42,7 +56,8 @@ public class CompareController {
         this(textComparisonService, termComparisonService, new com.alexandria.service.SearchService());
     }
 
-    CompareController(TextComparisonServiceINT textComparisonService, TermComparisonServiceINT termComparisonService, com.alexandria.service.analysis.SearchServiceINT searchService) {
+    CompareController(TextComparisonServiceINT textComparisonService, TermComparisonServiceINT termComparisonService,
+            com.alexandria.service.analysis.SearchServiceINT searchService) {
         this.textComparisonService = textComparisonService;
         this.termComparisonService = termComparisonService;
         this.searchService = searchService;
@@ -58,8 +73,8 @@ public class CompareController {
             validateFiles(texts, files);
             currentTexts = List.copyOf(texts);
             currentFiles = files == null ? List.of() : new ArrayList<>(files);
-            configureQuotations();
-            
+            currentTextComparison = null;
+
             // Cache page data to avoid constant re-parsing of the files.
             currentPageOffsetsById.clear();
             for (int index = 0; index < currentTexts.size(); index++) {
@@ -84,6 +99,7 @@ public class CompareController {
         } catch (Exception e) {
             currentTexts = List.of();
             currentFiles = List.of();
+            currentTextComparison = null;
             currentPageOffsetsById.clear();
             return ComparisonTextsOutcome.error(e.getMessage());
         }
@@ -97,51 +113,6 @@ public class CompareController {
         return List.copyOf(currentTexts);
     }
 
-    public List<Quotation> getQuotations() {
-        List<Quotation> result = new ArrayList<>();
-        for (QuotationController controller : quotationControllers) {
-            result.addAll(controller.getQuotations());
-        }
-        return List.copyOf(result);
-    }
-
-    public Quotation addQuotation(int documentIndex, String quotationText, String location) throws java.sql.SQLException {
-        return quotationControllers.get(documentIndex).addQuotation(quotationText, location);
-    }
-
-    public boolean removeQuotation(Quotation quotation) throws java.sql.SQLException {
-        QuotationController controller = controllerFor(quotation);
-        return controller != null && quotation.getId() != null && controller.removeQuotation(quotation.getId());
-    }
-
-    public boolean updateQuotation(Quotation quotation) throws java.sql.SQLException {
-        QuotationController controller = controllerFor(quotation);
-        return controller != null && controller.updateQuotation(quotation);
-    }
-
-    private void configureQuotations() throws java.sql.SQLException {
-        User user = session.getCurrentUser();
-        for (int index = 0; index < currentTexts.size(); index++) {
-            Text text = currentTexts.get(index);
-            Integer userId = user == null || !java.util.Objects.equals(user.getId(), text.getUserId())
-                    ? null : user.getId();
-            Integer textId = userId == null ? null : text.getId();
-            quotationControllers.get(index).openText(userId, textId);
-        }
-    }
-
-    private QuotationController controllerFor(Quotation quotation) {
-        if (quotation == null || quotation.getTextId() == null) {
-            return null;
-        }
-        for (int index = 0; index < currentTexts.size(); index++) {
-            if (java.util.Objects.equals(currentTexts.get(index).getId(), quotation.getTextId())) {
-                return quotationControllers.get(index);
-            }
-        }
-        return null;
-    }
-
     public TextComparisonOutcome compareTexts(int limit) {
         if (currentTexts.isEmpty()) {
             return TextComparisonOutcome.error("No texts currently selected for comparison.");
@@ -152,7 +123,8 @@ public class CompareController {
             Text text = currentTexts.get(index);
             contentsByTextId.put(comparisonTextId(text, index), text.getContent());
         }
-        return TextComparisonOutcome.ok(textComparisonService.compareTexts(contentsByTextId, currentPageOffsetsById, limit));
+        currentTextComparison = textComparisonService.compareTexts(contentsByTextId, currentPageOffsetsById, limit);
+        return TextComparisonOutcome.ok(currentTextComparison);
     }
 
     public TermComparisonOutcome compareTerm(String term) {
@@ -190,11 +162,72 @@ public class CompareController {
                 Text text = currentTexts.get(index);
                 contentsByTextId.put(comparisonTextId(text, index), text.getContent());
             }
-            Map<Integer, List<com.alexandria.service.analysis.SearchMatch>> matches = 
-                searchService.searchMultiple(contentsByTextId, term, settings, currentPageOffsetsById);
+            Map<Integer, List<com.alexandria.service.analysis.SearchMatch>> matches = searchService
+                    .searchMultiple(contentsByTextId, term, settings, currentPageOffsetsById);
             return MultiSearchOutcome.ok(matches);
         } catch (IllegalArgumentException e) {
             return MultiSearchOutcome.error(e.getMessage());
+        }
+    }
+
+    /**
+     * Saves the text comparison (similarity + shared words + key paragraphs) and
+     * one term
+     * comparison per tracked term, each linked to both compared texts.
+     * Both texts must be saved in the logged-in user's library.
+     */
+    public SaveOutcome saveFindings(Collection<String> trackedTerms) {
+        User user = session.getCurrentUser();
+        if (user == null) {
+            return SaveOutcome.error("Log in to save comparison findings.");
+        }
+        if (currentTexts.size() < 2) {
+            return SaveOutcome.error("No texts currently selected for comparison.");
+        }
+        for (Text text : currentTexts) {
+            if (text.getId() == null || !java.util.Objects.equals(user.getId(), text.getUserId())) {
+                return SaveOutcome.error("Both texts must be saved in your library to save findings.");
+            }
+        }
+
+        List<String> terms = trackedTerms == null ? List.of()
+                : trackedTerms.stream()
+                        .filter(term -> term != null && !term.isBlank())
+                        .distinct()
+                        .toList();
+
+        try {
+            if (currentTextComparison == null) {
+                TextComparisonOutcome comparison = compareTexts(COMMON_WORDS_LIMIT);
+                if (!comparison.success()) {
+                    return SaveOutcome.error(comparison.message());
+                }
+            }
+
+            int saved = 0;
+
+            TextComparison textComparison = textComparisonDAO.create(
+                    new TextComparison(user.getId(), JsonMapper.toJson(currentTextComparison)));
+            for (Text text : currentTexts) {
+                textComparisonTextDAO.create(new TextComparisonText(textComparison.getId(), text.getId()));
+            }
+            saved++;
+
+            for (String term : terms) {
+                TermComparisonOutcome comparison = compareTerm(term);
+                if (!comparison.success()) {
+                    return SaveOutcome.error(comparison.message());
+                }
+                TermComparison termComparison = termComparisonDAO.create(
+                        new TermComparison(user.getId(), term, JsonMapper.toJson(comparison.result())));
+                for (Text text : currentTexts) {
+                    termComparisonTextDAO.create(new TermComparisonText(termComparison.getId(), text.getId()));
+                }
+                saved++;
+            }
+            return SaveOutcome.ok(saved);
+        } catch (Exception e) {
+            return SaveOutcome.error("Could not save findings: " + e.getMessage());
         }
     }
 
@@ -264,7 +297,19 @@ public class CompareController {
         }
     }
 
-    public record MultiSearchOutcome(boolean success, String message, Map<Integer, List<com.alexandria.service.analysis.SearchMatch>> matches) {
+    /** savedCount = the text comparison plus every saved term comparison. */
+    public record SaveOutcome(boolean success, String message, int savedCount) {
+        static SaveOutcome ok(int savedCount) {
+            return new SaveOutcome(true, null, savedCount);
+        }
+
+        static SaveOutcome error(String message) {
+            return new SaveOutcome(false, message, 0);
+        }
+    }
+
+    public record MultiSearchOutcome(boolean success, String message,
+            Map<Integer, List<com.alexandria.service.analysis.SearchMatch>> matches) {
         public int totalMatches() {
             int sum = 0;
             for (List<com.alexandria.service.analysis.SearchMatch> list : matches.values()) {
