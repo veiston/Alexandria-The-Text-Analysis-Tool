@@ -124,11 +124,24 @@ public class UserGuideScreen extends VBox {
         return new UserGuideSection(content, "/images/user-guide/analyze.png");
     }
 
-    private VBox buildCompareGuide() {
-		// TODO Add guide content for the text comparison screen
-        Label todo = new Label("TODO");
-        todo.getStyleClass().addAll("text-muted", "user-guide-note");
-        return new VBox(todo);
+    private Node buildCompareGuide() {
+        Label startTitle = guideHeading("Open texts for comparison");
+        Label startDescription = new Label(UserGuideData.COMPARE_INTRODUCTION);
+        startDescription.getStyleClass().add("user-guide-row-text");
+        startDescription.setWrapText(true);
+        startDescription.setMinWidth(0);
+        startDescription.setMaxWidth(Double.MAX_VALUE);
+
+        Label functionsTitle = guideHeading("How comparison results are calculated");
+
+        VBox functionList = new VBox(10);
+        for (int i = 0; i < UserGuideData.COMPARE_METHODS.size(); i++) {
+            functionList.getChildren().add(new UserGuideStep(i + 1, UserGuideData.COMPARE_METHODS.get(i)));
+        }
+
+        VBox content = new VBox(12, startTitle, startDescription, functionsTitle, functionList);
+        content.setMinWidth(0);
+        return new UserGuideSection(content, "/images/user-guide/compare.png");
     }
 
     private Label guideHeading(String text) {
