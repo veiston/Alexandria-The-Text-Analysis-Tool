@@ -123,6 +123,22 @@
             <version>5.18.0</version>
             <scope>test</scope>
         </dependency>
+        <!-- TestFX -->
+        
+        <dependency>
+            <groupId>org.testfx</groupId>
+            <artifactId>testfx-junit</artifactId>
+            <version>4.0.18</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Monocle for headless JavaFX tests -->
+        <dependency>
+            <groupId>org.testfx</groupId>
+            <artifactId>openjfx-monocle</artifactId>
+            <version>17.0.10</version>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
 
