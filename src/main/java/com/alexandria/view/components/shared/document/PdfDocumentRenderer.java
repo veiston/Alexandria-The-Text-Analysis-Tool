@@ -1,10 +1,29 @@
 package com.alexandria.view.components.shared.document;
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.ImageType;
+import org.apache.pdfbox.rendering.PDFRenderer;
+
 import com.alexandria.service.analysis.SearchMatch;
-import com.alexandria.view.components.shared.quotation.QuotationLocation;
 import com.alexandria.view.components.shared.document.highlight.PdfHighlight;
 import com.alexandria.view.components.shared.document.highlight.PdfTextLayout;
+import com.alexandria.view.components.shared.quotation.QuotationLocation;
 import com.alexandria.view.components.shared.selection.QuotationSelectionPopup;
+
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Pos;
@@ -12,6 +31,7 @@ import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -20,26 +40,15 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import org.apache.pdfbox.Loader;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.rendering.ImageType;
-import org.apache.pdfbox.rendering.PDFRenderer;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
 
 public class PdfDocumentRenderer {
     private static final float BASE_DPI = 144f;
     private static final double BASE_PAGE_WIDTH = 620.0;
     private static final double PAGE_MARGIN = 30.0;
     private static final String LIVE_SELECTION_STYLE_CLASS = "pdf-selection-rect";
+
+    private record RenderedPage(BufferedImage image, Image fxImage, PdfTextLayout layout) {}
+    private final Map<Integer, RenderedPage> renderedPages = new LinkedHashMap<>();
 
     private final BorderPane root = new BorderPane();
     private final ScrollPane scrollPane = new ScrollPane();
@@ -123,6 +132,32 @@ public class PdfDocumentRenderer {
         }
     }
 
+    // Renders a page and uses recently-used -caching
+    private synchronized RenderedPage renderPage(int pageIndex) {
+        if (renderer == null || document == null || pageIndex < 0 || pageIndex >= document.getNumberOfPages()) {
+            return null;
+        }
+
+        RenderedPage cached = renderedPages.get(pageIndex);
+        if (cached != null) {
+            return cached;
+        }
+
+        try {
+            BufferedImage image = renderer.renderImageWithDPI(pageIndex, BASE_DPI, ImageType.RGB);
+            Image fxImage = SwingFXUtils.toFXImage(image, null);
+            PdfTextLayout layout = PdfTextLayout.forPage(document, pageIndex, BASE_DPI);
+            RenderedPage page = new RenderedPage(image, fxImage, layout);
+            if (renderedPages.size() >= 12) { // Max amount of stored pages
+                renderedPages.remove(renderedPages.keySet().iterator().next());
+            }
+            renderedPages.put(pageIndex, page);
+            return page;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     private void renderCurrentPage() {
         if (renderer == null || document == null)
             return;
@@ -130,27 +165,51 @@ public class PdfDocumentRenderer {
         hideQuotationPopup();
         dragActive = false;
 
-        try {
-            currentImage = renderer.renderImageWithDPI(currentPage, BASE_DPI, ImageType.RGB);
-            imageView.setImage(SwingFXUtils.toFXImage(currentImage, null));
-
-            try {
-                currentLayout = PdfTextLayout.forPage(document, currentPage, BASE_DPI);
-            } catch (IOException | RuntimeException e) {
-                currentLayout = null;
-            }
-
-            updateImageSize();
-            errorLabel.setVisible(false);
-            restorePageHost();
-            onVisiblePageChanged.accept(currentPage + 1);
-        } catch (IOException | RuntimeException e) {
-            showError(
-                    "Could not render PDF page "
-                            + (currentPage + 1)
-                            + ":\n"
-                            + e.getMessage());
+        RenderedPage page = renderedPages.get(currentPage);
+        if (page != null) {
+            displayPage(page);
+            return;
         }
+
+        // Rendering missing pages in backround so UI doesn't freeze
+        // Use async completableFuture
+        int current = currentPage;
+        CompletableFuture.supplyAsync(() -> renderPage(current))
+                .thenAcceptAsync(rendered -> {
+                    // Ignore if user already navigated to another page
+                    if (current != currentPage) {
+                        return;
+                    }
+                    if (rendered == null) {
+                        showError(
+                                "Could not render PDF page "
+                                        + (current + 1));
+                        return;
+                    }
+                    displayPage(rendered);
+                }, Platform::runLater);
+    }
+
+    private void displayPage(RenderedPage page) {
+        currentImage = page.image();
+        imageView.setImage(page.fxImage());
+        currentLayout = page.layout();
+
+        updateImageSize();
+        errorLabel.setVisible(false);
+        restorePageHost();
+        onVisiblePageChanged.accept(currentPage + 1);
+
+        // Pre-fetch next 6 pages backround
+        int current = currentPage;
+        CompletableFuture.runAsync(() -> {
+            for (int i = 1; i <= 6; i++) { // Max pages to preload
+                if (current != currentPage) {
+                    return;
+                }
+                renderPage(current + i);
+            }
+        });
     }
 
     private double[] rasterToDisplay(double[] rasterBounds) {
@@ -394,7 +453,7 @@ public class PdfDocumentRenderer {
     }
 
     public void setZoom(double value) {
-        zoom = Math.max(0.5, Math.min(2.0, value));
+        zoom = Math.max(0.30, Math.min(2.0, value));
         updateImageSize();
     }
 
@@ -552,6 +611,8 @@ public class PdfDocumentRenderer {
     }
 
     private void closeDocument() {
+        renderedPages.clear();
+
         hideQuotationPopup();
         clearLiveSelectionRects();
         scrollPane.setPannable(true);

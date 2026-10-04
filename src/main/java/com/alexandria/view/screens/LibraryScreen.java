@@ -22,6 +22,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -38,6 +39,8 @@ public class LibraryScreen extends StackPane {
     private final VBox libraryBody = buildBody();
     private final Modal modal = new Modal();
     private final ComparisonTextModal comparisonTextModal = new ComparisonTextModal();
+    private final HBox filterBar = new HBox(8);
+    private String activeFilter = "ALL";
 
     private List<Text> texts = List.of();
 
@@ -52,6 +55,7 @@ public class LibraryScreen extends StackPane {
         getStyleClass().add("content-screen");
         searchInput.setMaxWidth(Double.MAX_VALUE);
 
+        updateFilterButtons();
         libraryLayout.setTop(buildHeader());
         libraryLayout.setCenter(libraryBody);
         libraryLayout.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -95,9 +99,30 @@ public class LibraryScreen extends StackPane {
         Label subtitle = new Label("Saved texts and documents");
         subtitle.getStyleClass().addAll("text-muted", "archive-subtitle");
 
-        VBox header = new VBox(6, title, subtitle);
+        VBox header = new VBox(10, title, subtitle, filterBar);
         header.getStyleClass().add("content-screen-header");
         return header;
+    }
+
+    private void updateFilterButtons() {
+        filterBar.getChildren().clear();
+        for (String filter : new String[]{"All", "PDF", "TXT", "Manual"}) {
+            Button btn = new Button(filter);
+            btn.getStyleClass().add("button");
+            
+            if (filter.toUpperCase().equals(activeFilter)) {
+                btn.getStyleClass().add("primary");
+            } else {
+                btn.getStyleClass().add("secondary");
+            }
+
+            btn.setOnAction(e -> {
+                activeFilter = filter.toUpperCase();
+                updateFilterButtons();
+                showTexts();
+            });
+            filterBar.getChildren().add(btn);
+        }
     }
 
     private VBox buildBody() {
@@ -179,6 +204,10 @@ public class LibraryScreen extends StackPane {
             String fileType = null;
             if (text.getFileType() != null) {
                 fileType = text.getFileType().name();
+            }
+
+            if (!"ALL".equals(activeFilter) && !activeFilter.equalsIgnoreCase(fileType)) {
+                continue;
             }
 
             if (matchesSearch(text.getTitle(), text.getFileName(), fileType)) {

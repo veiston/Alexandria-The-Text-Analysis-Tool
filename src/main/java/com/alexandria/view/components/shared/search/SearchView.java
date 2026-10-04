@@ -1,16 +1,20 @@
 package com.alexandria.view.components.shared.search;
 
+
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
+import org.kordamp.ikonli.javafx.FontIcon;
+
+import com.alexandria.service.analysis.SearchSettings;
 import com.alexandria.view.components.shared.SearchInput;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-
-import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 public class SearchView extends VBox {
 
@@ -18,6 +22,11 @@ public class SearchView extends VBox {
     private final Button previousButton;
     private final Button nextButton;
     private final TrackedWordsList trackedWordsList;
+
+    private final CheckBox fuzzyCheckBox = new CheckBox("Fuzzy");
+    private final CheckBox caseCheckBox = new CheckBox("Case sensitive");
+    private final CheckBox wholeWordCheckBox = new CheckBox("Whole word");
+    private final CheckBox stopWordsCheckBox = new CheckBox("Stop words");
 
     private SearchCallback onSearch;
     private Runnable onPreviousMatch;
@@ -45,12 +54,21 @@ public class SearchView extends VBox {
                 navigationButtons);
 
         searchControls.setAlignment(Pos.CENTER_LEFT);
-        searchControls.setPadding(new Insets(4, 0, 8, 0));
+        searchControls.setPadding(new Insets(4, 0, 4, 0));
 
         HBox.setHgrow(searchInput, Priority.ALWAYS);
 
+        FlowPane searchOptions = new FlowPane(
+                8,
+                4,
+                fuzzyCheckBox,
+                caseCheckBox,
+                wholeWordCheckBox,
+                stopWordsCheckBox);
+
         getChildren().addAll(
                 searchControls,
+                searchOptions,
                 trackedWordsList);
 
         wireEvents();
@@ -74,6 +92,33 @@ public class SearchView extends VBox {
                 onNextMatch.run();
             }
         });
+
+        CheckBox[] options = {
+                fuzzyCheckBox,
+                caseCheckBox,
+                wholeWordCheckBox,
+                stopWordsCheckBox
+        };
+
+        for (CheckBox option : options) {
+            option.getStyleClass().add("text-muted");
+            option.setOnAction(e -> {
+                String term = searchInput.getText();
+                if (onSearch != null && term != null) {
+                    if (!term.isBlank()) {
+                        onSearch.onSearch(term);
+                    }
+                }
+            });
+        }
+    }
+
+    public SearchSettings getSearchSettings() {
+        return new SearchSettings(
+                caseCheckBox.isSelected(),
+                fuzzyCheckBox.isSelected(),
+                wholeWordCheckBox.isSelected(),
+                stopWordsCheckBox.isSelected());
     }
 
     private Button createIconButton(FontAwesomeSolid icon) {
