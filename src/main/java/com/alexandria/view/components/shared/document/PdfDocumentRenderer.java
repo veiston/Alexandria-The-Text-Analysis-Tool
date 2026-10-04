@@ -49,6 +49,7 @@ public class PdfDocumentRenderer {
 
     private record RenderedPage(BufferedImage image, Image fxImage, PdfTextLayout layout) {}
     private final Map<Integer, RenderedPage> renderedPages = new LinkedHashMap<>();
+    private Runnable activeHighlight;
 
     private final BorderPane root = new BorderPane();
     private final ScrollPane scrollPane = new ScrollPane();
@@ -138,7 +139,10 @@ public class PdfDocumentRenderer {
             return null;
         }
 
-        RenderedPage cached = renderedPages.get(pageIndex);
+        RenderedPage cached;
+        synchronized (renderedPages) {
+            cached = renderedPages.get(pageIndex);
+        }
         if (cached != null) {
             return cached;
         }
@@ -148,10 +152,12 @@ public class PdfDocumentRenderer {
             Image fxImage = SwingFXUtils.toFXImage(image, null);
             PdfTextLayout layout = PdfTextLayout.forPage(document, pageIndex, BASE_DPI);
             RenderedPage page = new RenderedPage(image, fxImage, layout);
-            if (renderedPages.size() >= 12) { // Max amount of stored pages
-                renderedPages.remove(renderedPages.keySet().iterator().next());
+            synchronized (renderedPages) {
+                if (renderedPages.size() >= 12) { // Max amount of stored pages
+                    renderedPages.remove(renderedPages.keySet().iterator().next());
+                }
+                renderedPages.put(pageIndex, page);
             }
-            renderedPages.put(pageIndex, page);
             return page;
         } catch (Exception e) {
             return null;
@@ -165,29 +171,15 @@ public class PdfDocumentRenderer {
         hideQuotationPopup();
         dragActive = false;
 
-        RenderedPage page = renderedPages.get(currentPage);
-        if (page != null) {
-            displayPage(page);
+        RenderedPage page = renderPage(currentPage);
+        if (page == null) {
+            showError(
+                    "Could not render PDF page "
+                            + (currentPage + 1));
             return;
         }
 
-        // Rendering missing pages in backround so UI doesn't freeze
-        // Use async completableFuture
-        int current = currentPage;
-        CompletableFuture.supplyAsync(() -> renderPage(current))
-                .thenAcceptAsync(rendered -> {
-                    // Ignore if user already navigated to another page
-                    if (current != currentPage) {
-                        return;
-                    }
-                    if (rendered == null) {
-                        showError(
-                                "Could not render PDF page "
-                                        + (current + 1));
-                        return;
-                    }
-                    displayPage(rendered);
-                }, Platform::runLater);
+        displayPage(page);
     }
 
     private void displayPage(RenderedPage page) {
@@ -296,6 +288,7 @@ public class PdfDocumentRenderer {
 
     public void highlightSearch(String searchTerm) {
         clearHighlights();
+        activeHighlight = () -> highlightSearch(searchTerm);
         highlight(searchTerm, PdfHighlight.SEARCH_STYLE_CLASS);
         restoreQuotationHighlights();
     }
@@ -314,11 +307,13 @@ public class PdfDocumentRenderer {
 
     public void highlightPassage(String passage) {
         clearHighlights();
+        activeHighlight = () -> highlightPassage(passage);
 
         if (currentLayout != null && passage != null) {
             int[] range = currentLayout.findGlyphRange(passage);
-            if (range != null)
+            if (range != null) {
                 drawGlyphRange(range, PdfHighlight.SEARCH_STYLE_CLASS);
+            }
         }
 
         restoreQuotationHighlights();
@@ -326,6 +321,7 @@ public class PdfDocumentRenderer {
 
     public void highlightSearchMatches(List<SearchMatch> matches, int activeIndex) {
         clearHighlights();
+        activeHighlight = () -> highlightSearchMatches(matches, activeIndex);
 
         if (currentLayout == null || matches == null || matches.isEmpty()) {
             restoreQuotationHighlights();
@@ -361,10 +357,12 @@ public class PdfDocumentRenderer {
 
     public void highlightQuotation(String quotedText) {
         clearHighlights();
+        activeHighlight = () -> highlightQuotation(quotedText);
         highlight(quotedText, PdfHighlight.QUOTATION_STYLE_CLASS);
     }
 
     public void clearHighlights() {
+        activeHighlight = null;
         pageHost.getChildren().removeIf(
                 node -> node instanceof Rectangle rectangle
                         && !rectangle.getStyleClass().contains(LIVE_SELECTION_STYLE_CLASS));
@@ -401,9 +399,13 @@ public class PdfDocumentRenderer {
         displayScaleX = pageWidth / currentImage.getWidth();
         displayScaleY = pageHeight / currentImage.getHeight();
 
-        clearHighlights();
         clearLiveSelectionRects();
         restoreQuotationHighlights();
+        if (activeHighlight != null) {
+            activeHighlight.run();
+        } else {
+            clearHighlights();
+        }
 
         Platform.runLater(this::centerPage);
     }
@@ -445,10 +447,16 @@ public class PdfDocumentRenderer {
         if (document == null || page == null || document.getNumberOfPages() == 0)
             return;
 
-        currentPage = Math.max(
+        int target = Math.max(
                 0,
                 Math.min(page - 1, document.getNumberOfPages() - 1));
 
+        if (target == currentPage) {
+            return;
+        }
+
+        activeHighlight = null;
+        currentPage = target;
         renderCurrentPage();
     }
 
@@ -611,6 +619,7 @@ public class PdfDocumentRenderer {
     }
 
     private void closeDocument() {
+        activeHighlight = null;
         renderedPages.clear();
 
         hideQuotationPopup();
