@@ -97,14 +97,12 @@ public class MainController {
 
     private CompareController configureComparison() {
         compareScreen = (CompareScreen) Route.COMPARE.createScreen();
-        compareScreen.setOnSaveFindings(() -> {
-            // TODO save comparison findings
-        });
         CompareController controller = new CompareController();
-        compareScreen.setOnCompareTerm(term -> {
-            CompareController.TermComparisonOutcome outcome = controller.compareTerm(term);
+        compareScreen.setOnSaveFindings(() -> {
+            CompareController.SaveOutcome outcome = controller.saveFindings(compareScreen.getTrackedSearchTerms());
             if (outcome.success()) {
-                compareScreen.setTermComparison(outcome.result());
+                compareScreen.showSaved(outcome.savedCount());
+                archiveController.loadAnalyses();
             } else {
                 ErrorAlert.show(outcome.message());
             }
@@ -112,33 +110,7 @@ public class MainController {
         compareScreen.setOnSearch(term -> showComparisonSearch(controller, term));
         compareScreen.setOnPreviousMatch(compareScreen::showPreviousSearchMatch);
         compareScreen.setOnNextMatch(compareScreen::showNextSearchMatch);
-        compareScreen.setOnDocumentAQuotationRequested(
-                (text, location) -> addComparisonQuotation(controller, 0, text, location));
-        compareScreen.setOnDocumentBQuotationRequested(
-                (text, location) -> addComparisonQuotation(controller, 1, text, location));
-        compareScreen.setOnQuotationDeleteRequested(quotation -> {
-            try {
-                if (controller.removeQuotation(quotation)) compareScreen.setQuotations(controller.getQuotations());
-            } catch (Exception e) { System.err.println("Could not delete quotation: " + e.getMessage()); }
-        });
-        compareScreen.setOnQuotationEditRequested(quotation -> {
-            try {
-                if (!controller.updateQuotation(quotation)) return;
-                compareScreen.setQuotations(controller.getQuotations());
-            } catch (Exception e) { System.err.println("Could not update quotation: " + e.getMessage()); }
-        });
         return controller;
-    }
-
-    private Integer addComparisonQuotation(CompareController controller, int documentIndex, String text, String location) {
-        try {
-            var quotation = controller.addQuotation(documentIndex, text, location);
-            compareScreen.setQuotations(controller.getQuotations());
-            return quotation == null ? null : quotation.getId();
-        } catch (Exception e) {
-            System.err.println("Could not save quotation: " + e.getMessage());
-            return null;
-        }
     }
 
     private void showComparisonSearch(CompareController controller, String term) {
@@ -168,7 +140,8 @@ public class MainController {
                 mainView::showNewProjectModal);
     }
 
-    //Now taking PDF page breaks into account, instead of just processing it as a long string
+    // Now taking PDF page breaks into account, instead of just processing it as a
+    // long string
     private void openLibraryText(Text text, File sourceFile) {
         List<Integer> pageOffsets = TextPaginator.paginate(text.getContent(), TextPaginator.CHARS_PER_PAGE);
         if (text.getFileType() == FileType.PDF && sourceFile != null) {
@@ -321,13 +294,13 @@ public class MainController {
                 openedTexts.get(1),
                 openedFiles.size() > 1 ? openedFiles.get(1) : null);
 
-        CompareController.TextComparisonOutcome comparison = compareController.compareTexts(10);
+        CompareController.TextComparisonOutcome comparison = compareController
+                .compareTexts(CompareController.COMMON_WORDS_LIMIT);
         if (comparison.success()) {
             compareScreen.setTextComparison(comparison.result());
         } else {
             ErrorAlert.show(comparison.message());
         }
-        compareScreen.setQuotations(compareController.getQuotations());
 
         mainView.navigateTo(Route.COMPARE);
     }
