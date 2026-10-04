@@ -141,7 +141,7 @@ public class UserGuideScreen extends VBox {
 
         VBox content = new VBox(12, startTitle, startDescription, functionsTitle, functionList);
         content.setMinWidth(0);
-        return new UserGuideSection(content, "/images/user-guide/compare.png");
+        return new UserGuideSection(content, null);
     }
 
     private Label guideHeading(String text) {
