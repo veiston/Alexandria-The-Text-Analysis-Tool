@@ -170,8 +170,30 @@ public class MainController {
 
         mainView.addEventHandler(UserGuideTour.CLOSE_ANALYSIS_EVENT,
                 event -> ((AnalyseScreen) Route.ANALYZE.createScreen()).clearAnalysis());
+        mainView.addEventHandler(UserGuideTour.OPEN_COMPARISON_EVENT, event -> openTourComparison());
+        mainView.addEventHandler(UserGuideTour.CLOSE_COMPARISON_EVENT, event -> {
+            compareController.clearComparison();
+            compareScreen.clearComparison();
+        });
         mainView.addEventHandler(UserGuideTour.CLOSE_ARCHIVE_EVENT,
                 event -> archiveController.loadAnalyses());
+    }
+
+    private void openTourComparison() {
+        Text firstText = new Text(
+                null,
+                UserGuideTourData.COMPARISON_FIRST_TITLE,
+                UserGuideTourData.COMPARISON_FIRST_FILE_NAME,
+                UserGuideTourData.FILE_TYPE,
+                UserGuideTourData.COMPARISON_FIRST_TEXT);
+        Text secondText = new Text(
+                null,
+                UserGuideTourData.COMPARISON_SECOND_TITLE,
+                UserGuideTourData.COMPARISON_SECOND_FILE_NAME,
+                UserGuideTourData.FILE_TYPE,
+                UserGuideTourData.COMPARISON_SECOND_TEXT);
+
+        openLibraryComparison(List.of(firstText, secondText), Arrays.asList(null, null));
     }
 
     private void configureProject() {
