@@ -17,7 +17,6 @@ import javafx.scene.layout.VBox;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.function.BiFunction;
 
 public class ComparisonDocumentView extends VBox {
 
@@ -36,6 +35,10 @@ public class ComparisonDocumentView extends VBox {
         setSpacing(0);
         setMinSize(0, 0);
         setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+
+        // Comparison is read-only: no text selection and no citation/annotation popup.
+        documentA.setSelectionEnabled(false);
+        documentB.setSelectionEnabled(false);
 
         StackPane rowA = buildDocumentRow(
                 "Doc A:", documentAName, documentA, "comparison-document-a");
@@ -166,19 +169,6 @@ public class ComparisonDocumentView extends VBox {
 
     public void clearSearchHighlightsB() {
         documentB.clearSearchHighlights();
-    }
-
-    public void setOnQuotationRequested(BiFunction<String, String, Integer> handler) {
-        documentA.setOnQuotationRequested(handler);
-        documentB.setOnQuotationRequested(handler);
-    }
-
-    public void setOnDocumentAQuotationRequested(BiFunction<String, String, Integer> handler) {
-        documentA.setOnQuotationRequested(handler);
-    }
-
-    public void setOnDocumentBQuotationRequested(BiFunction<String, String, Integer> handler) {
-        documentB.setOnQuotationRequested(handler);
     }
 
     public void dispose() {

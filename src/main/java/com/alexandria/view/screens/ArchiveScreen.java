@@ -4,6 +4,7 @@ import com.alexandria.model.ArchiveTermAnalysis;
 import com.alexandria.model.ArchiveTextAnalysis;
 import com.alexandria.view.components.archive_screen.ArchiveAnalysisCard;
 import com.alexandria.view.components.archive_screen.ArchiveAnalysisModal;
+import com.alexandria.model.ArchiveComparison;
 import com.alexandria.view.components.shared.EmptyState;
 import com.alexandria.view.components.shared.SearchInput;
 import com.alexandria.view.components.shared.toggle.Toggle;
@@ -24,7 +25,7 @@ import java.util.function.Consumer;
 public class ArchiveScreen extends StackPane {
 
     private final Toggle analysisFilter = new Toggle(
-            "Text analysis", "Term analysis", "Text comparisons");
+            "Text analysis", "Term analysis", "Text comparisons", "Term comparisons");
     private final SearchInput searchInput = new SearchInput("Search archive...");
     private final FlowPane analysisCards = new FlowPane(16, 16);
     private final StackPane contentArea = new StackPane();
@@ -34,10 +35,19 @@ public class ArchiveScreen extends StackPane {
 
     private List<ArchiveTextAnalysis> textAnalyses = List.of();
     private List<ArchiveTermAnalysis> termAnalyses = List.of();
+    private List<ArchiveComparison> textComparisons = List.of();
+    private List<ArchiveComparison> termComparisons = List.of();
 
-    private Consumer<Integer> onDeleteTextAnalysis = id -> {};
-    private Consumer<Integer> onDeleteTermAnalysis = id -> {};
-    private Runnable onShown = () -> {};
+    private Consumer<Integer> onDeleteTextAnalysis = id -> {
+    };
+    private Consumer<Integer> onDeleteTermAnalysis = id -> {
+    };
+    private Consumer<Integer> onDeleteTextComparison = id -> {
+    };
+    private Consumer<Integer> onDeleteTermComparison = id -> {
+    };
+    private Runnable onShown = () -> {
+    };
 
     public ArchiveScreen() {
         getStyleClass().add("content-screen");
@@ -98,16 +108,39 @@ public class ArchiveScreen extends StackPane {
         showStatistics();
     }
 
+    public void setTextComparisons(List<ArchiveComparison> textComparisons) {
+        this.textComparisons = textComparisons == null ? List.of() : List.copyOf(textComparisons);
+        showStatistics();
+    }
+
+    public void setTermComparisons(List<ArchiveComparison> termComparisons) {
+        this.termComparisons = termComparisons == null ? List.of() : List.copyOf(termComparisons);
+        showStatistics();
+    }
+
     public void setOnDeleteTextAnalysis(Consumer<Integer> handler) {
-        onDeleteTextAnalysis = handler == null ? id -> {} : handler;
+        onDeleteTextAnalysis = handler == null ? id -> {
+        } : handler;
     }
 
     public void setOnDeleteTermAnalysis(Consumer<Integer> handler) {
-        onDeleteTermAnalysis = handler == null ? id -> {} : handler;
+        onDeleteTermAnalysis = handler == null ? id -> {
+        } : handler;
+    }
+
+    public void setOnDeleteTextComparison(Consumer<Integer> handler) {
+        onDeleteTextComparison = handler == null ? id -> {
+        } : handler;
+    }
+
+    public void setOnDeleteTermComparison(Consumer<Integer> handler) {
+        onDeleteTermComparison = handler == null ? id -> {
+        } : handler;
     }
 
     public void setOnShown(Runnable handler) {
-        onShown = handler == null ? () -> {} : handler;
+        onShown = handler == null ? () -> {
+        } : handler;
     }
 
     public void showSignInMessage() {
@@ -164,6 +197,42 @@ public class ArchiveScreen extends StackPane {
             }
         }
 
+        if (analysisFilter.getSelectedIndex() == 2) {
+            for (ArchiveComparison comparison : textComparisons) {
+                if (matchesSearch(comparison.title(), comparison.sources())) {
+                    ArchiveAnalysisCard card = new ArchiveAnalysisCard(comparison);
+                    card.getDeleteButton().setOnAction(event -> {
+                        if (ConfirmationAlert.show(
+                                "Delete Comparison",
+                                "Delete this comparison?",
+                                "This action is permanent and cannot be undone.")) {
+                            onDeleteTextComparison.accept(comparison.id());
+                        }
+                    });
+                    card.getOpenButton().setOnAction(event -> analysisModal.showTextComparison(comparison));
+                    analysisCards.getChildren().add(card);
+                }
+            }
+        }
+
+        if (analysisFilter.getSelectedIndex() == 3) {
+            for (ArchiveComparison comparison : termComparisons) {
+                if (matchesSearch(comparison.title(), comparison.sources(), comparison.term())) {
+                    ArchiveAnalysisCard card = new ArchiveAnalysisCard(comparison);
+                    card.getDeleteButton().setOnAction(event -> {
+                        if (ConfirmationAlert.show(
+                                "Delete Comparison",
+                                "Delete this comparison?",
+                                "This action is permanent and cannot be undone.")) {
+                            onDeleteTermComparison.accept(comparison.id());
+                        }
+                    });
+                    card.getOpenButton().setOnAction(event -> analysisModal.showTermComparison(comparison));
+                    analysisCards.getChildren().add(card);
+                }
+            }
+        }
+
         StackPane statisticsContent = new StackPane();
         statisticsContent.getStyleClass().add("archive-content");
 
@@ -199,6 +268,9 @@ public class ArchiveScreen extends StackPane {
         if (analysisFilter.getSelectedIndex() == 2) {
             return "No saved text comparisons yet";
         }
+        if (analysisFilter.getSelectedIndex() == 3) {
+            return "No saved term comparisons yet";
+        }
         return "No saved text analyses yet";
     }
 
@@ -207,8 +279,8 @@ public class ArchiveScreen extends StackPane {
             return "Try changing your search query";
         }
 
-        if (analysisFilter.getSelectedIndex() == 2) {
-            return "Run a text comparison and save it to view it here";
+        if (analysisFilter.getSelectedIndex() >= 2) {
+            return "Run a comparison and save it to view it here";
         }
         return "Run an analysis and save it to view it here";
     }
