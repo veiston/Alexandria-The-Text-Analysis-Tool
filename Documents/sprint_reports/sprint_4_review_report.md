@@ -126,7 +126,7 @@ The GitHub repository was updated during Sprint 4 with:
 | Veikka Liukkonen | Text comparison fixes<br>Similarity score and similar paragraphs<br>Library filters<br>Search functionality<br>Dual search<br>PDF pagination fix | 15.5 | Submitted |
 | Kseniia Shlenskaia | User guide<br>Docker deployment and testing<br>Comparison frontend integration<br>Comparison service interfaces<br>Comparison database services<br>Library PDF opening fix | 20 | Submitted |
 | Luara Moreira Da Silva | Unit testing<br>Code review<br>Jump to Page functionality<br>Compound-term highlighting<br>New Project modal and font fixes<br>Comparison controllers<br>Comparison Analyze UI<br>Quotation highlighting | 22.5 | Submitted |
-| Unna Postila | Comparison screen controllers<br>Comparison screen UI tasks | 0 | Not Submitted |
+| Unna Postila | Comparison screen controllers<br>Comparison screen UI tasks | Not reported | Not Submitted |
 
 ## Scrum Master Activities
 
