@@ -99,7 +99,9 @@ Our vision is to create a desktop application for quantitative text research usi
 - [Sprint 3 Review Report](https://github.com/veiston/Alexandria-The-Text-Analysis-Tool/blob/main/Documents/sprint_reports/sprint_3_review_report.md)
 
 ### Sprint 4
-- To be added
+
+- [Sprint 4 Planning Report](https://github.com/veiston/Alexandria-The-Text-Analysis-Tool/blob/main/Documents/sprint_reports/sprint_4_planning_report.md)
+- [Sprint 4 Review Report](https://github.com/veiston/Alexandria-The-Text-Analysis-Tool/blob/main/Documents/sprint_reports/sprint_4_review_report.md)
 
 # Running the application:
  - Run all tests with `mvn test`
