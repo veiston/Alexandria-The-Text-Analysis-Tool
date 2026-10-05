@@ -84,9 +84,9 @@ public class MainControllerWiringTest {
 
             MainView mainView = mainViewConstruction.constructed().get(0);
 
-            // configureUserGuideTour(): OPEN_ANALYSIS_EVENT, CLOSE_ANALYSIS_EVENT,
-            // CLOSE_ARCHIVE_EVENT
-            verify(mainView, times(3)).addEventHandler(any(), any());
+            // configureUserGuideTour(): open/close analysis, open/close comparison,
+            // and close archive events
+            verify(mainView, times(5)).addEventHandler(any(), any());
 
             // configureProject(): wires the project-created callback
             verify(mainView).setOnProjectCreated(any());

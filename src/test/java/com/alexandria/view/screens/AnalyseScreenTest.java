@@ -1,67 +1,34 @@
 package com.alexandria.view.screens;
 
+import com.alexandria.controller.JavaFxTestBase;
 import com.alexandria.service.analysis.SearchMatch;
-import javafx.application.Platform;
-import org.junit.BeforeClass;
+
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.*;
 
-public class AnalyseScreenTest {
+public class AnalyseScreenTest extends JavaFxTestBase {
 
-    @BeforeClass
-    public static void initJavaFx() throws Exception {
-        CountDownLatch latch = new CountDownLatch(1);
+    private AtomicReference<AnalyseScreen> screenRef;
 
-        try {
-            Platform.startup(latch::countDown);
-        } catch (IllegalStateException alreadyInitialized) {
-            // Another test class in this JVM fork already started the
-            // toolkit — that's fine, we just need it running, not to
-            // have started it ourselves.
-            return;
-        }
-
-        if (!latch.await(5, TimeUnit.SECONDS)) {
-            throw new IllegalStateException("JavaFX failed to start");
-        }
+    @Before
+    public void setUp() {
+        screenRef = new AtomicReference<>();
     }
 
-    private <T> T runOnFxThread(java.util.concurrent.Callable<T> callable)
-            throws Exception {
-
-        AtomicReference<T> result = new AtomicReference<>();
-        AtomicReference<Throwable> error = new AtomicReference<>();
-        CountDownLatch latch = new CountDownLatch(1);
-
-        Platform.runLater(() -> {
-            try {
-                result.set(callable.call());
-            } catch (Throwable t) {
-                error.set(t);
-            } finally {
-                latch.countDown();
-            }
-        });
-
-        assertTrue(latch.await(5, TimeUnit.SECONDS));
-
-        if (error.get() != null) {
-            throw new AssertionError(error.get());
-        }
-
-        return result.get();
+    private AnalyseScreen createScreen() throws Exception {
+        runOnFxThread(() -> screenRef.set(new AnalyseScreen()));
+        return screenRef.get();
     }
 
     @Test
     public void constructor_createsScreen() throws Exception {
-        AnalyseScreen screen = runOnFxThread(AnalyseScreen::new);
+        AnalyseScreen screen = createScreen();
 
         assertNotNull(screen);
         assertNotNull(screen.getHeader());
@@ -73,8 +40,9 @@ public class AnalyseScreenTest {
 
     @Test
     public void constructor_startsWithEmptyState() throws Exception {
-        AnalyseScreen screen = runOnFxThread(AnalyseScreen::new);
+        AnalyseScreen screen = createScreen();
 
+        assertNotNull(screen);
         assertFalse(screen.getChildren().isEmpty());
     }
 
@@ -82,13 +50,9 @@ public class AnalyseScreenTest {
     public void setSearchHandler_acceptsHandler() throws Exception {
         AtomicBoolean called = new AtomicBoolean(false);
 
-        AnalyseScreen screen = runOnFxThread(() -> {
-            AnalyseScreen s = new AnalyseScreen();
+        AnalyseScreen screen = createScreen();
 
-            s.setOnSearch(term -> called.set(true));
-
-            return s;
-        });
+        runOnFxThread(() -> screen.setOnSearch(term -> called.set(true)));
 
         assertNotNull(screen);
         assertFalse(called.get());
@@ -96,19 +60,17 @@ public class AnalyseScreenTest {
 
     @Test
     public void nullSearchHandler_doesNotThrow() throws Exception {
-        AnalyseScreen screen = runOnFxThread(() -> {
-            AnalyseScreen s = new AnalyseScreen();
+        AnalyseScreen screen = createScreen();
 
-            s.setOnSearch(null);
-            s.setOnPreviousMatch(null);
-            s.setOnNextMatch(null);
-            s.setOnSaveAnalysis(null);
-            s.setOnTermDetailRequested(null);
-            s.setOnQuotationRequested(null);
-            s.setOnQuotationDeleteRequested(null);
-            s.setOnQuotationEditRequested(null);
-
-            return s;
+        runOnFxThread(() -> {
+            screen.setOnSearch(null);
+            screen.setOnPreviousMatch(null);
+            screen.setOnNextMatch(null);
+            screen.setOnSaveAnalysis(null);
+            screen.setOnTermDetailRequested(null);
+            screen.setOnQuotationRequested(null);
+            screen.setOnQuotationDeleteRequested(null);
+            screen.setOnQuotationEditRequested(null);
         });
 
         assertNotNull(screen);
@@ -116,64 +78,61 @@ public class AnalyseScreenTest {
 
     @Test
     public void clearAnalysis_doesNotThrow() throws Exception {
-        AnalyseScreen screen = runOnFxThread(AnalyseScreen::new);
+        AnalyseScreen screen = createScreen();
 
-        runOnFxThread(() -> {
-            screen.clearAnalysis();
-            return null;
-        });
+        runOnFxThread(screen::clearAnalysis);
 
         assertNotNull(screen);
     }
 
     @Test
-    public void showSearchMatch_withEmptyMatches_doesNothing() throws Exception {
-        AnalyseScreen screen = runOnFxThread(AnalyseScreen::new);
+    public void showSearchMatch_withEmptyMatches_doesNothing()
+            throws Exception {
 
-        runOnFxThread(() -> {
-            screen.showSearchMatch(List.of(), 0);
-            return null;
-        });
+        AnalyseScreen screen = createScreen();
 
-        assertNotNull(screen);
-    }
-
-    @Test
-    public void showSearchMatch_withNullMatch_doesNothing() throws Exception {
-        AnalyseScreen screen = runOnFxThread(AnalyseScreen::new);
-
-        runOnFxThread(() -> {
-            screen.showSearchMatch((SearchMatch) null);
-            return null;
-        });
+        runOnFxThread(() -> screen.showSearchMatch(List.of(), 0));
 
         assertNotNull(screen);
     }
 
     @Test
-    public void showSearchMatch_clampsNegativeIndex() throws Exception {
-        AnalyseScreen screen = runOnFxThread(AnalyseScreen::new);
+    public void showSearchMatch_withNullMatch_doesNothing()
+            throws Exception {
+
+        AnalyseScreen screen = createScreen();
+
+        runOnFxThread(() -> screen.showSearchMatch((SearchMatch) null));
+
+        assertNotNull(screen);
+    }
+
+    @Test
+    public void showSearchMatch_clampsNegativeIndex()
+            throws Exception {
+
+        AnalyseScreen screen = createScreen();
 
         SearchMatch match = createSearchMatch();
 
-        runOnFxThread(() -> {
-            screen.showSearchMatch(List.of(match), -10);
-            return null;
-        });
+        runOnFxThread(() -> screen.showSearchMatch(
+                List.of(match),
+                -10));
 
         assertNotNull(screen);
     }
 
     @Test
-    public void showSearchMatch_clampsIndexAboveRange() throws Exception {
-        AnalyseScreen screen = runOnFxThread(AnalyseScreen::new);
+    public void showSearchMatch_clampsIndexAboveRange()
+            throws Exception {
 
-        SearchMatch first = createSearchMatch();
+        AnalyseScreen screen = createScreen();
 
-        runOnFxThread(() -> {
-            screen.showSearchMatch(List.of(first), 100);
-            return null;
-        });
+        SearchMatch match = createSearchMatch();
+
+        runOnFxThread(() -> screen.showSearchMatch(
+                List.of(match),
+                100));
 
         assertNotNull(screen);
     }
@@ -182,16 +141,12 @@ public class AnalyseScreenTest {
     public void showSearchResults_withEmptyMatches_doesNotThrow()
             throws Exception {
 
-        AnalyseScreen screen = runOnFxThread(AnalyseScreen::new);
+        AnalyseScreen screen = createScreen();
 
-        runOnFxThread(() -> {
-            screen.showSearchResults(
-                    "test",
-                    List.of(),
-                    null);
-
-            return null;
-        });
+        runOnFxThread(() -> screen.showSearchResults(
+                "test",
+                List.of(),
+                null));
 
         assertNotNull(screen);
     }
@@ -200,67 +155,59 @@ public class AnalyseScreenTest {
     public void showSearchResults_withNullMatches_doesNotThrow()
             throws Exception {
 
-        AnalyseScreen screen = runOnFxThread(AnalyseScreen::new);
+        AnalyseScreen screen = createScreen();
 
-        runOnFxThread(() -> {
-            screen.showSearchResults(
-                    "test",
-                    null,
-                    null);
-
-            return null;
-        });
+        runOnFxThread(() -> screen.showSearchResults(
+                "test",
+                null,
+                null));
 
         assertNotNull(screen);
     }
 
     @Test
-    public void setTextAnalysis_acceptsResults() throws Exception {
-        AnalyseScreen screen = runOnFxThread(AnalyseScreen::new);
+    public void setTextAnalysis_acceptsResults()
+            throws Exception {
 
-        runOnFxThread(() -> {
-            screen.setTextAnalysis(
-                    List.of(),
-                    List.of());
+        AnalyseScreen screen = createScreen();
 
-            return null;
-        });
+        runOnFxThread(() -> screen.setTextAnalysis(
+                List.of(),
+                List.of()));
 
         assertNotNull(screen.getTextTermFrequencyPanel());
         assertNotNull(screen.getTextContextPanel());
     }
 
     @Test
-    public void setQuotations_acceptsEmptyList() throws Exception {
-        AnalyseScreen screen = runOnFxThread(AnalyseScreen::new);
+    public void setQuotations_acceptsEmptyList()
+            throws Exception {
 
-        runOnFxThread(() -> {
-            screen.setQuotations(List.of());
-            return null;
-        });
+        AnalyseScreen screen = createScreen();
+
+        runOnFxThread(() -> screen.setQuotations(List.of()));
 
         assertNotNull(screen);
     }
 
     @Test
-    public void removeQuotationHighlight_doesNotThrow() throws Exception {
-        AnalyseScreen screen = runOnFxThread(AnalyseScreen::new);
+    public void removeQuotationHighlight_doesNotThrow()
+            throws Exception {
 
-        runOnFxThread(() -> {
-            screen.removeQuotationHighlight(123);
-            return null;
-        });
+        AnalyseScreen screen = createScreen();
+
+        runOnFxThread(() -> screen.removeQuotationHighlight(123));
 
         assertNotNull(screen);
     }
 
     private SearchMatch createSearchMatch() {
         return new SearchMatch(
-                "test", // text
-                0, // matchStart
-                4, // matchEnd
-                1, // page
-                null, // paragraph
-                "context text"); // context
+                "test",
+                0,
+                4,
+                1,
+                null,
+                "context text");
     }
 }

@@ -74,4 +74,13 @@ public class UserSessionController {
             listener.accept(currentUser);
         }
     }
+
+    public void removeListener(Consumer<User> listener) {
+        listeners.remove(listener);
+    }
+
+    public void clearListeners() {
+        listeners.clear();
+    }
+
 }
