@@ -1,10 +1,10 @@
 # Sprint 4 Planning Report
 
-*Scrum Master: Kseniia Shlenskaia*
+*Scrum Master: Luara Moreira Da Silva*
 
 *Team: Kseniia Shlenskaia, Veikka Liukkonen, Luara Moreira Da Silva, Unna Postila*
 
-*Dates: [Sprint 4 dates]*
+*Dates: 28.09.2026 - 05.10.2026*
 
 ## Sprint Goal
 
@@ -25,24 +25,6 @@ During Sprint 4, the team planned to:
 - Finalize GitHub and Trello.
 - Prepare the final presentation and product walkthrough.
 - Prepare the functional prototype for sharing with classmates.
-
-## Selected Product Backlog Items
-
-The following items were selected for Sprint 4:
-
-- Finalize prototype functionality.
-- Fix remaining application bugs.
-- Complete comparison functionality.
-- Improve library and analysis screens.
-- Improve term highlighting and quotation functionality.
-- Complete unit testing.
-- Perform code review.
-- Complete end-to-end testing.
-- Deploy and test the Docker image.
-- Update the user guide.
-- Finalize project documentation.
-- Prepare the final presentation.
-- Prepare the prototype for peer feedback.
 
 ## Planned Tasks / Breakdown
 
@@ -141,7 +123,7 @@ The following items were selected for Sprint 4:
 - Complete comparison screen controllers.
 - Complete comparison screen UI-related tasks.
 - Support the implementation and integration of comparison functionality.
-- Complete assigned Sprint 4 tasks and report progress/blockers during the sprint.
+- Report progress/blockers during the sprint.
 
 ## Team Capacity & Assumptions
 
@@ -151,7 +133,7 @@ Each member records the time spent on tasks during the sprint.
 
 The main assumptions for Sprint 4 were:
 
-- The core project structure and Docker configuration were already available from previous sprints.
+- The core project structure and Docker configuration were already available from previous sprint.
 - Sprint 4 focuses primarily on finalization, integration, testing, deployment, and preparation for the final demonstration.
 - Remaining bugs may be discovered while integrating and testing the application.
 - Some tasks may need to be redistributed if blockers occur.
