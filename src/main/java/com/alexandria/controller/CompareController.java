@@ -113,6 +113,12 @@ public class CompareController {
         return List.copyOf(currentTexts);
     }
 
+    public void clearComparison() {
+        currentTexts = List.of();
+        currentFiles = List.of();
+        currentTextComparison = null;
+        currentPageOffsetsById.clear();
+    }
     public TextComparisonOutcome compareTexts(int limit) {
         if (currentTexts.isEmpty()) {
             return TextComparisonOutcome.error("No texts currently selected for comparison.");

@@ -21,6 +21,20 @@ public final class UserGuideTourData {
     public static final String QUOTATION =
             "A text can reveal patterns when we look at its words,\nphrases, and repeated ideas.";
 
+    public static final String COMPARISON_FIRST_TITLE = "Guided Tour Text A";
+    public static final String COMPARISON_FIRST_FILE_NAME = "tour-text-a.txt";
+    public static final String COMPARISON_FIRST_TEXT = """
+            Careful reading helps researchers recognise patterns in a text. Repeated words and ideas make
+            important themes visible. Alexandria helps researchers compare evidence and return to useful passages.
+            """;
+
+    public static final String COMPARISON_SECOND_TITLE = "Guided Tour Text B";
+    public static final String COMPARISON_SECOND_FILE_NAME = "tour-text-b.txt";
+    public static final String COMPARISON_SECOND_TEXT = """
+            Researchers compare texts to recognise repeated patterns and ideas. Careful reading makes shared
+            evidence visible and helps researchers return to important passages in each text.
+            """;
+
     public static List<ArchiveTextAnalysis> archiveExamples() {
         ArchiveTextAnalysis example = new ArchiveTextAnalysis(
                 null,

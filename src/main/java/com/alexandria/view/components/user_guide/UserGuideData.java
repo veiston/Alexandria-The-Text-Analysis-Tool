@@ -30,6 +30,14 @@ public final class UserGuideData {
             "Tracked words list: keeps searched words and phrases with their occurrence counts. It marks the active term in the document, provides term details, and supports navigation to individual occurrences or removal of a tracked term.",
             "Key Paragraphs: the text is split into sentences. Each sentence receives a score equal to the sum of the overall frequencies of its words. The five highest-scoring sentences are returned with their page and paragraph references.");
 
+    public static final String COMPARE_INTRODUCTION = "Create a new project and choose Compare, or open two projects from Library. Compare displays the documents side by side and calculates results for both texts. Use the Reader to review the documents, or open Quotations to work with quotations saved from either document.";
+    public static final List<String> COMPARE_METHODS = List.of(
+            "Similarity score: compares the word-frequency profiles of the two texts and shows a percentage together with a Low, Moderate, or High similarity label.",
+            "Most frequent shared words: finds words that occur in both texts, ranks them by their combined occurrence count, and shows the count for each document. Select a word to compare it as a term.",
+            "Term comparison: matches a word or phrase without regard to case in each document. For every document, it reports the total number of occurrences and the relative frequency per 1,000 words.",
+            "Search in both texts: searches both documents for a word or phrase and highlights every match. Use the previous and next controls to move through matches across the two documents. The tracked words list keeps searched terms and their total match counts.",
+            "Key paragraphs: compares paragraphs that are at least 50 characters long. A pair is shown when it shares at least three words from the common vocabulary. Up to five non-overlapping pairs with the highest similarity scores are displayed, with page and paragraph references when available.");
+
     public static final List<String> LIBRARY_STEPS = List.of(
             "Open Library to view the texts and projects saved to your account.",
             "Use the search field to find a text or project.",

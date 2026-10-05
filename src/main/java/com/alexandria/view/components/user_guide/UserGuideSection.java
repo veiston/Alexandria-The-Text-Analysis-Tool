@@ -17,7 +17,7 @@ public class UserGuideSection extends HBox {
         HBox.setHgrow(instructions, Priority.ALWAYS);
         getChildren().add(instructions);
 
-        URL imageUrl = getClass().getResource(imagePath);
+        URL imageUrl = imagePath == null ? null : getClass().getResource(imagePath);
         if (imageUrl != null) {
             ImageView screenshot = new ImageView(new Image(imageUrl.toExternalForm()));
             screenshot.setPreserveRatio(true);
