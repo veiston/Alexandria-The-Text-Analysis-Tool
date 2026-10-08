@@ -226,7 +226,7 @@ More Docker setup information is in [docker_setup.md](https://github.com/veiston
 
 Jenkins uses `jenkins/Jenkinsfile`.
 
-More Jenkins setup information is in [docker_setup.md](https://github.com/veiston/Alexandria-The-Text-Analysis-Tool/blob/main/Documents/jenkins_setup.md).
+More Jenkins setup information is in [jenkins_setup.md.md](https://github.com/veiston/Alexandria-The-Text-Analysis-Tool/blob/main/Documents/jenkins_setup.md).
 
 ## Authors
 
