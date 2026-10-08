@@ -1,180 +1,238 @@
 # Alexandria The Statistical Text Analysis Tool
 
-Alexandria is a JavaFX-based desktop application for quantitative analysis of large texts and text collections. Its key features include searching for words and phrases within uploaded texts, including different forms of the same word, getting statistics on how often they are used, and comparing texts. The application is designed for language researchers who work with texts in study or research projects.
+Alexandria is a JavaFX-based desktop application for quantitative analysis of large texts and text collections.
 
-## Team
 
-- Kseniia Shlenskaia
-- Veikka Liukkonen
-- Luara Moreira Da Silva
-- Unna Postila
 
-## Methodology
-Agile development using Scrum. Trello is used for the product backlog, sprint planning, task assignment, and progress tracking.
-
-## Product Vision
+## Project Overview & Objectives
 
 ### Problem Statement
 
-Researching books and documents may include finding words and phrases, counting how many times they are used, and comparing these results between different texts. For this kind of work, the results should be accurate and repeatable. Generative AI can help with understanding and interpreting texts, but it is less suitable for exact statistical analysis.
+Researching books and documents may include finding words and phrases, counting how many times they are used, and comparing these results between different texts. For this kind of work, the results should be accurate and repeatable.
 
 ### Target Audience
 
-This product is designed for linguists, literary scholars, philologists, humanities researchers, teachers, and students who work with texts in study or research projects and need advanced text search, statistics, comparison of several texts, and tools for working with quotations.
+This product is designed for linguists, literary scholars, philologists, humanities researchers, political scientists, political researchers, teachers, and students who work with texts in study or research projects.
 
-### Value Proposition
+### Main Features
 
-Alexandria is a desktop application that provides advanced text search, statistical analysis, text comparison, and the ability to save results and quotations in one place. The results can be checked against the original text and used later in research.
+- Upload and open text and PDF files.
+- Search for words and phrases, including different forms of the same word.
+- Show found uses with surrounding text and location in the text.
+- Show the most common words in a text.
+- Count how many times a word or phrase is used.
+- Compare words and phrases in two or more texts.
+- Save results and quotations in the user profile.
 
-### Key Features and Functionality
+### Goals
 
-- Text Upload
-  - Open one or more local files to work with them in the application,
-  - Support several file formats when possible,
-  - Display the opened texts next to the search and statistics panel.
+- Create a tool for text search and quantitative text analysis.
+- Allow users to find relevant parts of a text, count how often words are used, compare several texts, and save results and quotations for later use.
+- Create a working prototype of the desktop application within 8 weeks.
 
-- Text search
-  - Search for a word or phrase, including different forms of the same word,
-  - Show all found uses with the surrounding text and, when possible, their location in the text,
-  - Save search results to the user profile,
-  - Save found quotations to the user profile.
+More information about the project is in [Product Vision](https://github.com/veiston/Alexandria-The-Text-Analysis-Tool/blob/main/Documents/Product_Vision.md).
 
-- Statistics for one text
-  - Show the most common words in the text and how many times each of them is used, excluding stop words,
-  - Allow the user to enter any word or phrase and see how many times it is used in the text,
-  - Save the statistical result to the user profile.
+## Technology Stack & Dependencies
 
-- Comparison of two or more texts
-  - Show the most common words in two or more texts and how many times each word is used in each text,
-  - Allow the user to enter one word or phrase and see how many times it is used in all provided texts at the same time,
-  - Save the comparison result to the user profile.
+| Area | Technology |
+| --- | --- |
+| Language | Java 17 |
+| Build tool | Maven |
+| User interface | JavaFX 21 |
+| Icons | Ikonli 12.3.1 |
+| PDF processing | PDFBox 3.0.6, iText 8.0.5 |
+| JPEG 2000 PDF support | JAI ImageIO JPEG2000 1.4.0 |
+| JBIG2 PDF support | JBIG2 ImageIO 3.0.4 |
+| JSON mapping | Jackson Databind 2.17.0 |
+| Password hashing | Password4j 1.8.4 |
+| Database | MariaDB |
+| Database driver | MariaDB Java Client 3.5.10 |
+| Testing | JUnit 4.13.2, Mockito 5.18.0, TestFX 4.0.18 |
+| Headless JavaFX testing | OpenJFX Monocle 17.0.10 |
+| Test coverage | JaCoCo 0.8.15 |
+| CI/CD | Jenkins |
+| Docker database | MariaDB 11 |
 
-- User Profile
-  - Store the user's name, email, profile photo, and organization,
-  - Show saved results from text search, statistical analysis, and text comparison, including the text title, result type, result data, and save date,
-  - Show saved quotations, including the quotation text, source title, location when available, and save date.
+## Design & Development Methodology
 
-### Goals and Objectives
+### Design
 
-- Create a tool for text search and quantitative text analysis,
-- Allow users to find relevant parts of a text, count how often words are used, compare several texts, and save results and quotations for later use,
-- Create a working prototype of the desktop application within 8 weeks,
-- Develop the project using the practices and tools used in the course.
+The application uses the Model-View-Controller (MVC) architecture.
 
-### Vision Statement
+| Part | Description |
+| --- | --- |
+| View | JavaFX screens, FXML, CSS, and UI components. |
+| Controllers | Connect buttons and other UI actions to the application logic. |
+| Services | Search, text analysis, comparison, PDF processing, file storage, and validation. |
+| DAO classes | Read and save data in the database. |
+| Models | Represent users, texts, results, comparisons, and quotations. |
+| MariaDB | Stores the application data. |
 
-Our vision is to create a desktop application for quantitative text research using modern development, testing, automation, and deployment practices. The application should provide accurate and repeatable results, save them for later work, and remain a simple and practical tool for people who research texts.
+The main design documents:
 
-## Technology Stack
+- [Use case diagram](https://github.com/veiston/Alexandria-The-Text-Analysis-Tool/blob/main/Documents/AlexandriaUseCase.pdf)
+- [ER diagram](https://github.com/veiston/Alexandria-The-Text-Analysis-Tool/blob/main/Documents/ER_Diagram.png)
+- [Relational schema](https://github.com/veiston/Alexandria-The-Text-Analysis-Tool/blob/main/Documents/Relational_Schema.png)
+- [Database schema](https://github.com/veiston/Alexandria-The-Text-Analysis-Tool/blob/main/database/schema.sql)
+- [User story map](https://github.com/veiston/Alexandria-The-Text-Analysis-Tool/blob/main/Documents/User_story_map.md)
 
-| Area | Technology | Reason |
-|---|---|---|
-| Programming language | Java | Course standard and suitable for desktop applications |
-| User interface | JavaFX | Native Java framework for desktop UI |
-| Build and dependencies | Maven | Standard Java build and dependency management |
-| Database | MariaDB | Relational SQL database that works well with Java |
-| PDF processing | iText | Extracts text from PDF files |
-| Testing | JUnit 5 | Standard testing framework for Java |
-| Version control | Git | Supports branches and team development |
-| Repository hosting | GitHub | Pull requests, collaboration, and project files |
-| Project management | Trello | Backlog, sprints, and task tracking |
-| CI/CD | Jenkins | Automated builds and tests |
-| Containerization | Docker | Reproducible project environment |
-| Container orchestration | Kubernetes | Running and managing containers |
+### Development Methodology
 
-## Sprint Documentation
+Agile development using Scrum. Trello is used for the product backlog, sprint planning, task assignment, and progress tracking.
 
-### Sprint 1
+The Trello board: [Alexandria Trello board](https://trello.com/w/sep1_mursu_alexandriathetextanalysistool/home)
 
-- [Sprint 1 Planning Report](https://github.com/veiston/Alexandria-The-Text-Analysis-Tool/blob/main/Documents/sprint_reports/sprint_1_planning_report.md)
-- [Sprint 1 Review Report](https://github.com/veiston/Alexandria-The-Text-Analysis-Tool/blob/main/Documents/sprint_reports/sprint_1_review_report.md)
+The sprint documentation: [Alexandria Sprint Documentation](https://github.com/veiston/Alexandria-The-Text-Analysis-Tool/tree/main/Documents/sprint_reports)
 
-### Sprint 2
-- [Sprint 2 Planning Report](https://github.com/veiston/Alexandria-The-Text-Analysis-Tool/blob/main/Documents/sprint_reports/sprint_2_planning_report.md)
-- [Sprint 2 Review Report](https://github.com/veiston/Alexandria-The-Text-Analysis-Tool/blob/main/Documents/sprint_reports/sprint_2_review_report.md)
+## Functional Testing
 
-### Sprint 3
+The project has unit tests for services, controllers, and some views, database/integration tests for DAO classes, and end-to-end tests.
 
-- [Sprint 3 Planning Report](https://github.com/veiston/Alexandria-The-Text-Analysis-Tool/blob/main/Documents/sprint_reports/sprint_3_planning_report.md)
-- [Sprint 3 Review Report](https://github.com/veiston/Alexandria-The-Text-Analysis-Tool/blob/main/Documents/sprint_reports/sprint_3_review_report.md)
+| Test type | Examples |
+| --- | --- |
+| Unit tests | Text analysis, search, validation, PDF processing, password hashing, controllers, and some views |
+| Database/integration tests | Database connection and DAO create, read, update, and delete operations |
+| End-to-end tests | Login, project creation, analysis, comparison, settings, and user guide |
+| Performance tests | Text analysis and search with 100,000 words |
+| Security tests | Password hashing, password validation, and login behaviour |
 
-### Sprint 4
 
-- [Sprint 4 Planning Report](https://github.com/veiston/Alexandria-The-Text-Analysis-Tool/blob/main/Documents/sprint_reports/sprint_4_planning_report.md)
-- [Sprint 4 Review Report](https://github.com/veiston/Alexandria-The-Text-Analysis-Tool/blob/main/Documents/sprint_reports/sprint_4_review_report.md)
 
-# Running the application:
- - Run all tests with `mvn test`
- - Run the application with `mvn javafx:run`
+The project has a code coverage report generated by JaCoCo: [Alexandria JaCoCo Coverage Report](https://x-bananer.github.io/alexandria-jacoco-reports/). Jenkins updates this report after every push to production.
 
-## Automated test coverage report
+## Setup & Execution Instructions
 
-The [JaCoCo coverage report](https://x-bananer.github.io/alexandria-jacoco-reports/) is published on GitHub Pages. It is automatically regenerated after Jenkins, running on team member Kseniia Shlenskaia's computer, detects a new commit.
+### Requirements
 
-## Folder Structure
-```markdown
-Alexandria-The-Text-Analysis-Tool/
-├── pom.xml
-├── README.md
-├── LICENSE
-│
-├── docs/
-│   ├── architecture-diagram.png
-│   ├── user-guide.md
-│   └── deployment-guide.md
-│
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── com/
-│   │   │       └── alexandria/
-│   │   │           ├── controller/
-│   │   │           ├── dao/
-│   │   │           ├── model/
-│   │   │           ├── service/
-│   │   │           ├── utils/
-│   │   │           ├── view/
-│   │   │           └── Main.java
-│   │   │           └── ParsePdf.java
-│   │   └── resources/
-│   │       ├── fxml/
-│   │       │   └── main.fxml
-│   │       ├── styles/
-│   │       │   └── application.css
-│   │       └── images/
-│   │           └── logo.png
-│   │
-│   └── test/
-│       ├── java/
-│       │   └── com/
-│       │       └── alexandria/
-│       │           ├── dao/
-│       │           ├── service/
-│       │           └── integration/
-│       └── resources/
-│           └── test-database.properties
-│
-├── database/
-│   ├── schema.sql
-│   └── data.sql
-│
-├── docker/
-│   ├── Dockerfile
-│   ├── docker-compose.yml
-│   ├── .dockerignore
-│   ├── mariadb/
-│   │   └── init.sql
-│   └── jenkins/
-│       └── Dockerfile
-│
-├── jenkins/
-│   └── Jenkinsfile
-│
-└── scripts/
-├── setup-db.sh
-├── run-app.sh
-├── run-gui-windows.sh
-├── run-gui-linux.sh
-└── run-gui-mac.sh
+Install:
 
-```
+- JDK 17
+- Maven
+- MariaDB
+
+For Docker setup:
+
+- Docker Desktop
+- Xming for Windows or XQuartz for macOS
+
+### Local Setup
+
+1. Clone the project.
+
+   ```bash
+   git clone https://github.com/veiston/Alexandria-The-Text-Analysis-Tool.git
+   cd Alexandria-The-Text-Analysis-Tool
+   ```
+
+2. Install and start MariaDB.
+
+   macOS:
+
+   ```bash
+   brew install mariadb
+   brew services start mariadb
+   ```
+
+   Windows:
+
+   1. Download and install [MariaDB Community Server](https://mariadb.com/downloads/).
+   2. Keep port `3306` during installation.
+   3. Set a password for the MariaDB `root` user.
+
+   Then open Command Prompt as Administrator and start the service:
+
+   ```bat
+   net start MariaDB
+   ```
+
+3. Create the database.
+
+   macOS/Linux:
+
+   ```bash
+   ./scripts/setup-db.sh
+   ```
+
+   Windows:
+
+   ```bat
+   scripts\setup-db.bat
+   ```
+
+   The script creates the `alexandria` database and user, creates the tables, and loads test data.
+
+   After this step, the application uses the following default local database connection. You do not need to enter these values manually unless you change the database setup.
+
+   Default local database connection:
+
+	```text
+	username: alexandria
+	password: alexandria
+	host: localhost
+	port: 3306
+	database: alexandria
+	```
+
+4. Run tests and start the application.
+
+   ```bash
+   mvn test
+   mvn javafx:run
+   ```
+
+More database information is in [database/README.md](https://github.com/veiston/Alexandria-The-Text-Analysis-Tool/blob/main/database/README.md).
+
+### Docker Setup
+
+Before starting the application, open Docker Desktop and start an X server: XQuartz on macOS or XMing on Windows.
+
+1. Build the application.
+
+   ```bash
+   mvn clean package
+   docker build --platform linux/amd64 -f docker/Dockerfile -t alexandria:1.0.0 .
+   ```
+
+2. Set the folder that the container can read.
+
+   macOS/Linux:
+
+   ```bash
+   export HOST_FILES_DIR="$HOME"
+   ```
+
+   Windows PowerShell:
+
+   ```powershell
+   $env:HOST_FILES_DIR = $env:USERPROFILE
+   ```
+
+3. Start the application and database. Docker Compose uses the published Alexandria Docker Hub image.
+
+   ```bash
+   docker compose -f docker/docker-compose.yml up
+   ```
+
+4. Stop the containers when done.
+
+   ```bash
+   docker compose -f docker/docker-compose.yml down
+   ```
+Our Docker Hub image: [Alexandria on Docker Hub](https://hub.docker.com/r/ksenishl/alexandria/tags)
+
+More Docker setup information is in [docker_setup.md](https://github.com/veiston/Alexandria-The-Text-Analysis-Tool/blob/main/Documents/docker_setup.md).
+
+### Jenkins Setup
+
+Jenkins uses `jenkins/Jenkinsfile`.
+
+More Jenkins setup information is in [docker_setup.md](https://github.com/veiston/Alexandria-The-Text-Analysis-Tool/blob/main/Documents/jenkins_setup.md).
+
+## Authors
+
+Team #6
+
+- Veikka Liukkonen
+- Luara Moreira Da Silva
+- Unna Postila
+- Kseniia Shlenskaia
