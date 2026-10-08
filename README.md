@@ -135,9 +135,9 @@ For Docker setup:
 
    Windows:
 
-   1. Download and install [MariaDB Community Server](https://mariadb.com/downloads/).
-   2. Keep port `3306` during installation.
-   3. Set a password for the MariaDB `root` user.
+   - Download and install [MariaDB Community Server](https://mariadb.com/downloads/).
+   - Keep port `3306` during installation.
+   - Set a password for the MariaDB `root` user.
 
    Then open Command Prompt as Administrator and start the service:
 
