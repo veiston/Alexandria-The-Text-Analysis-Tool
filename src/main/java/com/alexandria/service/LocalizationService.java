@@ -19,6 +19,7 @@ public class LocalizationService {
 
     public static final Locale ENGLISH = Locale.US;
     public static final Locale JAPANESE = Locale.JAPAN;
+    /* Russian doesn't seem to have a short version available in Locale. */
     public static final Locale RUSSIAN = new Locale("ru", "RU");
 
     private Locale locale;
