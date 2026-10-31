@@ -1,5 +1,6 @@
 package com.alexandria.view.screens;
 
+import com.alexandria.model.Language;
 import com.alexandria.utils.ThemeSettings;
 import com.alexandria.utils.UserGuideSettings;
 import com.alexandria.view.components.shared.ToggleSwitch;
@@ -17,23 +18,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 public class SettingsScreen extends VBox {
-
-    public enum Language {
-        ENGLISH("English"),
-        JAPANESE("Japanese (日本語)"),
-        RUSSIAN("Russian (Русский)");
-
-        private final String displayName;
-
-        Language(String displayName) {
-            this.displayName = displayName;
-        }
-
-        @Override
-        public String toString() {
-            return displayName;
-        }
-    }
 
     private final ComboBox<Language> languageSelector = new ComboBox<>(
             FXCollections.observableArrayList(Language.values()));
