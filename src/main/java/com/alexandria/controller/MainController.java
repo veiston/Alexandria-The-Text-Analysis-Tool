@@ -9,6 +9,7 @@ import com.alexandria.dao.UserDAO;
 import com.alexandria.model.FileType;
 import com.alexandria.model.Text;
 import com.alexandria.service.FileStorageService;
+import com.alexandria.service.LocalizationService;
 import com.alexandria.service.PdfService;
 import com.alexandria.service.SearchService;
 import com.alexandria.service.TermAnalysisService;
@@ -26,6 +27,7 @@ import com.alexandria.view.screens.ArchiveScreen;
 import com.alexandria.view.screens.CompareScreen;
 import com.alexandria.view.screens.LibraryScreen;
 import com.alexandria.view.screens.ProfileScreen;
+import com.alexandria.view.screens.SettingsScreen;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -56,6 +58,7 @@ public class MainController {
                 new TextAnalysisService());
 
         configureProfile();
+        configureSettings();
         archiveController = configureArchive();
         compareController = configureComparison();
         libraryController = configureLibrary();
@@ -88,6 +91,11 @@ public class MainController {
     private void configureProfile() {
         ProfileScreen profileScreen = (ProfileScreen) Route.PROFILE.createScreen();
         new ProfileController(userDAO, profileScreen);
+    }
+
+    private void configureSettings() {
+        SettingsScreen settingsScreen = (SettingsScreen) Route.SETTINGS.createScreen();
+        new LanguageSettingsController(new LocalizationService(), settingsScreen);
     }
 
     private ArchiveController configureArchive() {
