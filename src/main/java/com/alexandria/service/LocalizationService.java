@@ -32,10 +32,14 @@ public class LocalizationService {
     }
 
     public void setLocale(Locale locale) {
+        ResourceBundle newBundle = ResourceBundle.getBundle(BUNDLE_BASE, locale, NO_FALLBACK);
+        NumberFormat newNumberFormat = NumberFormat.getNumberInstance(locale);
+        DateTimeFormatter newDateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale);
+
+        this.bundle = newBundle;
+        this.numberFormat = newNumberFormat;
+        this.dateFormatter = newDateFormatter;
         this.locale = locale;
-        this.bundle = ResourceBundle.getBundle(BUNDLE_BASE, locale, NO_FALLBACK);
-        this.numberFormat = NumberFormat.getNumberInstance(locale);
-        this.dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale);
     }
 
     public Locale getLocale() {

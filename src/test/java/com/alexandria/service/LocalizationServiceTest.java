@@ -56,6 +56,23 @@ public class LocalizationServiceTest {
     }
 
     @Test
+    public void testFailedLocaleChangePreservesPreviousLocaleAndFormatting() {
+        assertEquals(LocalizationService.ENGLISH, service.getLocale());
+        assertEquals("Library", service.get("library"));
+        String englishFormattedNumber = service.formatNumber(1234567.89);
+
+        try {
+            service.setLocale(new Locale("xx", "XX"));
+        } catch (MissingResourceException expected) {
+            // Expected failure to load bundle
+        }
+
+        assertEquals(LocalizationService.ENGLISH, service.getLocale());
+        assertEquals("Library", service.get("library"));
+        assertEquals(englishFormattedNumber, service.formatNumber(1234567.89));
+    }
+
+    @Test
     public void testFormatNumberEnglish() {
         assertEquals("1,234,567.89", service.formatNumber(1234567.89));
         assertEquals("1,234,567", service.formatNumber(1234567L));
