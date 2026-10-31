@@ -25,6 +25,7 @@ public class LanguageSettingsController {
             return;
         }
         localizationService.setLocale(language.getLocale());
+        LanguageSettings.setLanguage(language);
         settingsScreen.setSelectedLanguage(language);
         settingsScreen.refreshText(localizationService);
     }
