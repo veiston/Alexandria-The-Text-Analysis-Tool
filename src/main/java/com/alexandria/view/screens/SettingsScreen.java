@@ -1,6 +1,7 @@
 package com.alexandria.view.screens;
 
 import com.alexandria.model.Language;
+import com.alexandria.service.LocalizationService;
 import com.alexandria.utils.ThemeSettings;
 import com.alexandria.utils.UserGuideSettings;
 import com.alexandria.view.components.shared.ToggleSwitch;
@@ -25,21 +26,26 @@ public class SettingsScreen extends VBox {
     };
     private boolean updatingLanguage;
 
+    private final Label title = new Label("Settings");
+    private final Label subtitle = new Label("Manage your application preferences");
+    private final Label appearanceTitle = new Label("Appearance");
+    private final Label darkThemeLabel = new Label("Dark theme");
+    private final Label languageTitle = new Label("Language");
+    private final Label languageDescription = new Label("Choose the language used throughout the application.");
+    private final Label userGuideTitle = new Label("Additional Settings");
+    private final Label userGuideLabel = new Label("Show user tour on next launch");
+
     public SettingsScreen() {
         setPadding(new Insets(30));
         setSpacing(16);
         setMaxWidth(Double.MAX_VALUE);
 
-        Label title = new Label("Settings");
         title.getStyleClass().add("heading-xl");
 
-        Label subtitle = new Label("Manage your application preferences");
         subtitle.getStyleClass().add("text-muted");
 
-        Label appearanceTitle = new Label("Appearance");
         appearanceTitle.getStyleClass().add("heading-lg");
 
-        Label darkThemeLabel = new Label("Dark theme");
         darkThemeLabel.getStyleClass().add("heading-md");
         HBox.setHgrow(darkThemeLabel, Priority.ALWAYS);
 
@@ -58,10 +64,8 @@ public class SettingsScreen extends VBox {
         Separator divider = new Separator();
         divider.setMaxWidth(Double.MAX_VALUE);
 
-        Label languageTitle = new Label("Language");
         languageTitle.getStyleClass().add("heading-lg");
 
-        Label languageDescription = new Label("Choose the language used throughout the application.");
         languageDescription.getStyleClass().add("settings-language-description");
 
         languageSelector.setValue(Language.ENGLISH);
@@ -76,10 +80,8 @@ public class SettingsScreen extends VBox {
         VBox languageContent = new VBox(10, languageDescription, languageSelector);
         languageContent.setMaxWidth(Double.MAX_VALUE);
 
-        Label userGuideTitle = new Label("Additional Settings");
         userGuideTitle.getStyleClass().add("heading-lg");
 
-        Label userGuideLabel = new Label("Show user tour on next launch");
         userGuideLabel.getStyleClass().add("heading-md");
         HBox.setHgrow(userGuideLabel, Priority.ALWAYS);
 
@@ -126,5 +128,35 @@ public class SettingsScreen extends VBox {
         } finally {
             updatingLanguage = false;
         }
+    }
+
+    public void refreshText(LocalizationService svc) {
+        if (svc == null) {
+            return;
+        }
+        title.setText(svc.get("settings"));
+        subtitle.setText(svc.get("settings.subtitle"));
+        appearanceTitle.setText(svc.get("settings.appearance"));
+        darkThemeLabel.setText(svc.get("settings.darkTheme"));
+        languageTitle.setText(svc.get("settings.language"));
+        languageDescription.setText(svc.get("settings.languageDescription"));
+        userGuideTitle.setText(svc.get("settings.additional"));
+        userGuideLabel.setText(svc.get("settings.showUserTour"));
+    }
+
+    public Label getTitleLabel() {
+        return title;
+    }
+
+    public Label getSubtitleLabel() {
+        return subtitle;
+    }
+
+    public Label getDarkThemeLabel() {
+        return darkThemeLabel;
+    }
+
+    public Label getLanguageDescriptionLabel() {
+        return languageDescription;
     }
 }
