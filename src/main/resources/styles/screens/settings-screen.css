@@ -1,0 +1,74 @@
+/* Settings — Language */
+
+.settings-language-description {
+    -fx-font-family: -fx-font-sans;
+    -fx-font-size: 12px;
+    -fx-text-fill: -fx-foreground-muted;
+}
+
+.settings-language-selector {
+    -fx-background-color: -fx-surface;
+    -fx-border-color: -fx-border-subtle;
+    -fx-border-width: 1px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 2px 8px;
+    -fx-min-height: 36px;
+    -fx-pref-width: 230px;
+    -fx-cursor: hand;
+}
+
+.settings-language-selector:hover {
+    -fx-background-color: -fx-surface-hover;
+    -fx-border-color: -fx-accent;
+}
+
+.settings-language-selector:focused {
+    -fx-border-color: -fx-accent;
+}
+
+.settings-language-selector .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: -fx-foreground;
+    -fx-font-family: -fx-font-sans;
+    -fx-font-size: 12px;
+    -fx-padding: 6px 8px;
+}
+
+.settings-language-selector .arrow {
+    -fx-background-color: -fx-foreground-muted;
+}
+
+.settings-language-selector .arrow-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 4px;
+}
+
+.settings-language-selector .list-view {
+    -fx-background-color: -fx-surface;
+    -fx-border-color: -fx-border-subtle;
+    -fx-border-width: 1px;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-padding: 4px;
+}
+
+.settings-language-selector .list-view .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: -fx-foreground;
+    -fx-padding: 8px 10px;
+    -fx-background-radius: 4px;
+}
+
+.settings-language-selector .list-view .list-cell:hover {
+    -fx-background-color: -fx-surface-hover;
+}
+
+.settings-language-selector .list-view .list-cell:filled:selected {
+    -fx-background-color: -fx-accent-soft;
+    -fx-text-fill: -fx-foreground;
+}
+
+.settings-language-selector .list-view .list-cell:filled:selected:hover {
+    -fx-background-color: -fx-surface-hover;
+}

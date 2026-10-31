@@ -1,11 +1,16 @@
 package com.alexandria.view.screens;
 
+import com.alexandria.model.Language;
 import com.alexandria.utils.ThemeSettings;
 import com.alexandria.utils.UserGuideSettings;
 import com.alexandria.view.components.shared.ToggleSwitch;
 
+import java.util.function.Consumer;
+
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.HBox;
@@ -13,6 +18,12 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 public class SettingsScreen extends VBox {
+
+    private final ComboBox<Language> languageSelector = new ComboBox<>(
+            FXCollections.observableArrayList(Language.values()));
+    private Consumer<Language> onLanguageChanged = language -> {
+    };
+    private boolean updatingLanguage;
 
     public SettingsScreen() {
         setPadding(new Insets(30));
@@ -50,10 +61,22 @@ public class SettingsScreen extends VBox {
         Label languageTitle = new Label("Language");
         languageTitle.getStyleClass().add("heading-lg");
 
-        Label languageStatus = new Label("Language settings are under development and will be available later.");
-        languageStatus.getStyleClass().add("text-muted");
+        Label languageDescription = new Label("Choose the language used throughout the application.");
+        languageDescription.getStyleClass().add("settings-language-description");
 
-        Label userGuideTitle = new Label("Additional Ыettings");
+        languageSelector.setValue(Language.ENGLISH);
+        languageSelector.setPrefWidth(230);
+        languageSelector.getStyleClass().add("settings-language-selector");
+        languageSelector.setAccessibleText("Application language");
+        languageSelector.setOnAction(event -> {
+            if (!updatingLanguage && languageSelector.getValue() != null)
+                onLanguageChanged.accept(languageSelector.getValue());
+        });
+
+        VBox languageContent = new VBox(10, languageDescription, languageSelector);
+        languageContent.setMaxWidth(Double.MAX_VALUE);
+
+        Label userGuideTitle = new Label("Additional Settings");
         userGuideTitle.getStyleClass().add("heading-lg");
 
         Label userGuideLabel = new Label("Show user tour on next launch");
@@ -73,15 +96,35 @@ public class SettingsScreen extends VBox {
         languageDivider.setMaxWidth(Double.MAX_VALUE);
 
         getChildren().addAll(
-            title,
-            subtitle,
-            appearanceTitle,
-            darkThemeRow,
-            divider,
-            languageTitle,
-            languageStatus,
-            languageDivider,
-            userGuideTitle,
-            userGuideRow);
+                title,
+                subtitle,
+                appearanceTitle,
+                darkThemeRow,
+                divider,
+                languageTitle,
+                languageContent,
+                languageDivider,
+                userGuideTitle,
+                userGuideRow);
+    }
+
+    public void setOnLanguageChanged(Consumer<Language> callback) {
+        onLanguageChanged = callback != null ? callback : language -> {
+        };
+    }
+
+    public Language getSelectedLanguage() {
+        return languageSelector.getValue();
+    }
+
+    public void setSelectedLanguage(Language language) {
+        if (language == null)
+            return;
+        updatingLanguage = true;
+        try {
+            languageSelector.setValue(language);
+        } finally {
+            updatingLanguage = false;
+        }
     }
 }
