@@ -9,7 +9,6 @@ import com.alexandria.dao.UserDAO;
 import com.alexandria.model.FileType;
 import com.alexandria.model.Text;
 import com.alexandria.service.FileStorageService;
-import com.alexandria.service.LocalizationService;
 import com.alexandria.service.PdfService;
 import com.alexandria.service.SearchService;
 import com.alexandria.service.TermAnalysisService;
@@ -27,7 +26,6 @@ import com.alexandria.view.screens.ArchiveScreen;
 import com.alexandria.view.screens.CompareScreen;
 import com.alexandria.view.screens.LibraryScreen;
 import com.alexandria.view.screens.ProfileScreen;
-import com.alexandria.view.screens.SettingsScreen;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -63,7 +61,6 @@ public class MainController {
         libraryController = configureLibrary();
         configureProject();
         configureUserGuideTour();
-        configureSettings();
 
         openInitialRoute();
     }
@@ -86,11 +83,6 @@ public class MainController {
 
     private void openInitialRoute() {
         mainView.navigateTo(session.isLoggedIn() ? Route.LIBRARY : Route.PROFILE);
-    }
-
-    private void configureSettings() {
-        SettingsScreen settingsScreen = (SettingsScreen) Route.SETTINGS.createScreen();
-        new LanguageSettingsController(new LocalizationService(), settingsScreen);
     }
 
     private void configureProfile() {
