@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import com.alexandria.model.Text;
+import com.alexandria.service.LocalizationService;
 import com.alexandria.view.components.shared.Card;
 import com.alexandria.view.components.shared.EmptyState;
 import com.alexandria.view.components.shared.SearchInput;
@@ -77,6 +78,9 @@ public class LibraryScreen extends StackPane {
             onAddNewComparisonText.accept(firstText);
         });
         showTexts();
+        LocalizationService.getInstance().addListener(locale -> {
+            showTexts();
+        });
 
         // Refresh when router mounts screen into active scene
         sceneProperty().addListener((observable, oldScene, newScene) -> {
@@ -235,6 +239,8 @@ public class LibraryScreen extends StackPane {
         VBox.setVgrow(libraryContent, Priority.ALWAYS);
 
         contentArea.getChildren().setAll(searchAndContent);
+        LocalizationService.getInstance().apply(cardsPane);
+        LocalizationService.getInstance().apply(libraryContent);
     }
 
     private String emptyMessage() {
@@ -260,7 +266,9 @@ public class LibraryScreen extends StackPane {
         card.setSourceText(text.getFileName());
 
         if (text.getCreatedAt() != null) {
-            card.setFooterText("Added " + DATE_FORMAT.format(text.getCreatedAt()));
+            String dateText = DATE_FORMAT.format(text.getCreatedAt());
+            String footer = LocalizationService.getInstance().get("added").replace("{date}", dateText);
+            card.setFooterText(footer);
         }
 
         card.setActionText("Open with");

@@ -100,6 +100,10 @@ public class LocalizationService {
             updateTextInputPrompt(textInput);
         }
 
+        if (node instanceof javafx.scene.control.ScrollPane scrollPane) {
+            apply(scrollPane.getContent());
+        }
+
         if (node instanceof Parent parent) {
             for (Node child : parent.getChildrenUnmodifiable()) {
                 apply(child);
