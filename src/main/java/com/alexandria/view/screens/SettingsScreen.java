@@ -1,11 +1,12 @@
 package com.alexandria.view.screens;
 
+import java.util.function.Consumer;
+
 import com.alexandria.model.Language;
+import com.alexandria.service.LocalizationService;
 import com.alexandria.utils.ThemeSettings;
 import com.alexandria.utils.UserGuideSettings;
 import com.alexandria.view.components.shared.ToggleSwitch;
-
-import java.util.function.Consumer;
 
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
@@ -19,6 +20,14 @@ import javafx.scene.layout.VBox;
 
 public class SettingsScreen extends VBox {
 
+    private final Label title = new Label();
+    private final Label subtitle = new Label();
+    private final Label appearanceTitle = new Label();
+    private final Label darkThemeLabel = new Label();
+    private final Label languageTitle = new Label();
+    private final Label languageDescription = new Label();
+    private final Label userGuideTitle = new Label();
+    private final Label userGuideLabel = new Label();
     private final ComboBox<Language> languageSelector = new ComboBox<>(
             FXCollections.observableArrayList(Language.values()));
     private Consumer<Language> onLanguageChanged = language -> {
@@ -30,16 +39,12 @@ public class SettingsScreen extends VBox {
         setSpacing(16);
         setMaxWidth(Double.MAX_VALUE);
 
-        Label title = new Label("Settings");
         title.getStyleClass().add("heading-xl");
 
-        Label subtitle = new Label("Manage your application preferences");
         subtitle.getStyleClass().add("text-muted");
 
-        Label appearanceTitle = new Label("Appearance");
         appearanceTitle.getStyleClass().add("heading-lg");
 
-        Label darkThemeLabel = new Label("Dark theme");
         darkThemeLabel.getStyleClass().add("heading-md");
         HBox.setHgrow(darkThemeLabel, Priority.ALWAYS);
 
@@ -58,10 +63,8 @@ public class SettingsScreen extends VBox {
         Separator divider = new Separator();
         divider.setMaxWidth(Double.MAX_VALUE);
 
-        Label languageTitle = new Label("Language");
         languageTitle.getStyleClass().add("heading-lg");
 
-        Label languageDescription = new Label("Choose the language used throughout the application.");
         languageDescription.getStyleClass().add("settings-language-description");
 
         languageSelector.setValue(Language.ENGLISH);
@@ -69,17 +72,20 @@ public class SettingsScreen extends VBox {
         languageSelector.getStyleClass().add("settings-language-selector");
         languageSelector.setAccessibleText("Application language");
         languageSelector.setOnAction(event -> {
-            if (!updatingLanguage && languageSelector.getValue() != null)
-                onLanguageChanged.accept(languageSelector.getValue());
+            if (updatingLanguage) {
+                return;
+            }
+            Language selected = languageSelector.getValue();
+            if (selected != null) {
+                onLanguageChanged.accept(selected);
+            }
         });
 
         VBox languageContent = new VBox(10, languageDescription, languageSelector);
         languageContent.setMaxWidth(Double.MAX_VALUE);
 
-        Label userGuideTitle = new Label("Additional Settings");
         userGuideTitle.getStyleClass().add("heading-lg");
 
-        Label userGuideLabel = new Label("Show user tour on next launch");
         userGuideLabel.getStyleClass().add("heading-md");
         HBox.setHgrow(userGuideLabel, Priority.ALWAYS);
 
@@ -106,6 +112,8 @@ public class SettingsScreen extends VBox {
                 languageDivider,
                 userGuideTitle,
                 userGuideRow);
+
+        refreshText(LocalizationService.getInstance());
     }
 
     public void setOnLanguageChanged(Consumer<Language> callback) {
@@ -126,5 +134,32 @@ public class SettingsScreen extends VBox {
         } finally {
             updatingLanguage = false;
         }
+    }
+
+    public void refreshText(LocalizationService localizationService) {
+        title.setText(localizationService.get("settings"));
+        subtitle.setText(localizationService.get("settings.subtitle"));
+        appearanceTitle.setText(localizationService.get("settings.appearance"));
+        darkThemeLabel.setText(localizationService.get("settings.darkTheme"));
+        languageTitle.setText(localizationService.get("settings.language"));
+        languageDescription.setText(localizationService.get("settings.languageDescription"));
+        userGuideTitle.setText(localizationService.get("settings.additional"));
+        userGuideLabel.setText(localizationService.get("settings.showUserTour"));
+    }
+
+    public Label getTitleLabel() {
+        return title;
+    }
+
+    public Label getSubtitleLabel() {
+        return subtitle;
+    }
+
+    public Label getDarkThemeLabel() {
+        return darkThemeLabel;
+    }
+
+    public Label getLanguageDescriptionLabel() {
+        return languageDescription;
     }
 }
