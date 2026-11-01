@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 import com.alexandria.model.FileType;
+import com.alexandria.service.LocalizationService;
 import com.alexandria.service.analysis.SearchMatch;
 
 import javafx.application.Platform;
@@ -22,7 +23,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
 public class DocumentView extends BorderPane {
-        private final Label pageLabel = new Label("Page 1 / 1");
+        private final Label pageLabel = new Label();
         private final Button previous = new Button("‹");
         private final Button next = new Button("›");
         private final Button zoomOut = new Button("−");
@@ -40,6 +41,9 @@ public class DocumentView extends BorderPane {
                 setMinSize(0, 0);
                 setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
                 configureToolbar();
+                updatePageInformation();
+
+                LocalizationService.getInstance().addListener(locale -> updatePageInformation());
 
                 // When text selection is disabled, mouse input on the document itself is
                 // swallowed before the
@@ -221,9 +225,15 @@ public class DocumentView extends BorderPane {
         private void updatePageInformation() {
                 int total = Math.max(1, getPageCount());
                 currentPage = Math.max(1, Math.min(currentPage, total));
-                pageLabel.setText("Page " + currentPage + " / " + total);
+                pageLabel.setText(formatPageIndicator(currentPage, total));
                 previous.setDisable(total <= 1 || currentPage <= 1);
                 next.setDisable(total <= 1 || currentPage >= total);
+        }
+
+        private String formatPageIndicator(int current, int total) {
+                return LocalizationService.getInstance().get("analyse.pageIndicator")
+                                .replace("{current}", String.valueOf(current))
+                                .replace("{total}", String.valueOf(total));
         }
 
         public void highlightPdfSearch(String searchTerm) {
@@ -232,28 +242,10 @@ public class DocumentView extends BorderPane {
         }
 
         public void showSearchMatches(List<SearchMatch> matches, int activeIndex) {
-                if (matches == null || matches.isEmpty()) {
-                        clearSearchHighlights();
-                        return;
-                }
-
-                int safeIndex = Math.max(0, Math.min(activeIndex, matches.size() - 1));
-
                 if (showingPdf && pdfRenderer != null) {
-                        pdfRenderer.highlightSearchMatches(matches, safeIndex);
+                        pdfRenderer.highlightSearchMatches(matches, activeIndex);
                 } else if (textRenderer != null) {
-                        textRenderer.highlightSearchMatches(matches, safeIndex);
-                }
-        }
-
-        public void showSearchMatch(SearchMatch match) {
-                if (match == null)
-                        return;
-
-                if (showingPdf && pdfRenderer != null) {
-                        pdfRenderer.highlightSearch(match.text());
-                } else if (textRenderer != null) {
-                        textRenderer.highlightSearchMatch(match);
+                        textRenderer.highlightSearchMatches(matches, activeIndex);
                 }
         }
 
@@ -265,7 +257,11 @@ public class DocumentView extends BorderPane {
                 }
         }
 
-        public void highlightPdfQuotation(String quotedText) {
+        public void highlightPassage(String passage) {
+                jumpToPassage(currentPage, passage);
+        }
+
+        public void highlightQuotation(int quotationId, String quotedText, String location) {
                 if (showingPdf && pdfRenderer != null)
                         pdfRenderer.highlightQuotation(quotedText);
         }
@@ -305,7 +301,7 @@ public class DocumentView extends BorderPane {
                 showingPdf = false;
                 currentPage = 1;
                 zoom = 1.0;
-                pageLabel.setText("Page 1 / 1");
+                pageLabel.setText(formatPageIndicator(1, 1));
                 previous.setDisable(true);
                 next.setDisable(true);
         }

@@ -1,5 +1,6 @@
 package com.alexandria.view.components.compare_screen;
 
+import com.alexandria.service.LocalizationService;
 import com.alexandria.service.analysis.TextComparisonResult;
 import com.alexandria.view.components.shared.search.SearchView;
 import com.alexandria.view.components.shared.FrequencyBar;
@@ -19,14 +20,13 @@ import javafx.scene.layout.VBox;
 
 /**
  * Comparison-specific result panels built with the same search, tracker and
- * card
- * patterns as AnalyseScreen. The data differs: every row has a document A/B
- * side.
+ * card patterns as AnalyseScreen.
  */
 public class ComparisonSidePanel extends VBox {
     private final CommonWordsPanel commonWordsPanel = new CommonWordsPanel();
     private final SearchView searchView = new SearchView();
     private final SimilarParagraphsPanel paragraphsPanel = new SimilarParagraphsPanel();
+    private final Label searchHeading = new Label();
 
     private Consumer<String> onCommonWordSelected = word -> {
     };
@@ -42,7 +42,11 @@ public class ComparisonSidePanel extends VBox {
         setMinSize(0, 0);
         setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
-        VBox searchCard = new VBox(12, heading("Search in both texts"), searchView);
+        searchHeading.getStyleClass().add("heading-sm");
+
+        searchView.setPromptKey("compare.searchBothTexts");
+
+        VBox searchCard = new VBox(12, searchHeading, searchView);
         searchCard.getStyleClass().add("card");
         searchCard.setPadding(new Insets(14));
 
@@ -51,11 +55,26 @@ public class ComparisonSidePanel extends VBox {
         commonWordsPanel.setOnWordSelected(word -> onCommonWordSelected.accept(word));
         paragraphsPanel.setOnDocumentASelected(snippet -> onDocumentAParagraphSelected.accept(snippet));
         paragraphsPanel.setOnDocumentBSelected(snippet -> onDocumentBParagraphSelected.accept(snippet));
+
+        refreshText();
+        LocalizationService.getInstance().addListener(locale -> refreshText());
+    }
+
+    public void refreshText() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        searchHeading.setText(i18n.get("compare.searchBothTexts"));
+        commonWordsPanel.refreshText();
+        paragraphsPanel.refreshText();
+        searchView.refreshText();
     }
 
     public void setTextComparison(TextComparisonResult result) {
         commonWordsPanel.setResult(result);
         paragraphsPanel.setResults(result == null ? List.of() : result.similarParagraphs());
+    }
+
+    public void setResults(TextComparisonResult result) {
+        setTextComparison(result);
     }
 
     public SearchView getSearchView() {
@@ -91,15 +110,11 @@ public class ComparisonSidePanel extends VBox {
         searchView.reset();
     }
 
-    private static Label heading(String text) {
-        Label label = new Label(text);
-        label.getStyleClass().add("heading-sm");
-        return label;
-    }
-
     private static final class CommonWordsPanel extends VBox {
         private final VBox rowsHost = new VBox(10);
-        private final Label emptyLabel = new Label("Run comparison to see shared words.");
+        private final Label headingLabel = new Label();
+        private final Label emptyLabel = new Label();
+        private TextComparisonResult currentResult;
         private Consumer<String> onWordSelected = word -> {
         };
 
@@ -107,12 +122,22 @@ public class ComparisonSidePanel extends VBox {
             getStyleClass().add("card");
             setSpacing(12);
             setPadding(new Insets(14));
+            headingLabel.getStyleClass().add("heading-sm");
             emptyLabel.getStyleClass().add("text-muted");
-            getChildren().addAll(heading("Most frequent shared words"), rowsHost);
+            getChildren().addAll(headingLabel, rowsHost);
+            refreshText();
             showEmpty();
         }
 
+        private void refreshText() {
+            LocalizationService i18n = LocalizationService.getInstance();
+            headingLabel.setText(i18n.get("compare.mostFrequentSharedWords"));
+            emptyLabel.setText(i18n.get("compare.noSharedWords"));
+            setResult(currentResult);
+        }
+
         private void setResult(TextComparisonResult result) {
+            this.currentResult = result;
             rowsHost.getChildren().clear();
             if (result == null || result.commonWords().isEmpty()) {
                 showEmpty();
@@ -159,13 +184,15 @@ public class ComparisonSidePanel extends VBox {
             if (textIds == null || textIds.isEmpty()) {
                 return String.valueOf(totalCount(row));
             }
+            LocalizationService i18n = LocalizationService.getInstance();
             StringBuilder counts = new StringBuilder();
             for (int index = 0; index < textIds.size(); index++) {
                 if (index > 0) {
                     counts.append(" · ");
                 }
-                counts.append("Doc ").append((char) ('A' + index)).append(": ")
-                        .append(row.countsByTextId().getOrDefault(textIds.get(index), 0));
+                String docName = index == 0 ? i18n.get("compare.documentAName") : i18n.get("compare.documentBName");
+                counts.append(docName).append(": ")
+                        .append(i18n.formatNumber(row.countsByTextId().getOrDefault(textIds.get(index), 0)));
             }
             return counts.toString();
         }
@@ -180,11 +207,12 @@ public class ComparisonSidePanel extends VBox {
     }
 
     private static final class SimilarParagraphsPanel extends VBox {
-        // Roughly two lines of the side panel; the full passage is read via "go to".
         private static final int SNIPPET_CHAR_BUDGET = 100;
 
         private final VBox cardsHost = new VBox(10);
-        private final Label emptyLabel = new Label("No similar paragraphs found.");
+        private final Label headingLabel = new Label();
+        private final Label emptyLabel = new Label();
+        private List<TextComparisonResult.ParagraphMatch> currentMatches = List.of();
         private Consumer<TextComparisonResult.ParagraphSnippet> onDocumentASelected = snippet -> {
         };
         private Consumer<TextComparisonResult.ParagraphSnippet> onDocumentBSelected = snippet -> {
@@ -193,30 +221,42 @@ public class ComparisonSidePanel extends VBox {
         private SimilarParagraphsPanel() {
             getStyleClass().add("comparison-key-paragraphs");
             setSpacing(12);
+            headingLabel.getStyleClass().add("heading-sm");
             emptyLabel.getStyleClass().add("text-muted");
-            getChildren().addAll(heading("Key paragraphs"), cardsHost);
+            getChildren().addAll(headingLabel, cardsHost);
+            refreshText();
             showEmpty();
         }
 
+        private void refreshText() {
+            LocalizationService i18n = LocalizationService.getInstance();
+            headingLabel.setText(i18n.get("compare.keyParagraphs"));
+            emptyLabel.setText(i18n.get("compare.noSimilarParagraphs"));
+            setResults(currentMatches);
+        }
+
         private void setResults(List<TextComparisonResult.ParagraphMatch> matches) {
+            this.currentMatches = matches == null ? List.of() : List.copyOf(matches);
             cardsHost.getChildren().clear();
-            if (matches == null || matches.isEmpty()) {
+            if (currentMatches.isEmpty()) {
                 showEmpty();
                 return;
             }
-            for (TextComparisonResult.ParagraphMatch match : matches) {
+            for (TextComparisonResult.ParagraphMatch match : currentMatches) {
                 cardsHost.getChildren().add(buildCard(match));
             }
         }
 
         private VBox buildCard(TextComparisonResult.ParagraphMatch match) {
-            Label score = new Label(String.format("Similarity score: %.0f%%", match.scorePercent()));
+            LocalizationService i18n = LocalizationService.getInstance();
+            Label score = new Label(i18n.get("compare.similarityScore")
+                    .replace("{score}", String.format("%.0f", match.scorePercent())));
             score.getStyleClass().add("context-match-page");
 
             ContextMatchCard card = new ContextMatchCard(
                     score,
-                    documentPassage("Doc A", match.first(), onDocumentASelected),
-                    documentPassage("Doc B", match.second(), onDocumentBSelected));
+                    documentPassage(i18n.get("compare.documentAName"), match.first(), onDocumentASelected),
+                    documentPassage(i18n.get("compare.documentBName"), match.second(), onDocumentBSelected));
             card.setSpacing(7);
             return card;
         }
@@ -244,11 +284,18 @@ public class ComparisonSidePanel extends VBox {
         }
 
         private static String formatLocation(TextComparisonResult.ParagraphSnippet snippet) {
-            String page = snippet.page() == null ? "" : "Page " + snippet.page() + " · ";
-            return page + "Para " + snippet.paragraphIndex();
+            LocalizationService i18n = LocalizationService.getInstance();
+            if (snippet.page() != null && snippet.paragraphIndex() > 0) {
+                return i18n.get("compare.pageAndParagraph")
+                        .replace("{page}", String.valueOf(snippet.page()))
+                        .replace("{paragraph}", String.valueOf(snippet.paragraphIndex()));
+            }
+            if (snippet.page() != null) {
+                return i18n.get("compare.page").replace("{page}", String.valueOf(snippet.page()));
+            }
+            return i18n.get("compare.paragraph").replace("{paragraph}", String.valueOf(snippet.paragraphIndex()));
         }
 
-        /** Keeps only the beginning of the paragraph, followed by "...". */
         private static String truncate(String text) {
             if (text == null) {
                 return "";

@@ -3,6 +3,7 @@ package com.alexandria.view.components.archive_screen;
 import com.alexandria.model.ArchiveComparison;
 import com.alexandria.model.ArchiveTermAnalysis;
 import com.alexandria.model.ArchiveTextAnalysis;
+import com.alexandria.service.LocalizationService;
 import com.alexandria.service.analysis.TermAnalysisResult;
 import com.alexandria.service.analysis.TermComparisonResult;
 import com.alexandria.service.analysis.TextAnalysisResult;
@@ -26,27 +27,28 @@ public class ArchiveAnalysisModal extends Modal {
     private static final int SNIPPET_CHAR_BUDGET = 180;
 
     public void showTextAnalysis(ArchiveTextAnalysis analysis) {
+        LocalizationService i18n = LocalizationService.getInstance();
         TextAnalysisResult result = analysis.getTextAnalysisResult();
 
-        Label title = new Label("Text analysis");
+        Label title = new Label(i18n.get("textAnalysis"));
         title.getStyleClass().addAll("heading-lg", "archive-modal-title");
         VBox content = new VBox(20, title);
 
-        Label generalAnalysisTitle = new Label("General analysis");
+        Label generalAnalysisTitle = new Label(i18n.get("archive.generalAnalysis"));
         generalAnalysisTitle.getStyleClass().addAll("heading-md", "archive-modal-section-title");
-        GridPane statisticsTable = createTable("Statistic", "Value");
-        addTableRow(statisticsTable, 1, "Total words", result.totalWords());
-        addTableRow(statisticsTable, 2, "Unique words", result.uniqueWords());
-        addTableRow(statisticsTable, 3, "Sentences", result.totalSentences());
-        addTableRow(statisticsTable, 4, "Paragraphs", result.totalParagraphs());
+        GridPane statisticsTable = createTable(i18n.get("archive.statistic"), i18n.get("archive.value"));
+        addTableRow(statisticsTable, 1, i18n.get("archive.totalWords"), result.totalWords());
+        addTableRow(statisticsTable, 2, i18n.get("archive.uniqueWords"), result.uniqueWords());
+        addTableRow(statisticsTable, 3, i18n.get("archive.sentences"), result.totalSentences());
+        addTableRow(statisticsTable, 4, i18n.get("archive.paragraphs"), result.totalParagraphs());
         VBox generalAnalysis = new VBox(16, generalAnalysisTitle, statisticsTable);
 
-        Label frequentWordsTitle = new Label("Frequent words");
+        Label frequentWordsTitle = new Label(i18n.get("archive.frequentWords"));
         frequentWordsTitle.getStyleClass().addAll("heading-md", "archive-modal-section-title");
         VBox frequentWords = new VBox(16, frequentWordsTitle,
                 createWordsTable(result.frequentWords(), false));
 
-        Label fragmentsTitle = new Label("Important fragments");
+        Label fragmentsTitle = new Label(i18n.get("archive.importantFragments"));
         fragmentsTitle.getStyleClass().addAll("heading-md", "archive-modal-section-title");
         VBox fragments = new VBox(12);
 
@@ -70,11 +72,12 @@ public class ArchiveAnalysisModal extends Modal {
     }
 
     public void showTermAnalysis(ArchiveTermAnalysis analysis) {
+        LocalizationService i18n = LocalizationService.getInstance();
         TermAnalysisResult result = analysis.getTermAnalysisResult();
 
-        Label title = new Label("Term analysis");
+        Label title = new Label(i18n.get("termAnalysis"));
         title.getStyleClass().addAll("heading-lg", "archive-modal-title");
-        Label analyzedTermLabel = new Label("Analyzed term");
+        Label analyzedTermLabel = new Label(i18n.get("archive.analyzedTerm"));
         analyzedTermLabel.getStyleClass().add("text-muted");
         Label term = new Label(result.term());
         term.getStyleClass().add("archive-modal-term");
@@ -82,16 +85,16 @@ public class ArchiveAnalysisModal extends Modal {
         VBox termHeader = new VBox(16, title, analyzedTerm);
         VBox content = new VBox(20, termHeader);
 
-        Label generalAnalysisTitle = new Label("General analysis");
+        Label generalAnalysisTitle = new Label(i18n.get("archive.generalAnalysis"));
         generalAnalysisTitle.getStyleClass().addAll("heading-md", "archive-modal-section-title");
-        GridPane statisticsTable = createTable("Statistic", "Value");
-        addTableRow(statisticsTable, 1, "Occurrences", result.totalOccurrences());
-        addTableRow(statisticsTable, 2, "Per 1,000 words", result.relativeFrequency());
-        addTableRow(statisticsTable, 3, "Sentences", result.sentenceCount());
-        addTableRow(statisticsTable, 4, "Paragraphs", result.paragraphCount());
+        GridPane statisticsTable = createTable(i18n.get("archive.statistic"), i18n.get("archive.value"));
+        addTableRow(statisticsTable, 1, i18n.get("archive.occurrences"), result.totalOccurrences());
+        addTableRow(statisticsTable, 2, i18n.get("archive.perThousandWords"), result.relativeFrequency());
+        addTableRow(statisticsTable, 3, i18n.get("archive.sentences"), result.sentenceCount());
+        addTableRow(statisticsTable, 4, i18n.get("archive.paragraphs"), result.paragraphCount());
         VBox generalAnalysis = new VBox(16, generalAnalysisTitle, statisticsTable);
 
-        Label neighboringWordsTitle = new Label("Neighboring words");
+        Label neighboringWordsTitle = new Label(i18n.get("archive.neighboringWords"));
         neighboringWordsTitle.getStyleClass().addAll("heading-md", "archive-modal-section-title");
         VBox neighboringWords = new VBox(16, neighboringWordsTitle,
                 createWordsTable(result.neighboringWords(), true));
@@ -101,26 +104,27 @@ public class ArchiveAnalysisModal extends Modal {
     }
 
     public void showTextComparison(ArchiveComparison comparison) {
+        LocalizationService i18n = LocalizationService.getInstance();
         TextComparisonResult result = comparison.textResult();
 
-        Label title = new Label("Text comparison");
+        Label title = new Label(i18n.get("textComparison"));
         title.getStyleClass().addAll("heading-lg", "archive-modal-title");
         Label texts = new Label(comparison.title());
         texts.getStyleClass().add("text-muted");
         texts.setWrapText(true);
         VBox content = new VBox(20, new VBox(8, title, texts));
 
-        Label summaryTitle = new Label("Similarity");
+        Label summaryTitle = new Label(i18n.get("archive.similarity"));
         summaryTitle.getStyleClass().addAll("heading-md", "archive-modal-section-title");
-        GridPane summaryTable = createTable("Statistic", "Value");
+        GridPane summaryTable = createTable(i18n.get("archive.statistic"), i18n.get("archive.value"));
         double score = result.similarityScore();
-        addTableRow(summaryTable, 1, "Similarity index", Math.round(score) + "%");
-        addTableRow(summaryTable, 2, "Correlation", result.similarityAmount());
+        addTableRow(summaryTable, 1, i18n.get("archive.similarityIndex"), Math.round(score) + "%");
+        addTableRow(summaryTable, 2, i18n.get("archive.correlation"), result.similarityAmount());
         VBox summary = new VBox(16, summaryTitle, summaryTable);
 
-        Label wordsTitle = new Label("Most frequent shared words");
+        Label wordsTitle = new Label(i18n.get("archive.mostFrequentSharedWords"));
         wordsTitle.getStyleClass().addAll("heading-md", "archive-modal-section-title");
-        GridPane wordsTable = createTable("Word", "Doc A · Doc B");
+        GridPane wordsTable = createTable(i18n.get("archive.word"), i18n.get("archive.documentsHeader"));
         int row = 1;
         for (TextComparisonResult.TextComparisonRow word : result.commonWords()) {
             addTableCell(wordsTable, 0, row, capitalize(word.word()), "archive-table-cell");
@@ -129,18 +133,18 @@ public class ArchiveAnalysisModal extends Modal {
         }
         VBox sharedWords = new VBox(16, wordsTitle, wordsTable);
 
-        Label paragraphsTitle = new Label("Key paragraphs");
+        Label paragraphsTitle = new Label(i18n.get("archive.keyParagraphs"));
         paragraphsTitle.getStyleClass().addAll("heading-md", "archive-modal-section-title");
         VBox paragraphs = new VBox(12);
         List<TextComparisonResult.ParagraphMatch> matches = result.similarParagraphs();
         for (int index = 0; index < matches.size(); index++) {
             TextComparisonResult.ParagraphMatch match = matches.get(index);
-            Label score1 = new Label(String.format("Similarity score: %.0f%%", match.scorePercent()));
+            Label score1 = new Label(i18n.get("archive.similarityScore").replace("{score}", String.format("%.0f", match.scorePercent())));
             score1.getStyleClass().add("heading-sm");
             paragraphs.getChildren().addAll(
                     score1,
-                    snippetLabel("Doc A", match.first()),
-                    snippetLabel("Doc B", match.second()));
+                    snippetLabel(i18n.get("archive.documentA"), match.first()),
+                    snippetLabel(i18n.get("archive.documentB"), match.second()));
 
             if (index < matches.size() - 1) {
                 Separator divider = new Separator();
@@ -155,20 +159,21 @@ public class ArchiveAnalysisModal extends Modal {
     }
 
     public void showTermComparison(ArchiveComparison comparison) {
+        LocalizationService i18n = LocalizationService.getInstance();
         TermComparisonResult result = comparison.termResult();
 
-        Label title = new Label("Term comparison");
+        Label title = new Label(i18n.get("termComparison"));
         title.getStyleClass().addAll("heading-lg", "archive-modal-title");
-        Label comparedTermLabel = new Label("Compared term");
+        Label comparedTermLabel = new Label(i18n.get("archive.comparedTerm"));
         comparedTermLabel.getStyleClass().add("text-muted");
         Label term = new Label(comparison.term());
         term.getStyleClass().add("archive-modal-term");
         VBox comparedTerm = new VBox(2, comparedTermLabel, term);
         VBox content = new VBox(20, new VBox(16, title, comparedTerm));
 
-        Label occurrencesTitle = new Label("Occurrences per text");
+        Label occurrencesTitle = new Label(i18n.get("archive.occurrencesPerText"));
         occurrencesTitle.getStyleClass().addAll("heading-md", "archive-modal-section-title");
-        GridPane table = createTable("Text", "Occurrences");
+        GridPane table = createTable(i18n.get("archive.text"), i18n.get("archive.occurrences"));
         int row = 1;
         for (TermComparisonResult.TermTextOccurrence occurrence : result.occurrencesPerText()) {
             addTableCell(table, 0, row, occurrence.textTitle(), "archive-table-cell");
@@ -184,9 +189,10 @@ public class ArchiveAnalysisModal extends Modal {
     }
 
     private Label snippetLabel(String documentName, TextComparisonResult.ParagraphSnippet snippet) {
-        String page = snippet.page() == null ? "" : "Page " + snippet.page() + " · ";
-        Label label = new Label(documentName + " · " + page + "Para " + snippet.paragraphIndex()
-                + ": " + truncate(snippet.text()));
+        LocalizationService i18n = LocalizationService.getInstance();
+        String page = snippet.page() == null ? "" : i18n.get("archive.page").replace("{page}", String.valueOf(snippet.page())) + " · ";
+        Label label = new Label(documentName + " · " + page + i18n.get("archive.paragraph").replace("{paragraph}", String.valueOf(snippet.paragraphIndex()))
+                + " " + truncate(snippet.text()));
         label.getStyleClass().add("archive-fragment");
         label.setWrapText(true);
         return label;
@@ -251,7 +257,8 @@ public class ArchiveAnalysisModal extends Modal {
     }
 
     private GridPane createWordsTable(List<WordFrequency> words, boolean italicWords) {
-        GridPane table = createTable("Word", "Count");
+        LocalizationService i18n = LocalizationService.getInstance();
+        GridPane table = createTable(i18n.get("archive.word"), i18n.get("archive.count"));
         int row = 1;
 
         for (WordFrequency word : words) {

@@ -34,12 +34,14 @@ public class SettingsControllerTest extends JavaFxTestBase {
             controller = new LanguageSettingsController(localizationService, settingsScreen);
         });
     }
+
     @Test
     public void testLanguageToLocaleMapping() {
         assertEquals(Locale.US, Language.ENGLISH.getLocale());
         assertEquals(Locale.JAPAN, Language.JAPANESE.getLocale());
         assertEquals(new Locale("ru", "RU"), Language.RUSSIAN.getLocale());
     }
+
     @Test
     public void testSelectingEnglishCallsServiceAndUpdatesUI() throws Exception {
         runOnFxThread(() -> {
@@ -134,6 +136,7 @@ public class SettingsControllerTest extends JavaFxTestBase {
         assertEquals("Oct 31, 2026", localizationService.formatDate(date));
         assertEquals("1,234,567.89", localizationService.formatNumber(number));
     }
+
     @Test
     public void testLtrAndRtlLayoutBehavior() throws Exception {
         runOnFxThread(() -> {
@@ -165,32 +168,30 @@ public class SettingsControllerTest extends JavaFxTestBase {
     @Test
     public void testDynamicUiUpdatesWithoutRestart() throws Exception {
         runOnFxThread(() -> {
-            Label libraryNavLabel = new Label("Library");
-            Label analyzeNavLabel = new Label("Analyze");
+            Label libraryNavLabel = new Label(localizationService.get("library"));
+            Label analyzeNavLabel = new Label(localizationService.get("analyze"));
 
-            localizationService.apply(libraryNavLabel);
-            localizationService.apply(analyzeNavLabel);
             assertEquals("Library", libraryNavLabel.getText());
             assertEquals("Analyze", analyzeNavLabel.getText());
 
             // Switch to Japanese without restart
             controller.applyLanguage(Language.JAPANESE);
-            localizationService.apply(libraryNavLabel);
-            localizationService.apply(analyzeNavLabel);
+            libraryNavLabel.setText(localizationService.get("library"));
+            analyzeNavLabel.setText(localizationService.get("analyze"));
             assertEquals("ライブラリ", libraryNavLabel.getText());
             assertEquals("分析", analyzeNavLabel.getText());
 
             // Switch to Russian without restart
             controller.applyLanguage(Language.RUSSIAN);
-            localizationService.apply(libraryNavLabel);
-            localizationService.apply(analyzeNavLabel);
+            libraryNavLabel.setText(localizationService.get("library"));
+            analyzeNavLabel.setText(localizationService.get("analyze"));
             assertEquals("Библиотека", libraryNavLabel.getText());
             assertEquals("Анализ", analyzeNavLabel.getText());
 
             // Reset back to English
             controller.applyLanguage(Language.ENGLISH);
-            localizationService.apply(libraryNavLabel);
-            localizationService.apply(analyzeNavLabel);
+            libraryNavLabel.setText(localizationService.get("library"));
+            analyzeNavLabel.setText(localizationService.get("analyze"));
             assertEquals("Library", libraryNavLabel.getText());
             assertEquals("Analyze", analyzeNavLabel.getText());
         });

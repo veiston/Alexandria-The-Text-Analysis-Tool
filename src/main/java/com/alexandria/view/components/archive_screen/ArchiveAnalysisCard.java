@@ -3,6 +3,7 @@ package com.alexandria.view.components.archive_screen;
 import com.alexandria.model.ArchiveComparison;
 import com.alexandria.model.ArchiveTermAnalysis;
 import com.alexandria.model.ArchiveTextAnalysis;
+import com.alexandria.service.LocalizationService;
 import com.alexandria.view.components.shared.Card;
 
 import javafx.scene.control.Button;
@@ -16,22 +17,24 @@ public class ArchiveAnalysisCard extends Card {
 
     public ArchiveAnalysisCard(ArchiveTextAnalysis analysis) {
         super(titleText(analysis.getProjectTitle(), analysis.getSourceFileName()));
+        LocalizationService i18n = LocalizationService.getInstance();
 
-        setTypeText("Text analysis");
+        setTypeText(i18n.get("textAnalysis"));
         setSourceText(analysis.getSourceFileName());
-        setFooterText("Saved " + formatDate(analysis.getCreatedAt()));
-        setActionText("Open");
+        setFooterText(i18n.get("archive.saved").replace("{date}", formatDate(analysis.getCreatedAt())));
+        setActionText(i18n.get("open"));
     }
 
     public ArchiveAnalysisCard(ArchiveTermAnalysis analysis) {
         super(titleText(analysis.getProjectTitle(), analysis.getSourceFileName()));
+        LocalizationService i18n = LocalizationService.getInstance();
 
-        setTypeText("Term analysis");
+        setTypeText(i18n.get("termAnalysis"));
         setSourceText(analysis.getSourceFileName());
-        setFooterText("Saved " + formatDate(analysis.getCreatedAt()));
-        setActionText("Open");
+        setFooterText(i18n.get("archive.saved").replace("{date}", formatDate(analysis.getCreatedAt())));
+        setActionText(i18n.get("open"));
 
-        Label termLabel = new Label("Term: " + analysis.getTerm());
+        Label termLabel = new Label(i18n.get("archive.term").replace("{term}", analysis.getTerm()));
         termLabel.getStyleClass().add("archive-term-preview");
         termLabel.setWrapText(true);
         setExtraContent(termLabel);
@@ -39,15 +42,16 @@ public class ArchiveAnalysisCard extends Card {
 
     public ArchiveAnalysisCard(ArchiveComparison comparison) {
         super(titleText(comparison.title(), comparison.sources()));
+        LocalizationService i18n = LocalizationService.getInstance();
 
         boolean termComparison = comparison.term() != null;
-        setTypeText(termComparison ? "Term comparison" : "Text comparison");
+        setTypeText(termComparison ? i18n.get("termComparison") : i18n.get("textComparison"));
         setSourceText(comparison.sources());
-        setFooterText("Saved " + formatDate(comparison.createdAt()));
-        setActionText("Open");
+        setFooterText(i18n.get("archive.saved").replace("{date}", formatDate(comparison.createdAt())));
+        setActionText(i18n.get("open"));
 
         if (termComparison) {
-            Label termLabel = new Label("Term: " + comparison.term());
+            Label termLabel = new Label(i18n.get("archive.term").replace("{term}", comparison.term()));
             termLabel.getStyleClass().add("archive-term-preview");
             termLabel.setWrapText(true);
             setExtraContent(termLabel);
@@ -66,6 +70,7 @@ public class ArchiveAnalysisCard extends Card {
     }
 
     private static String formatDate(LocalDateTime date) {
-        return date == null ? "unknown date" : DATE_FORMAT.format(date);
+        LocalizationService i18n = LocalizationService.getInstance();
+        return date == null ? i18n.get("archive.unknownDate") : DATE_FORMAT.format(date);
     }
 }

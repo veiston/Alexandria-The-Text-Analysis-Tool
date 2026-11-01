@@ -1,12 +1,12 @@
 package com.alexandria.view.components.library_screen;
 
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import com.alexandria.model.Text;
+import com.alexandria.service.LocalizationService;
 import com.alexandria.view.components.shared.Card;
 import com.alexandria.view.components.shared.EmptyState;
 
@@ -20,8 +20,6 @@ import javafx.scene.layout.VBox;
 
 public class ComparisonTextModal extends VBox {
 
-    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("d.MM.uuuu");
-
     private final Label title = new Label();
     private final VBox selection = new VBox(16);
     private Text firstText;
@@ -30,6 +28,7 @@ public class ComparisonTextModal extends VBox {
     private Runnable onCancel = () -> {};
 
     public ComparisonTextModal() {
+        LocalizationService i18n = LocalizationService.getInstance();
         getStyleClass().add("modal-card");
         setSpacing(16);
         setPadding(new Insets(24));
@@ -37,15 +36,15 @@ public class ComparisonTextModal extends VBox {
         setPrefHeight(600);
 
         title.getStyleClass().add("heading-lg");
-        Label subtitle = new Label("Choose a second text from your library");
+        Label subtitle = new Label(i18n.get("library.chooseSecondText"));
         subtitle.getStyleClass().add("text-muted");
 
-        Button cancelButton = new Button("Cancel");
+        Button cancelButton = new Button(i18n.get("cancel"));
         cancelButton.getStyleClass().addAll("button", "secondary");
         cancelButton.setMaxWidth(Double.MAX_VALUE);
         cancelButton.setOnAction(e -> onCancel.run());
 
-        Button addNewTextButton = new Button("Add a new text");
+        Button addNewTextButton = new Button(i18n.get("library.addNewText"));
         addNewTextButton.getStyleClass().addAll("button", "primary");
         addNewTextButton.setMaxWidth(Double.MAX_VALUE);
         addNewTextButton.setOnAction(e -> onAddNewText.accept(firstText));
@@ -55,8 +54,9 @@ public class ComparisonTextModal extends VBox {
     }
 
     public void setTexts(Text firstText, List<Text> texts) {
+        LocalizationService i18n = LocalizationService.getInstance();
         this.firstText = firstText;
-        title.setText("Compare \"" + titleText(firstText) + "\" with:");
+        title.setText(i18n.get("library.comparisonTitle").replace("{title}", titleText(firstText)));
 
         FlowPane textCards = new FlowPane(16, 16);
         for (Text secondText : texts) {
@@ -67,8 +67,8 @@ public class ComparisonTextModal extends VBox {
 
         if (textCards.getChildren().isEmpty()) {
             selection.getChildren().setAll(new EmptyState(
-                    "No other texts to compare",
-                    "Add another text to your library first"));
+                    i18n.get("library.noOtherTexts"),
+                    i18n.get("library.addAnotherText")));
             return;
         }
 
@@ -101,6 +101,7 @@ public class ComparisonTextModal extends VBox {
     }
 
     private Card createTextCard(Text firstText, Text secondText) {
+        LocalizationService i18n = LocalizationService.getInstance();
         Card card = new Card(titleText(secondText));
         card.getDeleteButton().setVisible(false);
         card.getDeleteButton().setManaged(false);
@@ -110,10 +111,11 @@ public class ComparisonTextModal extends VBox {
         }
         card.setSourceText(secondText.getFileName());
         if (secondText.getCreatedAt() != null) {
-            card.setFooterText("Added " + DATE_FORMAT.format(secondText.getCreatedAt()));
+            String dateText = i18n.formatDate(secondText.getCreatedAt().toLocalDate());
+            card.setFooterText(i18n.get("added").replace("{date}", dateText));
         }
 
-        card.setActionText("Choose as second text");
+        card.setActionText(i18n.get("library.chooseAsSecondText"));
         card.getActionButton().setOnAction(e -> onCompare.accept(firstText, secondText));
         return card;
     }

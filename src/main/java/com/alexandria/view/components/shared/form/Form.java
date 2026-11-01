@@ -84,6 +84,20 @@ public class Form extends VBox {
         return submitButton;
     }
 
+    public void setFieldLabel(String key, String label) {
+        FormField field = fields.stream().filter(f -> f.key().equals(key)).findFirst().orElse(null);
+        boolean required = field != null && field.required();
+        renderer.setFieldLabel(key, label, required);
+    }
+
+    public void setSubmitLabel(String label) {
+        submitButton.setText(label);
+    }
+
+    public void refreshFileLabels() {
+        renderer.refreshFileLabels();
+    }
+
     public void setValue(String key, String value) {
         renderer.setValue(key, value);
     }

@@ -3,6 +3,7 @@ package com.alexandria.view.components.profile_screen;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import com.alexandria.service.LocalizationService;
 import com.alexandria.view.components.shared.form.Form;
 import com.alexandria.view.components.shared.form.FormField;
 import com.alexandria.view.components.shared.form.validation.EmailValidator;
@@ -15,11 +16,12 @@ public class LoginForm extends VBox {
 
     public LoginForm() {
         getStyleClass().add("login-form");
+        LocalizationService i18n = LocalizationService.getInstance();
 
         form = new Form.Builder()
-                .field("email", "Email", FormField.Type.TEXT, true, new EmailValidator())
-                .field("password", "Password", FormField.Type.PASSWORD, true)
-                .submitLabel("Log In")
+                .field("email", i18n.get("profile.email"), FormField.Type.TEXT, true, new EmailValidator())
+                .field("password", i18n.get("profile.password"), FormField.Type.PASSWORD, true)
+                .submitLabel(i18n.get("profile.logIn"))
                 .build();
 
         // Logins if user presses enter (Readymade listener in Javafx) 
@@ -40,4 +42,3 @@ public class LoginForm extends VBox {
         form.reset();
     }
 }
-

@@ -1,5 +1,7 @@
 package com.alexandria.view.components.compare_screen;
 
+import com.alexandria.service.LocalizationService;
+
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Pos;
@@ -15,16 +17,20 @@ public class SimilarityIndicator extends HBox {
     private static final String MODERATE = "similarity-badge-moderate";
     private static final String LOW = "similarity-badge-low";
 
+    private final Label caption = new Label();
     private final Label percentLabel = new Label("--");
     private final Label levelBadge = new Label();
     private final DoubleProperty fraction = new SimpleDoubleProperty(0);
 
+    private Double currentPercent;
+    private String currentSimilarityAmount;
+
     public SimilarityIndicator() {
+        LocalizationService i18n = LocalizationService.getInstance();
         getStyleClass().add("similarity-indicator");
         setAlignment(Pos.CENTER_LEFT);
         setSpacing(12);
 
-        Label caption = new Label("Similarity Index:");
         caption.getStyleClass().add("heading-md");
 
         percentLabel.getStyleClass().add("similarity-percent");
@@ -46,15 +52,28 @@ public class SimilarityIndicator extends HBox {
 
         getChildren().addAll(caption, new VBox(4, valueRow, track));
 
+        refreshText();
         clear();
     }
 
+    public void refreshText() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        caption.setText(i18n.get("compare.similarityIndex"));
+        if (currentPercent != null) {
+            setSimilarity(currentPercent, currentSimilarityAmount);
+        }
+    }
+
     public void setSimilarity(Double percent, String similarityAmount) {
+        this.currentPercent = percent;
+        this.currentSimilarityAmount = similarityAmount;
+
         if (percent == null || percent.isNaN()) {
             clear();
             return;
         }
 
+        LocalizationService i18n = LocalizationService.getInstance();
         double value = Math.max(0, Math.min(100, percent));
 
         percentLabel.setText(Math.round(value) + "%");
@@ -63,13 +82,13 @@ public class SimilarityIndicator extends HBox {
         levelBadge.getStyleClass().removeAll(HIGH, MODERATE, LOW);
 
         if ("High".equalsIgnoreCase(similarityAmount)) {
-            levelBadge.setText("HIGH CORRELATION");
+            levelBadge.setText(i18n.get("compare.highCorrelation"));
             levelBadge.getStyleClass().add(HIGH);
         } else if ("Moderate".equalsIgnoreCase(similarityAmount)) {
-            levelBadge.setText("MODERATE CORRELATION");
+            levelBadge.setText(i18n.get("compare.moderateCorrelation"));
             levelBadge.getStyleClass().add(MODERATE);
         } else if ("Low".equalsIgnoreCase(similarityAmount)) {
-            levelBadge.setText("LOW CORRELATION");
+            levelBadge.setText(i18n.get("compare.lowCorrelation"));
             levelBadge.getStyleClass().add(LOW);
         } else {
             levelBadge.setVisible(false);
@@ -82,6 +101,8 @@ public class SimilarityIndicator extends HBox {
     }
 
     public void clear() {
+        currentPercent = null;
+        currentSimilarityAmount = null;
         percentLabel.setText("--");
         fraction.set(0);
         levelBadge.setVisible(false);

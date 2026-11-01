@@ -2,6 +2,7 @@ package com.alexandria.view.screens;
 
 import com.alexandria.model.FileType;
 import com.alexandria.model.Quotation;
+import com.alexandria.service.LocalizationService;
 import com.alexandria.view.components.shared.quotation.QuotationLocation;
 import com.alexandria.service.analysis.SearchMatch;
 import com.alexandria.service.analysis.SearchSettings;
@@ -43,11 +44,17 @@ public class AnalyseScreen extends StackPane {
     private final QuotationsView quotationsView = new QuotationsView();
     private final TermDetailModal termDetailModal = new TermDetailModal();
     private final Modal modal = new Modal();
+    private final Label emptyTitle = new Label();
+    private final Label emptySubtitle = new Label();
     private final VBox emptyState = buildEmptyState();
     private final BorderPane loadedState = new BorderPane();
     private final StackPane centerSwitcher = new StackPane();
     private final ScrollPane sidebarScroll = new ScrollPane();
     private final SuccessToast successToast = new SuccessToast();
+
+    private String currentProjectTitle;
+    private String currentFileName;
+    private int currentPageCount;
 
     private String activeSearchTerm;
     private List<SearchMatch> currentSearchMatches = List.of();
@@ -85,6 +92,24 @@ public class AnalyseScreen extends StackPane {
         loadedState.setVisible(false);
         loadedState.setManaged(false);
         wireCallbacks();
+        refreshText();
+        LocalizationService.getInstance().addListener(locale -> refreshText());
+    }
+
+    public void refreshText() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        emptyTitle.setText(i18n.get("analyse.noDocumentOpen"));
+        emptySubtitle.setText(i18n.get("analyse.emptySubtitle"));
+        header.refreshText();
+        searchView.refreshText();
+        textTermFrequencyPanel.refreshText();
+        textContextPanel.refreshText();
+        if (currentProjectTitle != null) {
+            String pagesText = currentPageCount > 0
+                    ? " · " + i18n.get("analyse.pages").replace("{count}", String.valueOf(currentPageCount))
+                    : "";
+            header.setTitle(currentProjectTitle, currentFileName + pagesText);
+        }
     }
 
     private HBox buildBody() {
@@ -172,11 +197,9 @@ public class AnalyseScreen extends StackPane {
     }
 
     private VBox buildEmptyState() {
-        Label title = new Label("No document open");
-        title.getStyleClass().add("heading-lg");
-        Label subtitle = new Label("Start a new project or open one from your Library to begin analysing.");
-        subtitle.getStyleClass().add("text-muted");
-        VBox box = new VBox(8, title, subtitle);
+        emptyTitle.getStyleClass().add("heading-lg");
+        emptySubtitle.getStyleClass().add("text-muted");
+        VBox box = new VBox(8, emptyTitle, emptySubtitle);
         box.getStyleClass().add("analyse-empty-state");
         box.setAlignment(Pos.CENTER);
         return box;
@@ -185,8 +208,13 @@ public class AnalyseScreen extends StackPane {
     public void loadDocument(String projectTitle, String fileName, String content,
             FileType fileType, Path sourcePath, List<Integer> pageOffsets) {
 
-        boolean hasPages = pageOffsets != null && !pageOffsets.isEmpty();
-        header.setTitle(projectTitle, fileName + (hasPages ? " · " + pageOffsets.size() + " Pages" : ""));
+        this.currentProjectTitle = projectTitle;
+        this.currentFileName = fileName;
+        this.currentPageCount = (pageOffsets != null && !pageOffsets.isEmpty()) ? pageOffsets.size() : 0;
+
+        LocalizationService i18n = LocalizationService.getInstance();
+        String pagesText = currentPageCount > 0 ? " · " + i18n.get("analyse.pages").replace("{count}", String.valueOf(currentPageCount)) : "";
+        header.setTitle(projectTitle, fileName + pagesText);
         header.resetToReader();
         documentView.loadDocument(content, fileType, sourcePath);
         resetSearchState();
@@ -206,6 +234,9 @@ public class AnalyseScreen extends StackPane {
     }
 
     public void clearAnalysis() {
+        this.currentProjectTitle = null;
+        this.currentFileName = null;
+        this.currentPageCount = 0;
         modal.hide();
         documentView.dispose();
         loadedState.setVisible(false);
@@ -216,7 +247,8 @@ public class AnalyseScreen extends StackPane {
     }
 
     public void showSaved(int savedCount) {
-        successToast.show(savedCount > 0 ? "Analysis saved" : "Analysis already saved");
+        LocalizationService i18n = LocalizationService.getInstance();
+        successToast.show(savedCount > 0 ? i18n.get("analyse.analysisSaved") : i18n.get("analyse.analysisAlreadySaved"));
     }
 
     private static <T> Consumer<T> orNoop(Consumer<T> handler) {
@@ -356,7 +388,7 @@ public class AnalyseScreen extends StackPane {
             return;
         showDocument();
         documentView.goToPage(
-                QuotationLocation.parsePage(quotation.getLocation()),
-                QuotationLocation.parseStartOffset(quotation.getLocation()));
+            QuotationLocation.parsePage(quotation.getLocation()),
+            QuotationLocation.parseStartOffset(quotation.getLocation()));
     }
 }

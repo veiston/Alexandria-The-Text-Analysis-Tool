@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 
 import javafx.scene.layout.VBox;
 
+import com.alexandria.service.LocalizationService;
 import com.alexandria.view.components.shared.form.Form;
 import com.alexandria.view.components.shared.form.FormField;
 import com.alexandria.view.components.shared.form.validation.EmailValidator;
@@ -18,14 +19,15 @@ public class RegisterForm extends VBox {
 
     public RegisterForm() {
         getStyleClass().add("register-form");
+        LocalizationService i18n = LocalizationService.getInstance();
 
         form = new Form.Builder()
-                .field("name", "Username", FormField.Type.TEXT, true, new TextValidator())
-                .field("email", "Email", FormField.Type.TEXT, true, new EmailValidator())
-                .field("password", "Password", FormField.Type.PASSWORD, true, new PasswordValidator())
-                .field("organization", "Organization", FormField.Type.TEXT, false, new TextValidator())
-                .field("photo", "Profile Photo", FormField.Type.IMG_FILE, false, new FileValidator())
-                .submitLabel("Create Account")
+                .field("name", i18n.get("profile.username"), FormField.Type.TEXT, true, new TextValidator())
+                .field("email", i18n.get("profile.email"), FormField.Type.TEXT, true, new EmailValidator())
+                .field("password", i18n.get("profile.password"), FormField.Type.PASSWORD, true, new PasswordValidator())
+                .field("organization", i18n.get("profile.organization"), FormField.Type.TEXT, false, new TextValidator())
+                .field("photo", i18n.get("profile.photo"), FormField.Type.IMG_FILE, false, new FileValidator())
+                .submitLabel(i18n.get("profile.createAccount"))
                 .build();
 
         form.getSubmitButton().setDefaultButton(true);

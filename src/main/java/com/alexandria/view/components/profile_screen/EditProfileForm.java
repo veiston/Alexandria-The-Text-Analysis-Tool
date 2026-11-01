@@ -8,6 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
 import com.alexandria.model.User;
+import com.alexandria.service.LocalizationService;
 import com.alexandria.view.components.shared.form.Form;
 import com.alexandria.view.components.shared.form.FormField;
 import com.alexandria.view.components.shared.form.validation.EmailValidator;
@@ -27,20 +28,21 @@ public class EditProfileForm extends VBox {
         setMaxWidth(MAX_WIDTH);
         setPrefWidth(420);
 
-        Label title = new Label("Edit Profile");
+        LocalizationService i18n = LocalizationService.getInstance();
+        Label title = new Label(i18n.get("profile.edit"));
         title.getStyleClass().add("heading-lg");
 
         form = new Form.Builder()
-                .field("name", "Username", FormField.Type.TEXT, false, new TextValidator())
-                .field("email", "Email", FormField.Type.TEXT, false, new EmailValidator())
-                .field("organization", "Organization", FormField.Type.TEXT, false, new TextValidator())
-                .field("photo", "Profile Photo", FormField.Type.IMG_FILE, false, new FileValidator())
-                .submitLabel("Save Changes")
+                .field("name", i18n.get("profile.username"), FormField.Type.TEXT, false, new TextValidator())
+                .field("email", i18n.get("profile.email"), FormField.Type.TEXT, false, new EmailValidator())
+                .field("organization", i18n.get("profile.organization"), FormField.Type.TEXT, false, new TextValidator())
+                .field("photo", i18n.get("profile.photo"), FormField.Type.IMG_FILE, false, new FileValidator())
+                .submitLabel(i18n.get("profile.saveChanges"))
                 .customValidator(values -> {
                     boolean anyFilled = values.values().stream()
                             .anyMatch(v -> v != null && !v.isBlank());
 
-                    return anyFilled ? null : "Change at least one field.";
+                    return anyFilled ? null : LocalizationService.getInstance().get("vm.changeAtLeastOneField");
                 })
                 .build();
 

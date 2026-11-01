@@ -7,6 +7,7 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
+import com.alexandria.service.LocalizationService;
 import com.alexandria.view.components.shared.toggle.Toggle;
 
 public class AuthView extends VBox {
@@ -14,22 +15,24 @@ public class AuthView extends VBox {
     private final RegisterForm registerForm;
     private final Toggle toggle;
     private final VBox formHost;
+    private final Label title = new Label();
+
     private Consumer<Map<String, String>> onLogin = values -> {
     };
     private Consumer<Map<String, String>> onRegister = values -> {
     };
 
     public AuthView() {
+        LocalizationService i18n = LocalizationService.getInstance();
         getStyleClass().add("auth-view");
         getStyleClass().add("modal-card");
         setPrefWidth(420);
         setSpacing(20);
         setPadding(new Insets(24));
 
-        Label title = new Label("Welcome to Alexandria");
         title.getStyleClass().add("heading-lg");
 
-        toggle = new Toggle("Log In", "Create Account");
+        toggle = new Toggle(i18n.get("profile.logIn"), i18n.get("profile.createAccount"));
 
         formHost = new VBox();
         loginForm = new LoginForm();
@@ -47,6 +50,15 @@ public class AuthView extends VBox {
         });
 
         getChildren().addAll(title, toggle, formHost);
+
+        refreshText();
+        LocalizationService.getInstance().addListener(locale -> refreshText());
+    }
+
+    public void refreshText() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        title.setText(i18n.get("profile.welcome"));
+        toggle.setLabels(i18n.get("profile.logIn"), i18n.get("profile.createAccount"));
     }
 
     private void showLogin() {

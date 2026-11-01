@@ -50,6 +50,9 @@ public class MainController {
         userDAO = new UserDAO();
         restoreSession();
 
+        LocalizationService localizationService = LocalizationService.getInstance();
+        localizationService.setLocale(com.alexandria.utils.LanguageSettings.getLanguage().getLocale());
+
         mainView = new MainView();
 
         analyseController = new AnalyseController(
@@ -65,7 +68,7 @@ public class MainController {
         configureProject();
         configureUserGuideTour();
 
-        LocalizationService.getInstance().apply(mainView);
+        localizationService.apply(mainView);
         openInitialRoute();
     }
 
@@ -98,7 +101,10 @@ public class MainController {
         SettingsScreen settingsScreen = (SettingsScreen) Route.SETTINGS.createScreen();
         LocalizationService localizationService = LocalizationService.getInstance();
         new LanguageSettingsController(localizationService, settingsScreen);
-        localizationService.addListener(locale -> localizationService.apply(mainView));
+        localizationService.addListener(locale -> {
+            mainView.refreshText();
+            localizationService.apply(mainView);
+        });
     }
 
     private ArchiveController configureArchive() {

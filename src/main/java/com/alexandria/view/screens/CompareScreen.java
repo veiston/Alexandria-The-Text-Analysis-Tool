@@ -2,6 +2,7 @@ package com.alexandria.view.screens;
 
 import com.alexandria.model.FileType;
 import com.alexandria.model.Text;
+import com.alexandria.service.LocalizationService;
 import com.alexandria.view.components.compare_screen.CompareHeader;
 import com.alexandria.view.components.compare_screen.ComparisonDocumentView;
 import com.alexandria.view.components.compare_screen.ComparisonSidePanel;
@@ -36,6 +37,8 @@ public class CompareScreen extends StackPane {
     private final ScrollPane sidebarScroll = new ScrollPane(comparisonSidePanel);
     private final SuccessToast successToast = new SuccessToast();
 
+    private final Label emptyTitle = new Label();
+    private final Label emptySubtitle = new Label();
     private final VBox emptyState = buildEmptyState();
     private final BorderPane loadedState = new BorderPane();
     private final StackPane centerSwitcher = new StackPane();
@@ -77,6 +80,17 @@ public class CompareScreen extends StackPane {
         loadedState.setManaged(false);
 
         wireCallbacks();
+        refreshText();
+        LocalizationService.getInstance().addListener(locale -> refreshText());
+    }
+
+    public void refreshText() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        emptyTitle.setText(i18n.get("compare.noDocumentsSelected"));
+        emptySubtitle.setText(i18n.get("compare.emptySubtitle"));
+        header.refreshText();
+        comparisonSidePanel.refreshText();
+        documentView.refreshText();
     }
 
     private static final double SIDE_PANEL_WIDTH_RATIO = 0.360;
@@ -125,13 +139,10 @@ public class CompareScreen extends StackPane {
     }
 
     private VBox buildEmptyState() {
-        Label title = new Label("No documents selected");
-        title.getStyleClass().add("heading-lg");
+        emptyTitle.getStyleClass().add("heading-lg");
+        emptySubtitle.getStyleClass().add("text-muted");
 
-        Label subtitle = new Label("Select two documents to compare them.");
-        subtitle.getStyleClass().add("text-muted");
-
-        VBox box = new VBox(8, title, subtitle);
+        VBox box = new VBox(8, emptyTitle, emptySubtitle);
         box.getStyleClass().add("empty-state");
         box.setAlignment(Pos.CENTER);
         return box;
@@ -189,20 +200,17 @@ public class CompareScreen extends StackPane {
         if (result == null) {
             return;
         }
-        header.setSimilarity(result.similarityScore(), result.similarityAmount());
-        comparisonSidePanel.setTextComparison(result);
-    }
 
+        header.setSimilarity(result.similarityScore(), result.similarityAmount());
+        comparisonSidePanel.setResults(result);
+    }
     /**
      * Terms currently in the tracked list (each term once, even though it has a Doc
      * A and a Doc B row).
      */
     public List<String> getTrackedSearchTerms() {
-        LinkedHashSet<String> terms = new LinkedHashSet<>();
-        for (TrackedSearch tracked : trackedSearches.values()) {
-            terms.add(tracked.term());
-        }
-        return List.copyOf(terms);
+        return List.copyOf(new LinkedHashSet<>(
+                trackedSearches.values().stream().map(TrackedSearch::term).toList()));
     }
 
     /**
@@ -210,10 +218,15 @@ public class CompareScreen extends StackPane {
      * saved terms.
      */
     public void showSaved(int savedCount) {
+        LocalizationService i18n = LocalizationService.getInstance();
         int terms = Math.max(0, savedCount - 1);
-        successToast.show(terms == 0
-                ? "Comparison saved"
-                : "Comparison and " + terms + (terms == 1 ? " term" : " terms") + " saved");
+        if (terms == 0) {
+            successToast.show(i18n.get("compare.saved"));
+        } else if (terms == 1) {
+            successToast.show(i18n.get("compare.oneTermSaved"));
+        } else {
+            successToast.show(i18n.get("compare.termsSaved").replace("{count}", String.valueOf(terms)));
+        }
     }
 
     private void searchFor(String term) {
@@ -251,7 +264,9 @@ public class CompareScreen extends StackPane {
     }
 
     private static String trackedKey(String term, boolean first) {
-        return (first ? "Doc A · " : "Doc B · ") + term;
+        LocalizationService i18n = LocalizationService.getInstance();
+        String docLabel = first ? i18n.get("compare.documentAName") : i18n.get("compare.documentBName");
+        return docLabel + " · " + term;
     }
 
     private void beginSearch(String term) {

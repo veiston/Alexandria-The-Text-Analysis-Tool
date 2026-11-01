@@ -1,11 +1,11 @@
 package com.alexandria.view.components.analyse_screen.text_term_analyze;
 
+import com.alexandria.service.LocalizationService;
 import com.alexandria.service.analysis.TextFragment;
 import com.alexandria.view.components.shared.ContextMatchCard;
 import com.alexandria.view.components.shared.PassagePreview;
 
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
@@ -16,7 +16,9 @@ public class TextContextPanel extends VBox {
     private static final int SNIPPET_CHAR_BUDGET = 180;
 
     private final VBox cardsHost = new VBox(10);
-    private final Label emptyLabel = new Label("Open a document to see relevant paragraphs.");
+    private final Label emptyLabel = new Label();
+    private final Label heading = new Label();
+    private List<TextFragment> currentFragments = List.of();
     private Consumer<TextFragment> onJump = fragment -> {
     };
 
@@ -25,22 +27,32 @@ public class TextContextPanel extends VBox {
         setSpacing(12);
         setPadding(new Insets(16));
 
-        Label heading = new Label("Key Paragraphs");
         heading.getStyleClass().add("heading-sm");
         emptyLabel.getStyleClass().add("text-muted");
 
         getChildren().addAll(heading, cardsHost);
-        showEmpty();
+
+        refreshText();
+        LocalizationService.getInstance().addListener(locale -> refreshText());
+    }
+
+    public void refreshText() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        heading.setText(i18n.get("analyse.keyParagraphs"));
+        emptyLabel.setText(i18n.get("analyse.noDocumentRelevantParagraphs"));
+        setResults(currentFragments);
     }
 
     public void setResults(List<TextFragment> fragments) {
+        this.currentFragments = fragments == null ? List.of() : List.copyOf(fragments);
         cardsHost.getChildren().clear();
-        if (fragments == null || fragments.isEmpty()) {
+        if (currentFragments.isEmpty()) {
             showEmpty();
             return;
         }
-        for (int i = 0; i < fragments.size(); i++)
-            cardsHost.getChildren().add(buildCard(i + 1, fragments.get(i)));
+        for (int i = 0; i < currentFragments.size(); i++) {
+            cardsHost.getChildren().add(buildCard(i + 1, currentFragments.get(i)));
+        }
     }
 
     private VBox buildCard(int rank, TextFragment fragment) {
@@ -61,12 +73,18 @@ public class TextContextPanel extends VBox {
     }
 
     private static String formatPageLabel(Integer page, Integer paragraph) {
-        if (page != null && paragraph != null)
-            return "Page " + page + " · Para " + paragraph;
-        if (page != null)
-            return "Page " + page;
-        if (paragraph != null)
-            return "Para " + paragraph;
+        LocalizationService i18n = LocalizationService.getInstance();
+        if (page != null && paragraph != null) {
+            return i18n.get("analyse.pageAndParagraph")
+                    .replace("{page}", String.valueOf(page))
+                    .replace("{paragraph}", String.valueOf(paragraph));
+        }
+        if (page != null) {
+            return i18n.get("analyse.page").replace("{page}", String.valueOf(page));
+        }
+        if (paragraph != null) {
+            return i18n.get("analyse.paragraph").replace("{paragraph}", String.valueOf(paragraph));
+        }
         return "";
     }
 

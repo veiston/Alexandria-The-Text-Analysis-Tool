@@ -1,65 +1,94 @@
 package com.alexandria.view.components.user_guide;
 
 import java.util.List;
+import com.alexandria.service.LocalizationService;
 
 public final class UserGuideData {
 
-    public static final List<String> ABOUT_PARAGRAPHS = List.of(
-            "Alexandria is an application for working with texts.",
-            "You can add your own text or upload a TXT or PDF file. Alexandria can search for the words "
-                    + "and phrases you need, count words and sentences, show which words are used most often, "
-                    + "analyze a specific word or phrase, and compare several texts.",
-            "You can also save your texts, analysis results, comparisons, search results, and quotations to your account.");
+    public static List<String> getAboutParagraphs() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        return List.of(
+                i18n.get("userGuide.about1"),
+                i18n.get("userGuide.about2"),
+                i18n.get("userGuide.about3"));
+    }
 
-    public static final List<String> NEW_PROJECT_STEPS = List.of(
-            "Click + New Project in the sidebar to add a text.",
-            "Choose Upload File or Paste Text. Only PDF and TXT files are supported.",
-            "Enter the project name.",
-            "Choose where to open your project.\n\n"
-                    + "Analyze lets you explore one text, search for words or phrases, and view its statistics.\n\n"
-                    + "Compare lets you compare word use across several texts.",
-            "Click Create Project. You will be taken to either the Analyze or Compare page, depending on "
-                    + "your selection. Your project will be added to your Library so you can return to it later.");
+    public static List<String> getNewProjectSteps() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        return List.of(
+                i18n.get("userGuide.newProject1"),
+                i18n.get("userGuide.newProject2"),
+                i18n.get("userGuide.newProject3"),
+                i18n.get("userGuide.newProject4"),
+                i18n.get("userGuide.newProject5"));
+    }
 
-    public static final String ANALYZE_INTRODUCTION = "Create a new project and choose Analyze, or open an existing project from Library. Analyze works with one text at a time. Reader is shown on the left, while the panel on the right shows automatically calculated Term Frequency and Key Paragraphs. The selected text remains available in Library, so you can return to the same project later.";
-    public static final List<String> ANALYZE_METHODS = List.of(
-            "Term Frequency: returns the five non-stop words with the highest raw occurrence counts. The fixed stop-word list excludes: the, be, to, of, and, a, in, that, have, i, it, for, not, on, with, he, as, you, do, and at.",
-            "Term analysis: matches a word or phrase without regard to case and reports total occurrences, occurrences per 1,000 words, the number of sentences and paragraphs containing the term, and the five most frequent neighbouring words. Neighbours are counted within five word positions on either side of each match. Stop words are excluded.",
-            "Search Term Frequency: searches the current text for a word or phrase and returns every matching occurrence with its page, when page information is available, and up to 40 characters of surrounding context on each side. Search settings can control case sensitivity and whole-word matching.",
-            "Fuzzy search: performs case-insensitive approximate matching. Queries are limited to 64 characters. Queries shorter than four characters allow no differences, queries of four to seven characters allow one difference, and longer queries allow up to two differences.",
-            "Tracked words list: keeps searched words and phrases with their occurrence counts. It marks the active term in the document, provides term details, and supports navigation to individual occurrences or removal of a tracked term.",
-            "Key Paragraphs: the text is split into sentences. Each sentence receives a score equal to the sum of the overall frequencies of its words. The five highest-scoring sentences are returned with their page and paragraph references.");
+    public static String getAnalyzeIntroduction() {
+        return LocalizationService.getInstance().get("userGuide.analyzeIntroduction");
+    }
 
-    public static final String COMPARE_INTRODUCTION = "Create a new project and choose Compare, or open two projects from Library. Compare displays the documents side by side and calculates results for both texts. Use the Reader to review the documents, or open Quotations to work with quotations saved from either document.";
-    public static final List<String> COMPARE_METHODS = List.of(
-            "Similarity score: compares the word-frequency profiles of the two texts and shows a percentage together with a Low, Moderate, or High similarity label.",
-            "Most frequent shared words: finds words that occur in both texts, ranks them by their combined occurrence count, and shows the count for each document. Select a word to compare it as a term.",
-            "Term comparison: matches a word or phrase without regard to case in each document. For every document, it reports the total number of occurrences and the relative frequency per 1,000 words.",
-            "Search in both texts: searches both documents for a word or phrase and highlights every match. Use the previous and next controls to move through matches across the two documents. The tracked words list keeps searched terms and their total match counts.",
-            "Key paragraphs: compares paragraphs that are at least 50 characters long. A pair is shown when it shares at least three words from the common vocabulary. Up to five non-overlapping pairs with the highest similarity scores are displayed, with page and paragraph references when available.");
+    public static List<String> getAnalyzeMethods() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        return List.of(
+                i18n.get("userGuide.analyzeMethod1"),
+                i18n.get("userGuide.analyzeMethod2"),
+                i18n.get("userGuide.analyzeMethod3"),
+                i18n.get("userGuide.analyzeMethod4"),
+                i18n.get("userGuide.analyzeMethod5"),
+                i18n.get("userGuide.analyzeMethod6"));
+    }
 
-    public static final List<String> LIBRARY_STEPS = List.of(
-            "Open Library to view the texts and projects saved to your account.",
-            "Use the search field to find a text or project.",
-            "Select a project and choose Open with.",
-            "Choose Analyze to work with one text, or Compare to work with several texts.");
+    public static String getCompareIntroduction() {
+        return LocalizationService.getInstance().get("userGuide.compareIntroduction");
+    }
 
-    public static final List<String> ARCHIVE_STEPS = List.of(
-            "Sign in to access your Archive.",
-            "Choose Text analysis, Term analysis, or Text comparisons.",
-            "Use the search field to find saved findings.",
-            "Open a saved result to review it, or remove it when you no longer need it.");
+    public static List<String> getCompareMethods() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        return List.of(
+                i18n.get("userGuide.compareMethod1"),
+                i18n.get("userGuide.compareMethod2"),
+                i18n.get("userGuide.compareMethod3"),
+                i18n.get("userGuide.compareMethod4"),
+                i18n.get("userGuide.compareMethod5"));
+    }
 
-    public static final List<String> PROFILE_STEPS = List.of(
-            "Open Profile from the sidebar.",
-            "Choose Register to create an account, or Log in if you already have one.",
-            "When signed in, update your profile details or change your password.",
-            "Signing in lets you save projects and findings to your account.");
+    public static List<String> getLibrarySteps() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        return List.of(
+                i18n.get("userGuide.library1"),
+                i18n.get("userGuide.library2"),
+                i18n.get("userGuide.library3"),
+                i18n.get("userGuide.library4"));
+    }
 
-    public static final List<String> SETTINGS_STEPS = List.of(
-            "Use the Dark theme switch to choose between the light and dark appearance.",
-            "Turn on Show user tour on next launch to see this guided tour when you next open Alexandria.");
-    public static final String SETTINGS_NOTE = "Language settings are under development and will be available later.";
+    public static List<String> getArchiveSteps() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        return List.of(
+                i18n.get("userGuide.archive1"),
+                i18n.get("userGuide.archive2"),
+                i18n.get("userGuide.archive3"),
+                i18n.get("userGuide.archive4"));
+    }
+
+    public static List<String> getProfileSteps() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        return List.of(
+                i18n.get("userGuide.profile1"),
+                i18n.get("userGuide.profile2"),
+                i18n.get("userGuide.profile3"),
+                i18n.get("userGuide.profile4"));
+    }
+
+    public static List<String> getSettingsSteps() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        return List.of(
+                i18n.get("userGuide.settings1"),
+                i18n.get("userGuide.settings2"));
+    }
+
+    public static String getSettingsNote() {
+        return LocalizationService.getInstance().get("userGuide.settingsNote");
+    }
 
     private UserGuideData() {
     }

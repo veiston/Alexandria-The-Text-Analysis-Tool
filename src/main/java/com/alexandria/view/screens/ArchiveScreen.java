@@ -2,6 +2,7 @@ package com.alexandria.view.screens;
 
 import com.alexandria.model.ArchiveTermAnalysis;
 import com.alexandria.model.ArchiveTextAnalysis;
+import com.alexandria.service.LocalizationService;
 import com.alexandria.view.components.archive_screen.ArchiveAnalysisCard;
 import com.alexandria.view.components.archive_screen.ArchiveAnalysisModal;
 import com.alexandria.model.ArchiveComparison;
@@ -24,14 +25,15 @@ import java.util.function.Consumer;
 
 public class ArchiveScreen extends StackPane {
 
-    private final Toggle analysisFilter = new Toggle(
-            "Text analysis", "Term analysis", "Text comparisons", "Term comparisons");
-    private final SearchInput searchInput = new SearchInput("Search archive...");
+    private final Toggle analysisFilter;
+    private final SearchInput searchInput;
     private final FlowPane analysisCards = new FlowPane(16, 16);
     private final StackPane contentArea = new StackPane();
     private final BorderPane archiveLayout = new BorderPane();
-    private final VBox archiveBody = buildBody();
+    private final VBox archiveBody;
     private final ArchiveAnalysisModal analysisModal = new ArchiveAnalysisModal();
+    private final Label title = new Label();
+    private final Label subtitle = new Label();
 
     private List<ArchiveTextAnalysis> textAnalyses = List.of();
     private List<ArchiveTermAnalysis> termAnalyses = List.of();
@@ -50,6 +52,15 @@ public class ArchiveScreen extends StackPane {
     };
 
     public ArchiveScreen() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        analysisFilter = new Toggle(
+                i18n.get("textAnalysis"),
+                i18n.get("termAnalysis"),
+                i18n.get("textComparison"),
+                i18n.get("termComparison"));
+        searchInput = new SearchInput(i18n.get("archive.search"));
+        archiveBody = buildBody();
+
         getStyleClass().add("content-screen");
         searchInput.setMaxWidth(Double.MAX_VALUE);
 
@@ -64,7 +75,8 @@ public class ArchiveScreen extends StackPane {
         analysisModal.prefHeightProperty().bind(heightProperty());
 
         configureActions();
-        showStatistics();
+        refreshText();
+        LocalizationService.getInstance().addListener(locale -> refreshText());
 
         sceneProperty().addListener((observable, oldScene, newScene) -> {
             if (newScene != null) {
@@ -73,11 +85,22 @@ public class ArchiveScreen extends StackPane {
         });
     }
 
+    public void refreshText() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        title.setText(i18n.get("archive"));
+        subtitle.setText(i18n.get("archive.subtitle"));
+        analysisFilter.setLabels(
+                i18n.get("textAnalysis"),
+                i18n.get("termAnalysis"),
+                i18n.get("textComparison"),
+                i18n.get("termComparison"));
+        searchInput.setPromptText(i18n.get("archive.search"));
+        showStatistics();
+    }
+
     private VBox buildHeader() {
-        Label title = new Label("Archive");
         title.getStyleClass().add("heading-xl");
 
-        Label subtitle = new Label("Saved text, term and comparison analyses");
         subtitle.getStyleClass().add("text-muted");
         subtitle.getStyleClass().add("archive-subtitle");
 
@@ -87,10 +110,10 @@ public class ArchiveScreen extends StackPane {
     }
 
     private VBox buildBody() {
-        VBox archiveBody = new VBox(contentArea);
-        archiveBody.getStyleClass().add("content-screen-body");
+        VBox body = new VBox(contentArea);
+        body.getStyleClass().add("content-screen-body");
         VBox.setVgrow(contentArea, Priority.ALWAYS);
-        return archiveBody;
+        return body;
     }
 
     private void configureActions() {
@@ -144,9 +167,10 @@ public class ArchiveScreen extends StackPane {
     }
 
     public void showSignInMessage() {
+        LocalizationService i18n = LocalizationService.getInstance();
         EmptyState emptyState = new EmptyState(
-                "Sign in to view your archive",
-                "Create an account to save and view text and term analyses here");
+                i18n.get("archive.signInTitle"),
+                i18n.get("archive.signInSubtitle"));
         archiveLayout.setCenter(emptyState);
         BorderPane.setAlignment(emptyState, Pos.CENTER);
     }
@@ -155,6 +179,7 @@ public class ArchiveScreen extends StackPane {
         archiveLayout.setCenter(archiveBody);
 
         analysisCards.getChildren().clear();
+        LocalizationService i18n = LocalizationService.getInstance();
 
         if (analysisFilter.getSelectedIndex() == 0) {
             for (ArchiveTextAnalysis analysis : textAnalyses) {
@@ -164,9 +189,9 @@ public class ArchiveScreen extends StackPane {
                     ArchiveAnalysisCard card = new ArchiveAnalysisCard(analysis);
                     card.getDeleteButton().setOnAction(event -> {
                         if (ConfirmationAlert.show(
-                                "Delete Analysis",
-                                "Delete this analysis?",
-                                "This action is permanent and cannot be undone.")) {
+                                i18n.get("cm.deleteAnalysisTitle"),
+                                i18n.get("cm.deleteAnalysisQuestion"),
+                                i18n.get("cm.permanentActionWarning"))) {
                             onDeleteTextAnalysis.accept(analysis.getId());
                         }
                     });
@@ -185,9 +210,9 @@ public class ArchiveScreen extends StackPane {
                     ArchiveAnalysisCard card = new ArchiveAnalysisCard(analysis);
                     card.getDeleteButton().setOnAction(event -> {
                         if (ConfirmationAlert.show(
-                                "Delete Analysis",
-                                "Delete this analysis?",
-                                "This action is permanent and cannot be undone.")) {
+                                i18n.get("cm.deleteAnalysisTitle"),
+                                i18n.get("cm.deleteAnalysisQuestion"),
+                                i18n.get("cm.permanentActionWarning"))) {
                             onDeleteTermAnalysis.accept(analysis.getId());
                         }
                     });
@@ -203,9 +228,9 @@ public class ArchiveScreen extends StackPane {
                     ArchiveAnalysisCard card = new ArchiveAnalysisCard(comparison);
                     card.getDeleteButton().setOnAction(event -> {
                         if (ConfirmationAlert.show(
-                                "Delete Comparison",
-                                "Delete this comparison?",
-                                "This action is permanent and cannot be undone.")) {
+                                i18n.get("cm.deleteComparisonTitle"),
+                                i18n.get("cm.deleteComparisonQuestion"),
+                                i18n.get("cm.permanentActionWarning"))) {
                             onDeleteTextComparison.accept(comparison.id());
                         }
                     });
@@ -221,9 +246,9 @@ public class ArchiveScreen extends StackPane {
                     ArchiveAnalysisCard card = new ArchiveAnalysisCard(comparison);
                     card.getDeleteButton().setOnAction(event -> {
                         if (ConfirmationAlert.show(
-                                "Delete Comparison",
-                                "Delete this comparison?",
-                                "This action is permanent and cannot be undone.")) {
+                                i18n.get("cm.deleteComparisonTitle"),
+                                i18n.get("cm.deleteComparisonQuestion"),
+                                i18n.get("cm.permanentActionWarning"))) {
                             onDeleteTermComparison.accept(comparison.id());
                         }
                     });
@@ -258,31 +283,33 @@ public class ArchiveScreen extends StackPane {
     }
 
     private String emptyStatisticsMessage() {
+        LocalizationService i18n = LocalizationService.getInstance();
         if (!searchInput.getText().isBlank()) {
-            return "Nothing found";
+            return i18n.get("nothingFound");
         }
 
         if (analysisFilter.getSelectedIndex() == 1) {
-            return "No saved term analyses yet";
+            return i18n.get("archive.noSavedTermAnalyses");
         }
         if (analysisFilter.getSelectedIndex() == 2) {
-            return "No saved text comparisons yet";
+            return i18n.get("archive.noSavedTextComparisons");
         }
         if (analysisFilter.getSelectedIndex() == 3) {
-            return "No saved term comparisons yet";
+            return i18n.get("archive.noSavedTermComparisons");
         }
-        return "No saved text analyses yet";
+        return i18n.get("archive.noSavedTextAnalyses");
     }
 
     private String emptyStatisticsSubtitle() {
+        LocalizationService i18n = LocalizationService.getInstance();
         if (!searchInput.getText().isBlank()) {
-            return "Try changing your search query";
+            return i18n.get("tryChangingSearchQuery");
         }
 
         if (analysisFilter.getSelectedIndex() >= 2) {
-            return "Run a comparison and save it to view it here";
+            return i18n.get("archive.runAndSaveComparison");
         }
-        return "Run an analysis and save it to view it here";
+        return i18n.get("archive.runAndSaveAnalysis");
     }
 
     private boolean matchesSearch(String... values) {

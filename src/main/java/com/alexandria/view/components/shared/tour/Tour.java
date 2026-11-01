@@ -3,6 +3,8 @@ package com.alexandria.view.components.shared.tour;
 import java.util.List;
 import java.util.function.Supplier;
 
+import com.alexandria.service.LocalizationService;
+
 import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -31,24 +33,32 @@ public class Tour extends StackPane {
     public static final EventType<Event> START_EVENT = new EventType<>(Event.ANY, "START_TOUR");
 
     public record Step(
-            String title,
-            String description,
+            String titleKey,
+            String descriptionKey,
             Supplier<Node> target,
             Runnable beforeShow,
             boolean isBackAllowed,
             StepOptions options) {
 
         public Step(
-                String title,
-                String description,
+                String titleKey,
+                String descriptionKey,
                 Supplier<Node> target,
                 Runnable beforeShow,
                 boolean isBackAllowed) {
-            this(title, description, target, beforeShow, isBackAllowed, StepOptions.DEFAULT);
+            this(titleKey, descriptionKey, target, beforeShow, isBackAllowed, StepOptions.DEFAULT);
         }
 
         public Step {
             options = options == null ? StepOptions.DEFAULT : options;
+        }
+
+        public String title() {
+            return LocalizationService.getInstance().get(titleKey);
+        }
+
+        public String description() {
+            return LocalizationService.getInstance().get(descriptionKey);
         }
     }
 
@@ -87,9 +97,9 @@ public class Tour extends StackPane {
     private final Label stepLabel = new Label();
     private final Label titleLabel = new Label();
     private final Label descriptionLabel = new Label();
-    private final Button backButton = new Button("Back");
-    private final Button nextButton = new Button("Next");
-    private final Button skipButton = new Button("Skip tour");
+    private final Button backButton = new Button();
+    private final Button nextButton = new Button();
+    private final Button skipButton = new Button();
 
     private List<Step> steps = List.of();
     private int currentStep;
@@ -128,6 +138,8 @@ public class Tour extends StackPane {
         configureTooltip();
         getChildren().addAll(
                 dimOverlay, inputBlocker, spotlight, secondarySpotlight, tooltip);
+
+        LocalizationService.getInstance().addListener(locale -> refreshText());
     }
 
     private void configureTooltip() {
@@ -163,6 +175,23 @@ public class Tour extends StackPane {
 
         HBox actions = new HBox(8, backButton, spacer, skipButton, nextButton);
         tooltip.getChildren().addAll(stepLabel, titleLabel, descriptionLabel, actions);
+
+        refreshText();
+    }
+
+    public void refreshText() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        backButton.setText(i18n.get("tour.back"));
+        skipButton.setText(i18n.get("tour.skip"));
+        if (steps != null && !steps.isEmpty() && currentStep >= 0 && currentStep < steps.size()) {
+            Step step = steps.get(currentStep);
+            stepLabel.setText(i18n.get("tour.step")
+                    .replace("{current}", String.valueOf(currentStep + 1))
+                    .replace("{total}", String.valueOf(steps.size())));
+            titleLabel.setText(step.title());
+            descriptionLabel.setText(step.description());
+            nextButton.setText(currentStep == steps.size() - 1 ? i18n.get("tour.finish") : i18n.get("tour.next"));
+        }
     }
 
     public void start(List<Step> steps, Runnable onClose) {
@@ -199,11 +228,8 @@ public class Tour extends StackPane {
 
         toFront();
 
-        stepLabel.setText("Step " + (index + 1) + " of " + steps.size());
-        titleLabel.setText(step.title());
-        descriptionLabel.setText(step.description());
+        refreshText();
         backButton.setDisable(index == 0 || !step.isBackAllowed());
-        nextButton.setText(index == steps.size() - 1 ? "Finish" : "Next");
 
         Platform.runLater(() -> {
             if (!isVisible() || currentStep != index) {
@@ -289,15 +315,15 @@ public class Tour extends StackPane {
 
         double holeX = Math.max(0, topLeft.getX() - padding);
         double holeY = Math.max(0, topLeft.getY() - padding);
-        double holeWidth = Math.min(getWidth() - holeX, bounds.getWidth() + padding * 2);
-        double holeHeight = Math.min(getHeight() - holeY, bounds.getHeight() + padding * 2);
+        double width = Math.min(getWidth() - holeX, bounds.getWidth() + padding * 2);
+        double height = Math.min(getHeight() - holeY, bounds.getHeight() + padding * 2);
 
         secondarySpotlight.setX(holeX);
         secondarySpotlight.setY(holeY);
-        secondarySpotlight.setWidth(holeWidth);
-        secondarySpotlight.setHeight(holeHeight);
+        secondarySpotlight.setWidth(width);
+        secondarySpotlight.setHeight(height);
         secondarySpotlight.setVisible(true);
-        return new Hole(holeX, holeY, holeWidth, holeHeight);
+        return new Hole(holeX, holeY, width, height);
     }
 
     private void layoutDimOverlay(Hole primaryHole, Hole secondaryHole) {

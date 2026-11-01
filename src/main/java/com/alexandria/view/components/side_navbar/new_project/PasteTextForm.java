@@ -2,6 +2,7 @@ package com.alexandria.view.components.side_navbar.new_project;
 
 import java.util.function.Consumer;
 
+import com.alexandria.service.LocalizationService;
 import com.alexandria.view.components.shared.form.Form;
 import com.alexandria.view.components.shared.form.FormField;
 
@@ -21,11 +22,12 @@ public class PasteTextForm extends VBox {
     public PasteTextForm(Node customContent) {
         getStyleClass().add("paste-text-form");
 
+        LocalizationService i18n = LocalizationService.getInstance();
         form = new Form.Builder()
-                .field("title", "Project Name", FormField.Type.TEXT, true)
-                .field("fileName", "File Name", FormField.Type.TEXT, true)
-                .field("content", "Text", FormField.Type.TEXT_AREA, true)
-                .submitLabel("Create Project")
+                .field("title", i18n.get("newProject.projectName"), FormField.Type.TEXT, true)
+                .field("fileName", i18n.get("newProject.fileName"), FormField.Type.TEXT, true)
+                .field("content", i18n.get("newProject.text"), FormField.Type.TEXT_AREA, true)
+                .submitLabel(i18n.get("newProject.createProject"))
                 .build();
 
         form.addCustomContent(customContent);
@@ -36,6 +38,16 @@ public class PasteTextForm extends VBox {
                 values.get("content"))));
 
         getChildren().add(form);
+
+        LocalizationService.getInstance().addListener(locale -> refreshText());
+    }
+
+    public void refreshText() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        form.setFieldLabel("title", i18n.get("newProject.projectName"));
+        form.setFieldLabel("fileName", i18n.get("newProject.fileName"));
+        form.setFieldLabel("content", i18n.get("newProject.text"));
+        form.setSubmitLabel(i18n.get("newProject.createProject"));
     }
 
     public void setOnSubmit(Consumer<PasteData> handler) {
