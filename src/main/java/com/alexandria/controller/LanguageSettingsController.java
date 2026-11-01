@@ -14,9 +14,7 @@ public class LanguageSettingsController {
         this.localizationService = localizationService;
         this.settingsScreen = settingsScreen;
 
-        Language saved = LanguageSettings.getLanguage();
-        applyLanguage(saved);
-
+        applyLanguage(LanguageSettings.getLanguage());
         this.settingsScreen.setOnLanguageChanged(this::applyLanguage);
     }
 
@@ -24,14 +22,11 @@ public class LanguageSettingsController {
         if (language == null) {
             return;
         }
-        localizationService.setLocale(language.getLocale());
         LanguageSettings.setLanguage(language);
+        localizationService.setLocale(language.getLocale());
         settingsScreen.setSelectedLanguage(language);
         settingsScreen.refreshText(localizationService);
         localizationService.apply(settingsScreen);
-        if (settingsScreen.getScene() != null && settingsScreen.getScene().getRoot() != null) {
-            localizationService.apply(settingsScreen.getScene().getRoot());
-        }
     }
 
     public LocalizationService getLocalizationService() {

@@ -115,8 +115,10 @@ public class LocalizationService {
                 labeled.getProperties().put(I18N_KEY_PROPERTY, key);
             }
         }
-        if (key != null && bundle.containsKey(key) && !labeled.textProperty().isBound()) {
-            labeled.setText(bundle.getString(key));
+        if (key != null && bundle.containsKey(key)) {
+            if (!labeled.textProperty().isBound()) {
+                labeled.setText(bundle.getString(key));
+            }
         }
     }
 
@@ -128,8 +130,10 @@ public class LocalizationService {
                 textInput.getProperties().put(I18N_KEY_PROPERTY, key);
             }
         }
-        if (key != null && bundle.containsKey(key) && !textInput.promptTextProperty().isBound()) {
-            textInput.setPromptText(bundle.getString(key));
+        if (key != null && bundle.containsKey(key)) {
+            if (!textInput.promptTextProperty().isBound()) {
+                textInput.setPromptText(bundle.getString(key));
+            }
         }
     }
 

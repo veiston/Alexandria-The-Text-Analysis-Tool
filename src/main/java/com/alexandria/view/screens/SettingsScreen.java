@@ -72,8 +72,13 @@ public class SettingsScreen extends VBox {
         languageSelector.getStyleClass().add("settings-language-selector");
         languageSelector.setAccessibleText("Application language");
         languageSelector.setOnAction(event -> {
-            if (!updatingLanguage && languageSelector.getValue() != null)
-                onLanguageChanged.accept(languageSelector.getValue());
+            if (updatingLanguage) {
+                return;
+            }
+            Language selected = languageSelector.getValue();
+            if (selected != null) {
+                onLanguageChanged.accept(selected);
+            }
         });
 
         VBox languageContent = new VBox(10, languageDescription, languageSelector);
