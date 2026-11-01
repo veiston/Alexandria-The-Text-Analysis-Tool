@@ -235,7 +235,10 @@ public class ArchiveAnalysisModal extends Modal {
 
     private void addTableRow(GridPane table, int row, String label, Object value) {
         addTableCell(table, 0, row, label, "archive-table-cell");
-        addTableCell(table, 1, row, String.valueOf(value), "archive-table-cell");
+        String formattedValue = (value instanceof Number number)
+                ? com.alexandria.service.LocalizationService.getInstance().formatNumber(number.doubleValue())
+                : String.valueOf(value);
+        addTableCell(table, 1, row, formattedValue, "archive-table-cell");
     }
 
     private Label addTableCell(GridPane table, int column, int row, String text, String styleClass) {
@@ -258,7 +261,7 @@ public class ArchiveAnalysisModal extends Modal {
                 wordLabel.getStyleClass().add("archive-neighboring-word");
             }
 
-            addTableCell(table, 1, row, String.valueOf(word.count()), "archive-table-cell");
+            addTableCell(table, 1, row, com.alexandria.service.LocalizationService.getInstance().formatNumber(word.count()), "archive-table-cell");
             row++;
         }
 
@@ -274,6 +277,7 @@ public class ArchiveAnalysisModal extends Modal {
     }
 
     private void showAnalysis(VBox content) {
+        com.alexandria.service.LocalizationService.getInstance().apply(content);
         ScrollPane scroll = new ScrollPane(content);
         scroll.getStyleClass().add("shared-scroll");
         scroll.setFitToWidth(true);

@@ -108,7 +108,7 @@ public class SettingsScreen extends VBox {
                 userGuideTitle,
                 userGuideRow);
 
-            refreshText(new LocalizationService());
+        refreshText(LocalizationService.getInstance());
     }
 
     public void setOnLanguageChanged(Consumer<Language> callback) {

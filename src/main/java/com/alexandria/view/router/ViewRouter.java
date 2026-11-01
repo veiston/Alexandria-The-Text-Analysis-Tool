@@ -16,6 +16,7 @@ public class ViewRouter extends StackPane {
         currentRoute = route;
 
         Node screen = route.createScreen();
+        com.alexandria.service.LocalizationService.getInstance().apply(screen);
         getChildren().setAll(screen);
     }
 

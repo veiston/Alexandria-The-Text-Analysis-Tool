@@ -28,6 +28,10 @@ public class LanguageSettingsController {
         LanguageSettings.setLanguage(language);
         settingsScreen.setSelectedLanguage(language);
         settingsScreen.refreshText(localizationService);
+        localizationService.apply(settingsScreen);
+        if (settingsScreen.getScene() != null && settingsScreen.getScene().getRoot() != null) {
+            localizationService.apply(settingsScreen.getScene().getRoot());
+        }
     }
 
     public LocalizationService getLocalizationService() {

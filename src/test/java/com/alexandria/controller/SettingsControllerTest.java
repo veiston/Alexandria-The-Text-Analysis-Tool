@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.Locale;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,6 +14,7 @@ import com.alexandria.utils.LanguageSettings;
 import com.alexandria.view.screens.SettingsScreen;
 
 import javafx.geometry.NodeOrientation;
+import javafx.scene.control.Label;
 
 /**
  * Controller tests for SettingsController and SettingsScreen localization.
@@ -135,13 +137,82 @@ public class SettingsControllerTest extends JavaFxTestBase {
     @Test
     public void testLtrAndRtlLayoutBehavior() throws Exception {
         runOnFxThread(() -> {
-            assertEquals(NodeOrientation.INHERIT, settingsScreen.getNodeOrientation());
-
-            settingsScreen.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
-            assertEquals(NodeOrientation.RIGHT_TO_LEFT, settingsScreen.getNodeOrientation());
-
-            settingsScreen.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
+            // Russian is Left-To-Right
+            controller.applyLanguage(Language.RUSSIAN);
             assertEquals(NodeOrientation.LEFT_TO_RIGHT, settingsScreen.getNodeOrientation());
+
+            // Japanese is Left-To-Right
+            controller.applyLanguage(Language.JAPANESE);
+            assertEquals(NodeOrientation.LEFT_TO_RIGHT, settingsScreen.getNodeOrientation());
+
+            // Explicit Right-To-Left test locale (Arabic) with Arabic test content
+            localizationService.setLocale(LocalizationService.ARABIC);
+            assertTrue(localizationService.isRtl());
+
+            Label arabicLabel = new Label("مرحبا بالعالم");
+            settingsScreen.getChildren().add(arabicLabel);
+            localizationService.apply(settingsScreen);
+
+            assertEquals(NodeOrientation.RIGHT_TO_LEFT, settingsScreen.getNodeOrientation());
+            assertEquals(NodeOrientation.RIGHT_TO_LEFT, arabicLabel.getNodeOrientation());
+
+            // Reset back to English (Left-To-Right)
+            controller.applyLanguage(Language.ENGLISH);
+            assertEquals(NodeOrientation.LEFT_TO_RIGHT, settingsScreen.getNodeOrientation());
+        });
+    }
+
+    @Test
+    public void testDynamicUiUpdatesWithoutRestart() throws Exception {
+        runOnFxThread(() -> {
+            Label libraryNavLabel = new Label("Library");
+            Label analyzeNavLabel = new Label("Analyze");
+
+            localizationService.apply(libraryNavLabel);
+            localizationService.apply(analyzeNavLabel);
+            assertEquals("Library", libraryNavLabel.getText());
+            assertEquals("Analyze", analyzeNavLabel.getText());
+
+            // Switch to Japanese without restart
+            controller.applyLanguage(Language.JAPANESE);
+            localizationService.apply(libraryNavLabel);
+            localizationService.apply(analyzeNavLabel);
+            assertEquals("ライブラリ", libraryNavLabel.getText());
+            assertEquals("分析", analyzeNavLabel.getText());
+
+            // Switch to Russian without restart
+            controller.applyLanguage(Language.RUSSIAN);
+            localizationService.apply(libraryNavLabel);
+            localizationService.apply(analyzeNavLabel);
+            assertEquals("Библиотека", libraryNavLabel.getText());
+            assertEquals("Анализ", analyzeNavLabel.getText());
+
+            // Reset back to English
+            controller.applyLanguage(Language.ENGLISH);
+            localizationService.apply(libraryNavLabel);
+            localizationService.apply(analyzeNavLabel);
+            assertEquals("Library", libraryNavLabel.getText());
+            assertEquals("Analyze", analyzeNavLabel.getText());
+        });
+    }
+
+    @Test
+    public void testBoundPropertiesDoNotThrowOnApply() throws Exception {
+        runOnFxThread(() -> {
+            Label boundOrientationLabel = new Label("Library");
+            javafx.beans.property.SimpleObjectProperty<NodeOrientation> orientationProperty =
+                    new javafx.beans.property.SimpleObjectProperty<>(NodeOrientation.LEFT_TO_RIGHT);
+            boundOrientationLabel.nodeOrientationProperty().bind(orientationProperty);
+
+            Label boundTextLabel = new Label("Settings");
+            javafx.beans.property.SimpleStringProperty textProperty =
+                    new javafx.beans.property.SimpleStringProperty("Settings");
+            boundTextLabel.textProperty().bind(textProperty);
+            localizationService.apply(boundOrientationLabel);
+            localizationService.apply(boundTextLabel);
+
+            assertEquals(NodeOrientation.LEFT_TO_RIGHT, boundOrientationLabel.getNodeOrientation());
+            assertEquals("Settings", boundTextLabel.getText());
         });
     }
 }

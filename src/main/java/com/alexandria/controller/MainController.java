@@ -65,6 +65,7 @@ public class MainController {
         configureProject();
         configureUserGuideTour();
 
+        LocalizationService.getInstance().apply(mainView);
         openInitialRoute();
     }
 
@@ -95,7 +96,9 @@ public class MainController {
 
     private void configureSettings() {
         SettingsScreen settingsScreen = (SettingsScreen) Route.SETTINGS.createScreen();
-        new LanguageSettingsController(new LocalizationService(), settingsScreen);
+        LocalizationService localizationService = LocalizationService.getInstance();
+        new LanguageSettingsController(localizationService, settingsScreen);
+        localizationService.addListener(locale -> localizationService.apply(mainView));
     }
 
     private ArchiveController configureArchive() {
