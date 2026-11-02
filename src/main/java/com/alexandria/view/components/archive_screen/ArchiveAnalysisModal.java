@@ -25,8 +25,19 @@ import java.util.List;
 public class ArchiveAnalysisModal extends Modal {
 
     private static final int SNIPPET_CHAR_BUDGET = 180;
+    private Runnable refreshContent = () -> {
+    };
+
+    public ArchiveAnalysisModal() {
+        LocalizationService.getInstance().addListener(locale -> {
+            if (isShowing()) {
+                refreshContent.run();
+            }
+        });
+    }
 
     public void showTextAnalysis(ArchiveTextAnalysis analysis) {
+        refreshContent = () -> showTextAnalysis(analysis);
         LocalizationService i18n = LocalizationService.getInstance();
         TextAnalysisResult result = analysis.getTextAnalysisResult();
 
@@ -72,6 +83,7 @@ public class ArchiveAnalysisModal extends Modal {
     }
 
     public void showTermAnalysis(ArchiveTermAnalysis analysis) {
+        refreshContent = () -> showTermAnalysis(analysis);
         LocalizationService i18n = LocalizationService.getInstance();
         TermAnalysisResult result = analysis.getTermAnalysisResult();
 
@@ -104,6 +116,7 @@ public class ArchiveAnalysisModal extends Modal {
     }
 
     public void showTextComparison(ArchiveComparison comparison) {
+        refreshContent = () -> showTextComparison(comparison);
         LocalizationService i18n = LocalizationService.getInstance();
         TextComparisonResult result = comparison.textResult();
 
@@ -159,6 +172,7 @@ public class ArchiveAnalysisModal extends Modal {
     }
 
     public void showTermComparison(ArchiveComparison comparison) {
+        refreshContent = () -> showTermComparison(comparison);
         LocalizationService i18n = LocalizationService.getInstance();
         TermComparisonResult result = comparison.termResult();
 

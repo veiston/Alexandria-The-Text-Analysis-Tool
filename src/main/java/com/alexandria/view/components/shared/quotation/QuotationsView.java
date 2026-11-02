@@ -17,6 +17,7 @@ import java.util.function.Consumer;
 
 public class QuotationsView extends VBox {
         private final GridPane cardsContainer = new GridPane();
+        private List<Quotation> currentQuotations = List.of();
         private Consumer<Quotation> onGoTo = quotation -> {
         };
         private Consumer<Quotation> onDelete = quotation -> {
@@ -54,12 +55,15 @@ public class QuotationsView extends VBox {
 
                 VBox.setVgrow(scroll, Priority.ALWAYS);
                 getChildren().add(scroll);
+
+                LocalizationService.getInstance().addListener(locale -> setQuotations(currentQuotations));
         }
 
         public void setQuotations(List<Quotation> quotations) {
+                currentQuotations = quotations == null ? List.of() : List.copyOf(quotations);
                 cardsContainer.getChildren().clear();
 
-                if (quotations == null || quotations.isEmpty()) {
+                if (currentQuotations.isEmpty()) {
                         Label empty = new Label(LocalizationService.getInstance().get("quotations.noItems"));
                         empty.getStyleClass().add("text-muted");
 
@@ -71,8 +75,8 @@ public class QuotationsView extends VBox {
 
                 cardsContainer.setAlignment(Pos.TOP_LEFT);
 
-                for (int i = 0; i < quotations.size(); i++) {
-                        Quotation quotation = quotations.get(i);
+                for (int i = 0; i < currentQuotations.size(); i++) {
+                        Quotation quotation = currentQuotations.get(i);
 
                         QuotationCard card = new QuotationCard(quotation);
 

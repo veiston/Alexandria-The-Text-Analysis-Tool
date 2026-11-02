@@ -24,6 +24,10 @@ public class TermDetailModal extends VBox {
     private final VBox occurrencesHost = new VBox(8);
     private final Label neighborsHeading = new Label();
     private final Label occurrencesHeading = new Label();
+    private String term;
+    private TermAnalysisResult analysis;
+    private List<SearchMatch> matches = List.of();
+    private IntConsumer onJumpToMatch;
 
     public TermDetailModal() {
         getStyleClass().add("modal-card");
@@ -47,13 +51,18 @@ public class TermDetailModal extends VBox {
                 neighborsHeading, neighborsHost,
                 occurrencesHeading, occurrencesScroll);
 
-        refreshHeadings();
+        refreshText();
+        LocalizationService.getInstance().addListener(locale -> refreshText());
     }
 
-    private void refreshHeadings() {
+    private void refreshText() {
         LocalizationService i18n = LocalizationService.getInstance();
         neighborsHeading.setText(i18n.get("termDetail.nearbyWords"));
         occurrencesHeading.setText(i18n.get("termDetail.occurrences"));
+
+        if (analysis != null) {
+            renderData();
+        }
     }
 
     public void setData(
@@ -61,7 +70,14 @@ public class TermDetailModal extends VBox {
             TermAnalysisResult analysis,
             List<SearchMatch> matches,
             IntConsumer onJumpToMatch) {
-        refreshHeadings();
+        this.term = term;
+        this.analysis = analysis;
+        this.matches = matches == null ? List.of() : List.copyOf(matches);
+        this.onJumpToMatch = onJumpToMatch;
+        renderData();
+    }
+
+    private void renderData() {
         LocalizationService i18n = LocalizationService.getInstance();
         titleLabel.setText("\"" + term + "\"");
         statsLabel.setText(i18n.get("termDetail.statistics")
@@ -84,7 +100,7 @@ public class TermDetailModal extends VBox {
         }
 
         occurrencesHost.getChildren().clear();
-        if (matches == null || matches.isEmpty()) {
+        if (matches.isEmpty()) {
             occurrencesHost.getChildren().add(mutedLabel(i18n.get("termDetail.noLocatedOccurrences")));
         } else {
             for (int i = 0; i < matches.size(); i++) {
