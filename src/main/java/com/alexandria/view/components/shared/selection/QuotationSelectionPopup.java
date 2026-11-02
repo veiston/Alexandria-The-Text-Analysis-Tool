@@ -1,6 +1,7 @@
 package com.alexandria.view.components.shared.selection;
 
 import com.alexandria.model.QuotationType;
+import com.alexandria.service.LocalizationService;
 
 import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
@@ -14,11 +15,12 @@ public final class QuotationSelectionPopup {
     private Pane attachedTo;
 
     public QuotationSelectionPopup(Consumer<QuotationType> onSelect) {
-        Button directBtn = createTypeButton("Direct citation",
+        LocalizationService i18n = LocalizationService.getInstance();
+        Button directBtn = createTypeButton(i18n.get(QuotationType.DIRECT.getLocalizationKey()),
                 () -> onSelect.accept(QuotationType.DIRECT));
-        Button indirectBtn = createTypeButton("Indirect citation",
+        Button indirectBtn = createTypeButton(i18n.get(QuotationType.INDIRECT.getLocalizationKey()),
                 () -> onSelect.accept(QuotationType.INDIRECT));
-        Button annotationBtn = createTypeButton("Annotation",
+        Button annotationBtn = createTypeButton(i18n.get(QuotationType.ANNOTATION.getLocalizationKey()),
                 () -> onSelect.accept(QuotationType.ANNOTATION));
 
         root = new HBox(6, directBtn, indirectBtn, annotationBtn);

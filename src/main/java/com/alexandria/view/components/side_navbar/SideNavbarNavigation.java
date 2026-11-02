@@ -74,6 +74,7 @@ public class SideNavbarNavigation {
         button.setToggleGroup(navGroup);
         button.setMaxWidth(Double.MAX_VALUE);
         button.setAlignment(Pos.CENTER_LEFT);
+        button.setWrapText("userguide".equals(item.id()));
         button.getStyleClass().add("nav-item");
         button.setOnAction(e -> {
             if (!button.isSelected()) {

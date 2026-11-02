@@ -146,7 +146,7 @@ public class Tour extends StackPane {
         tooltip.getStyleClass().add("tour-tooltip");
         tooltip.setManaged(false);
         tooltip.setMouseTransparent(false);
-        tooltip.setPrefWidth(300);
+        tooltip.setPrefWidth(380);
 
         stepLabel.getStyleClass().add("tour-step");
         titleLabel.getStyleClass().add("heading-md");
