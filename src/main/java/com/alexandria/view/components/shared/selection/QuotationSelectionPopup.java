@@ -1,6 +1,7 @@
 package com.alexandria.view.components.shared.selection;
 
 import com.alexandria.model.QuotationType;
+import com.alexandria.service.LocalizationService;
 
 import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
@@ -11,26 +12,40 @@ import java.util.function.Consumer;
 
 public final class QuotationSelectionPopup {
     private final HBox root;
+    private final Button directButton;
+    private final Button indirectButton;
+    private final Button annotationButton;
     private Pane attachedTo;
 
     public QuotationSelectionPopup(Consumer<QuotationType> onSelect) {
-        Button directBtn = createTypeButton("Direct citation",
+        directButton = createTypeButton(
                 () -> onSelect.accept(QuotationType.DIRECT));
-        Button indirectBtn = createTypeButton("Indirect citation",
+        indirectButton = createTypeButton(
                 () -> onSelect.accept(QuotationType.INDIRECT));
-        Button annotationBtn = createTypeButton("Annotation",
+        annotationButton = createTypeButton(
                 () -> onSelect.accept(QuotationType.ANNOTATION));
 
-        root = new HBox(6, directBtn, indirectBtn, annotationBtn);
+        root = new HBox(6, directButton, indirectButton, annotationButton);
         root.getStyleClass().add("selection-popup");
         root.setManaged(false);
+
+        refreshText();
+        LocalizationService.getInstance().addListener(locale -> refreshText());
     }
 
-    private Button createTypeButton(String text, Runnable action) {
-        Button button = new Button(text);
+    private Button createTypeButton(Runnable action) {
+        Button button = new Button();
         button.getStyleClass().add("selection-popup-toggle");
         button.setOnAction(e -> action.run());
         return button;
+    }
+
+    private void refreshText() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        directButton.setText(i18n.get(QuotationType.DIRECT.getLocalizationKey()));
+        indirectButton.setText(i18n.get(QuotationType.INDIRECT.getLocalizationKey()));
+        annotationButton.setText(i18n.get(QuotationType.ANNOTATION.getLocalizationKey()));
+        root.requestLayout();
     }
 
     public void showAt(Pane overlay, double screenX, double screenY) {

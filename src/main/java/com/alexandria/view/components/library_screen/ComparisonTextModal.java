@@ -21,14 +21,17 @@ import javafx.scene.layout.VBox;
 public class ComparisonTextModal extends VBox {
 
     private final Label title = new Label();
+    private final Label subtitle = new Label();
     private final VBox selection = new VBox(16);
+    private final Button cancelButton = new Button();
+    private final Button addNewTextButton = new Button();
     private Text firstText;
+    private List<Text> texts = List.of();
     private BiConsumer<Text, Text> onCompare = (firstText, secondText) -> {};
     private Consumer<Text> onAddNewText = text -> {};
     private Runnable onCancel = () -> {};
 
     public ComparisonTextModal() {
-        LocalizationService i18n = LocalizationService.getInstance();
         getStyleClass().add("modal-card");
         setSpacing(16);
         setPadding(new Insets(24));
@@ -36,30 +39,42 @@ public class ComparisonTextModal extends VBox {
         setPrefHeight(600);
 
         title.getStyleClass().add("heading-lg");
-        Label subtitle = new Label(i18n.get("library.chooseSecondText"));
         subtitle.getStyleClass().add("text-muted");
 
-        Button cancelButton = new Button(i18n.get("cancel"));
         cancelButton.getStyleClass().addAll("button", "secondary");
         cancelButton.setMaxWidth(Double.MAX_VALUE);
         cancelButton.setOnAction(e -> onCancel.run());
 
-        Button addNewTextButton = new Button(i18n.get("library.addNewText"));
         addNewTextButton.getStyleClass().addAll("button", "primary");
         addNewTextButton.setMaxWidth(Double.MAX_VALUE);
         addNewTextButton.setOnAction(e -> onAddNewText.accept(firstText));
 
         getChildren().addAll(new VBox(4, title, subtitle), selection, addNewTextButton, cancelButton);
         VBox.setVgrow(selection, Priority.ALWAYS);
+
+        LocalizationService.getInstance().addListener(locale -> refreshText());
     }
 
     public void setTexts(Text firstText, List<Text> texts) {
-        LocalizationService i18n = LocalizationService.getInstance();
         this.firstText = firstText;
+        this.texts = texts == null ? List.of() : List.copyOf(texts);
+        refreshText();
+    }
+
+    private void refreshText() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        subtitle.setText(i18n.get("library.chooseSecondText"));
+        addNewTextButton.setText(i18n.get("library.addNewText"));
+        cancelButton.setText(i18n.get("cancel"));
+
+        if (firstText == null) {
+            return;
+        }
+
         title.setText(i18n.get("library.comparisonTitle").replace("{title}", titleText(firstText)));
 
         FlowPane textCards = new FlowPane(16, 16);
-        for (Text secondText : texts) {
+        for (Text secondText : this.texts) {
             if (!Objects.equals(firstText.getId(), secondText.getId())) {
                 textCards.getChildren().add(createTextCard(firstText, secondText));
             }

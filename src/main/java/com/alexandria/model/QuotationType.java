@@ -6,26 +6,21 @@ import com.alexandria.service.LocalizationService;
  * The kind of note a user attaches to a document selection.
  */
 public enum QuotationType {
-    DIRECT("Direct citation"),
-    INDIRECT("Indirect citation"),
-    ANNOTATION("Annotation");
+    DIRECT("quotations.directCitation"),
+    INDIRECT("quotations.indirectCitation"),
+    ANNOTATION("quotations.annotation");
 
-    private final String label;
+    private final String localizationKey;
 
-    QuotationType(String label) {
-        this.label = label;
+    QuotationType(String localizationKey) {
+        this.localizationKey = localizationKey;
     }
 
-    public String label() {
-        return label;
+    public String getLocalizationKey() {
+        return localizationKey;
     }
 
     public String getLocalizedLabel() {
-        LocalizationService i18n = LocalizationService.getInstance();
-        return switch (this) {
-            case DIRECT -> i18n.get("quotations.directCitation");
-            case INDIRECT -> i18n.get("quotations.indirectCitation");
-            case ANNOTATION -> i18n.get("quotations.annotation");
-        };
+        return LocalizationService.getInstance().get(localizationKey);
     }
 }
