@@ -31,13 +31,12 @@ public class EditProfileForm extends VBox {
 
         title.getStyleClass().add("heading-lg");
 
-        LocalizationService i18n = LocalizationService.getInstance();
         form = new Form.Builder()
-                .field("name", i18n.get("profile.username"), FormField.Type.TEXT, false, new TextValidator())
-                .field("email", i18n.get("profile.email"), FormField.Type.TEXT, false, new EmailValidator())
-                .field("organization", i18n.get("profile.organization"), FormField.Type.TEXT, false, new TextValidator())
-                .field("photo", i18n.get("profile.photo"), FormField.Type.IMG_FILE, false, new FileValidator())
-                .submitLabel(i18n.get("profile.saveChanges"))
+                .field("name", "profile.username", FormField.Type.TEXT, false, new TextValidator())
+                .field("email", "profile.email", FormField.Type.TEXT, false, new EmailValidator())
+                .field("organization", "profile.organization", FormField.Type.TEXT, false, new TextValidator())
+                .field("photo", "profile.photo", FormField.Type.IMG_FILE, false, new FileValidator())
+                .submitLabel("profile.saveChanges")
                 .customValidator(values -> {
                     boolean anyFilled = values.values().stream()
                             .anyMatch(v -> v != null && !v.isBlank());
@@ -54,14 +53,7 @@ public class EditProfileForm extends VBox {
     }
 
     public void refreshText() {
-        LocalizationService i18n = LocalizationService.getInstance();
-        title.setText(i18n.get("profile.edit"));
-        form.setFieldLabel("name", i18n.get("profile.username"));
-        form.setFieldLabel("email", i18n.get("profile.email"));
-        form.setFieldLabel("organization", i18n.get("profile.organization"));
-        form.setFieldLabel("photo", i18n.get("profile.photo"));
-        form.setSubmitLabel(i18n.get("profile.saveChanges"));
-        form.refreshFileLabels();
+        title.setText(LocalizationService.getInstance().get("profile.edit"));
     }
 
     public void prefill(User user) {

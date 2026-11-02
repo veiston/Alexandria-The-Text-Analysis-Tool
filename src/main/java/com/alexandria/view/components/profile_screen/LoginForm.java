@@ -16,28 +16,21 @@ public class LoginForm extends VBox {
 
     public LoginForm() {
         getStyleClass().add("login-form");
-        LocalizationService i18n = LocalizationService.getInstance();
 
         form = new Form.Builder()
-                .field("email", i18n.get("profile.email"), FormField.Type.TEXT, true, new EmailValidator())
-                .field("password", i18n.get("profile.password"), FormField.Type.PASSWORD, true)
-                .submitLabel(i18n.get("profile.logIn"))
+                .field("email", "profile.email", FormField.Type.TEXT, true, new EmailValidator())
+                .field("password", "profile.password", FormField.Type.PASSWORD, true)
+                .submitLabel("profile.logIn")
                 .build();
 
         // Logins if user presses enter (Readymade listener in Javafx) 
         form.getSubmitButton().setDefaultButton(true);
         form.setOnSubmit(values -> onLogin.accept(values));
         getChildren().add(form);
-
-        refreshText();
-        LocalizationService.getInstance().addListener(locale -> refreshText());
     }
 
     public void refreshText() {
-        LocalizationService i18n = LocalizationService.getInstance();
-        form.setFieldLabel("email", i18n.get("profile.email"));
-        form.setFieldLabel("password", i18n.get("profile.password"));
-        form.setSubmitLabel(i18n.get("profile.logIn"));
+        form.refreshText();
     }
 
     public void setOnLogin(Consumer<Map<String, String>> handler) {

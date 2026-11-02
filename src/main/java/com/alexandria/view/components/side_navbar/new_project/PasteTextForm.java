@@ -22,12 +22,11 @@ public class PasteTextForm extends VBox {
     public PasteTextForm(Node customContent) {
         getStyleClass().add("paste-text-form");
 
-        LocalizationService i18n = LocalizationService.getInstance();
         form = new Form.Builder()
-                .field("title", i18n.get("newProject.projectName"), FormField.Type.TEXT, true)
-                .field("fileName", i18n.get("newProject.fileName"), FormField.Type.TEXT, true)
-                .field("content", i18n.get("newProject.text"), FormField.Type.TEXT_AREA, true)
-                .submitLabel(i18n.get("newProject.createProject"))
+                .field("title", "newProject.projectName", FormField.Type.TEXT, true)
+                .field("fileName", "newProject.fileName", FormField.Type.TEXT, true)
+                .field("content", "newProject.text", FormField.Type.TEXT_AREA, true)
+                .submitLabel("newProject.createProject")
                 .build();
 
         form.addCustomContent(customContent);
@@ -38,16 +37,10 @@ public class PasteTextForm extends VBox {
                 values.get("content"))));
 
         getChildren().add(form);
-
-        LocalizationService.getInstance().addListener(locale -> refreshText());
     }
 
     public void refreshText() {
-        LocalizationService i18n = LocalizationService.getInstance();
-        form.setFieldLabel("title", i18n.get("newProject.projectName"));
-        form.setFieldLabel("fileName", i18n.get("newProject.fileName"));
-        form.setFieldLabel("content", i18n.get("newProject.text"));
-        form.setSubmitLabel(i18n.get("newProject.createProject"));
+        form.refreshText();
     }
 
     public void setOnSubmit(Consumer<PasteData> handler) {

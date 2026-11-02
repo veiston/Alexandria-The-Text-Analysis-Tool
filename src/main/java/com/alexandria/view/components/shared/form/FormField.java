@@ -2,6 +2,8 @@ package com.alexandria.view.components.shared.form;
 
 import java.util.List;
 
+import com.alexandria.service.LocalizationService;
+
 public final class FormField {
 
     public enum Type {
@@ -49,7 +51,7 @@ public final class FormField {
     }
 
     public String label() {
-        return label;
+        return LocalizationService.getInstance().getOrDefault(label, label);
     }
 
     public Type type() {

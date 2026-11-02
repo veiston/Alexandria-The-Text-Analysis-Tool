@@ -27,11 +27,10 @@ public class ChangePasswordForm extends VBox {
 
         title.getStyleClass().add("heading-lg");
 
-        LocalizationService i18n = LocalizationService.getInstance();
         form = new Form.Builder()
-                .field("newPassword", i18n.get("profile.newPassword"), FormField.Type.PASSWORD, true, new PasswordValidator())
-                .field("confirmPassword", i18n.get("profile.confirmPassword"), FormField.Type.PASSWORD, true)
-                .submitLabel(i18n.get("profile.changePassword"))
+                .field("newPassword", "profile.newPassword", FormField.Type.PASSWORD, true, new PasswordValidator())
+                .field("confirmPassword", "profile.confirmPassword", FormField.Type.PASSWORD, true)
+                .submitLabel("profile.changePassword")
                 .customValidator(values -> {
                     String password = values.get("newPassword");
                     String confirmation = values.get("confirmPassword");
@@ -52,11 +51,7 @@ public class ChangePasswordForm extends VBox {
     }
 
     public void refreshText() {
-        LocalizationService i18n = LocalizationService.getInstance();
-        title.setText(i18n.get("profile.changePassword"));
-        form.setFieldLabel("newPassword", i18n.get("profile.newPassword"));
-        form.setFieldLabel("confirmPassword", i18n.get("profile.confirmPassword"));
-        form.setSubmitLabel(i18n.get("profile.changePassword"));
+        title.setText(LocalizationService.getInstance().get("profile.changePassword"));
     }
 
     public void setOnChangePassword(Consumer<String> handler) {

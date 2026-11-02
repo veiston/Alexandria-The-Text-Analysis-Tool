@@ -19,34 +19,23 @@ public class RegisterForm extends VBox {
 
     public RegisterForm() {
         getStyleClass().add("register-form");
-        LocalizationService i18n = LocalizationService.getInstance();
 
         form = new Form.Builder()
-                .field("name", i18n.get("profile.username"), FormField.Type.TEXT, true, new TextValidator())
-                .field("email", i18n.get("profile.email"), FormField.Type.TEXT, true, new EmailValidator())
-                .field("password", i18n.get("profile.password"), FormField.Type.PASSWORD, true, new PasswordValidator())
-                .field("organization", i18n.get("profile.organization"), FormField.Type.TEXT, false, new TextValidator())
-                .field("photo", i18n.get("profile.photo"), FormField.Type.IMG_FILE, false, new FileValidator())
-                .submitLabel(i18n.get("profile.createAccount"))
+                .field("name", "profile.username", FormField.Type.TEXT, true, new TextValidator())
+                .field("email", "profile.email", FormField.Type.TEXT, true, new EmailValidator())
+                .field("password", "profile.password", FormField.Type.PASSWORD, true, new PasswordValidator())
+                .field("organization", "profile.organization", FormField.Type.TEXT, false, new TextValidator())
+                .field("photo", "profile.photo", FormField.Type.IMG_FILE, false, new FileValidator())
+                .submitLabel("profile.createAccount")
                 .build();
 
         form.getSubmitButton().setDefaultButton(true);
         form.setOnSubmit(values -> onRegister.accept(values));
         getChildren().add(form);
-
-        refreshText();
-        LocalizationService.getInstance().addListener(locale -> refreshText());
     }
 
     public void refreshText() {
-        LocalizationService i18n = LocalizationService.getInstance();
-        form.setFieldLabel("name", i18n.get("profile.username"));
-        form.setFieldLabel("email", i18n.get("profile.email"));
-        form.setFieldLabel("password", i18n.get("profile.password"));
-        form.setFieldLabel("organization", i18n.get("profile.organization"));
-        form.setFieldLabel("photo", i18n.get("profile.photo"));
-        form.setSubmitLabel(i18n.get("profile.createAccount"));
-        form.refreshFileLabels();
+        form.refreshText();
     }
 
     public void setOnRegister(Consumer<Map<String, String>> handler) {

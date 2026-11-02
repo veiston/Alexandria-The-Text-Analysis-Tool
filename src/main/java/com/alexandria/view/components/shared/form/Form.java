@@ -11,6 +11,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
+import com.alexandria.service.LocalizationService;
 
 public class Form extends VBox {
 
@@ -19,12 +20,14 @@ public class Form extends VBox {
     private final FormValidator validator;
     private final Label errorLabel;
     private final Button submitButton;
+    private String submitLabel;
 
     private Consumer<Map<String, String>> onSubmit = values -> {
     };
 
     private Form(Builder builder) {
         this.fields = new ArrayList<>(builder.fields);
+        this.submitLabel = builder.submitLabel;
         this.renderer = new FormRenderer();
         this.validator = new FormValidator(builder.customValidator);
 
@@ -36,8 +39,10 @@ public class Form extends VBox {
         errorLabel = createErrorLabel();
         getChildren().add(errorLabel);
 
-        submitButton = createSubmitButton(builder.submitLabel);
+        submitButton = createSubmitButton(LocalizationService.getInstance().getOrDefault(submitLabel, submitLabel));
         getChildren().add(submitButton);
+
+        LocalizationService.getInstance().addListener(locale -> refreshText());
     }
 
     private Label createErrorLabel() {
@@ -87,11 +92,20 @@ public class Form extends VBox {
     public void setFieldLabel(String key, String label) {
         FormField field = fields.stream().filter(f -> f.key().equals(key)).findFirst().orElse(null);
         boolean required = field != null && field.required();
-        renderer.setFieldLabel(key, label, required);
+        renderer.setFieldLabel(key, LocalizationService.getInstance().getOrDefault(label, label), required);
     }
 
     public void setSubmitLabel(String label) {
-        submitButton.setText(label);
+        this.submitLabel = label;
+        submitButton.setText(LocalizationService.getInstance().getOrDefault(label, label));
+    }
+
+    public void refreshText() {
+        for (FormField field : fields) {
+            renderer.setFieldLabel(field.key(), field.label(), field.required());
+        }
+        submitButton.setText(LocalizationService.getInstance().getOrDefault(submitLabel, submitLabel));
+        renderer.refreshFileLabels();
     }
 
     public void refreshFileLabels() {

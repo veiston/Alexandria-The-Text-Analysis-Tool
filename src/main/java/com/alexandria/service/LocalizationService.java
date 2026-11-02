@@ -77,6 +77,13 @@ public class LocalizationService {
         return bundle.getString(key);
     }
 
+    public String getOrDefault(String key, String defaultValue) {
+        if (key != null && bundle != null && bundle.containsKey(key)) {
+            return bundle.getString(key);
+        }
+        return defaultValue;
+    }
+
     public String get(String key, Object... args) {
         return MessageFormat.format(bundle.getString(key), args);
     }
