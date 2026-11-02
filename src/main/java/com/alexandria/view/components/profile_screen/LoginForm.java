@@ -28,6 +28,16 @@ public class LoginForm extends VBox {
         form.getSubmitButton().setDefaultButton(true);
         form.setOnSubmit(values -> onLogin.accept(values));
         getChildren().add(form);
+
+        refreshText();
+        LocalizationService.getInstance().addListener(locale -> refreshText());
+    }
+
+    public void refreshText() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        form.setFieldLabel("email", i18n.get("profile.email"));
+        form.setFieldLabel("password", i18n.get("profile.password"));
+        form.setSubmitLabel(i18n.get("profile.logIn"));
     }
 
     public void setOnLogin(Consumer<Map<String, String>> handler) {

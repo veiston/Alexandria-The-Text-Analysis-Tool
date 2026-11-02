@@ -214,6 +214,8 @@ public class LibraryScreen extends StackPane {
         libraryLayout.setCenter(libraryBody);
         cardsPane.getChildren().clear();
 
+        boolean searching = !searchInput.getText().isBlank();
+
         List<Text> visibleTexts = texts.stream()
                 .filter(text -> switch (activeFilter) {
                     case "PDF" -> "PDF".equalsIgnoreCase(text.getFileType() != null ? text.getFileType().name() : "");
@@ -224,31 +226,21 @@ public class LibraryScreen extends StackPane {
                 .filter(text -> matchesSearch(text.getTitle(), text.getFileName()))
                 .toList();
 
-        cardsPane.getChildren().add(createNewProjectCard());
+        if (!searching) {
+            cardsPane.getChildren().add(createNewProjectCard());
+        }
 
         for (Text text : visibleTexts) {
             cardsPane.getChildren().add(createProjectCard(text));
         }
 
-        VBox libraryContent = new VBox(16);
-        boolean searching = !searchInput.getText().isBlank();
+        StackPane libraryContent = new StackPane();
 
-        if (visibleTexts.isEmpty()) {
+        if (searching && visibleTexts.isEmpty()) {
             EmptyState emptyState = new EmptyState(
                     emptyMessage(),
                     emptySubtitle());
             emptyState.setMaxHeight(Double.MAX_VALUE);
-            VBox.setVgrow(emptyState, Priority.ALWAYS);
-
-            if (!searching) {
-                Button newProjectButton = new Button("+ New Project");
-                newProjectButton.getStyleClass().addAll("button", "primary");
-                newProjectButton.setOnAction(e -> {
-                    onNewProject.run();
-                });
-                emptyState.setAction(newProjectButton);
-            }
-
             libraryContent.getChildren().add(emptyState);
         } else {
             ScrollPane cardsScroll = new ScrollPane(cardsPane);

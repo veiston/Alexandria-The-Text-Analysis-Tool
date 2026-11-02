@@ -146,6 +146,7 @@ public class SettingsScreen extends VBox {
         languageDescription.setText(localizationService.get("settings.languageDescription"));
         userGuideTitle.setText(localizationService.get("settings.additional"));
         userGuideLabel.setText(localizationService.get("settings.showUserTour"));
+        languageSelector.setAccessibleText(localizationService.get("settings.language"));
     }
 
     public Label getTitleLabel() {

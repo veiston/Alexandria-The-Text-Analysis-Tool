@@ -100,17 +100,20 @@ public class ProfileScreen extends StackPane {
     /* Modal composition */
     private void showAuthModal() {
         authView.reset();
+        authView.refreshText();
         modal.show(authView, false);
     }
 
     private void showEditProfileModal() {
         editProfileForm.reset();
+        editProfileForm.refreshText();
         editProfileForm.prefill(session.getCurrentUser());
         modal.show(editProfileForm);
     }
 
     private void showChangePasswordModal() {
         changePasswordForm.reset();
+        changePasswordForm.refreshText();
         modal.show(changePasswordForm);
     }
 

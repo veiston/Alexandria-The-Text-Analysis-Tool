@@ -105,13 +105,13 @@ public class LocalizationService {
             return;
         }
 
-        if (!node.nodeOrientationProperty().isBound()) {
+        if (node.nodeOrientationProperty() != null && !node.nodeOrientationProperty().isBound()) {
             node.setNodeOrientation(isRtl() ? NodeOrientation.RIGHT_TO_LEFT : NodeOrientation.LEFT_TO_RIGHT);
         }
 
         if (node instanceof ScrollPane scrollPane) {
             apply(scrollPane.getContent());
-        } else if (node instanceof Parent parent) {
+        } else if (node instanceof Parent parent && parent.getChildrenUnmodifiable() != null) {
             for (Node child : parent.getChildrenUnmodifiable()) {
                 apply(child);
             }

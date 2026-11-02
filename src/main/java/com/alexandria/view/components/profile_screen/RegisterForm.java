@@ -33,6 +33,20 @@ public class RegisterForm extends VBox {
         form.getSubmitButton().setDefaultButton(true);
         form.setOnSubmit(values -> onRegister.accept(values));
         getChildren().add(form);
+
+        refreshText();
+        LocalizationService.getInstance().addListener(locale -> refreshText());
+    }
+
+    public void refreshText() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        form.setFieldLabel("name", i18n.get("profile.username"));
+        form.setFieldLabel("email", i18n.get("profile.email"));
+        form.setFieldLabel("password", i18n.get("profile.password"));
+        form.setFieldLabel("organization", i18n.get("profile.organization"));
+        form.setFieldLabel("photo", i18n.get("profile.photo"));
+        form.setSubmitLabel(i18n.get("profile.createAccount"));
+        form.refreshFileLabels();
     }
 
     public void setOnRegister(Consumer<Map<String, String>> handler) {

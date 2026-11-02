@@ -297,7 +297,7 @@ public class MainController {
 
     private void openComparisonWithNewSecondText(Text secondText, File secondSourceFile) {
         if (firstComparisonText == null) {
-            ErrorAlert.show("Choose the first text for comparison.");
+            ErrorAlert.show(LocalizationService.getInstance().get("sm.chooseFirstTextForComparison"));
             return;
         }
 

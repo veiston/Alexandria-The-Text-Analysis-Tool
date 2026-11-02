@@ -13,6 +13,7 @@ import com.alexandria.view.components.shared.form.validation.PasswordValidator;
 
 public class ChangePasswordForm extends VBox {
     private static final double MAX_WIDTH = 380;
+    private final Label title = new Label();
     private final Form form;
     private Consumer<String> onChangePassword = password -> {
     };
@@ -24,10 +25,9 @@ public class ChangePasswordForm extends VBox {
         setMaxWidth(MAX_WIDTH);
         setPrefWidth(420);
 
-        LocalizationService i18n = LocalizationService.getInstance();
-        Label title = new Label(i18n.get("profile.changePassword"));
         title.getStyleClass().add("heading-lg");
 
+        LocalizationService i18n = LocalizationService.getInstance();
         form = new Form.Builder()
                 .field("newPassword", i18n.get("profile.newPassword"), FormField.Type.PASSWORD, true, new PasswordValidator())
                 .field("confirmPassword", i18n.get("profile.confirmPassword"), FormField.Type.PASSWORD, true)
@@ -46,6 +46,17 @@ public class ChangePasswordForm extends VBox {
 
         form.setOnSubmit(values -> onChangePassword.accept(values.get("newPassword")));
         getChildren().addAll(title, form);
+
+        refreshText();
+        LocalizationService.getInstance().addListener(locale -> refreshText());
+    }
+
+    public void refreshText() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        title.setText(i18n.get("profile.changePassword"));
+        form.setFieldLabel("newPassword", i18n.get("profile.newPassword"));
+        form.setFieldLabel("confirmPassword", i18n.get("profile.confirmPassword"));
+        form.setSubmitLabel(i18n.get("profile.changePassword"));
     }
 
     public void setOnChangePassword(Consumer<String> handler) {

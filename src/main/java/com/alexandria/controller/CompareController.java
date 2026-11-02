@@ -20,6 +20,7 @@ import com.alexandria.model.TermComparisonText;
 import com.alexandria.model.TextComparison;
 import com.alexandria.model.TextComparisonText;
 import com.alexandria.model.User;
+import com.alexandria.service.LocalizationService;
 import com.alexandria.service.PdfService;
 import com.alexandria.service.TermComparisonService;
 import com.alexandria.service.TextComparisonService;
@@ -121,7 +122,7 @@ public class CompareController {
     }
     public TextComparisonOutcome compareTexts(int limit) {
         if (currentTexts.isEmpty()) {
-            return TextComparisonOutcome.error("No texts currently selected for comparison.");
+            return TextComparisonOutcome.error(LocalizationService.getInstance().get("sm.noTextsSelectedForComparison"));
         }
 
         Map<Integer, String> contentsByTextId = new LinkedHashMap<>();
@@ -139,7 +140,7 @@ public class CompareController {
 
     public TermComparisonOutcome compareTerm(String term, boolean ignoreStopWords) {
         if (currentTexts.isEmpty()) {
-            return TermComparisonOutcome.error("No texts currently selected for comparison.");
+            return TermComparisonOutcome.error(LocalizationService.getInstance().get("sm.noTextsSelectedForComparison"));
         }
 
         try {
@@ -160,7 +161,7 @@ public class CompareController {
 
     public MultiSearchOutcome search(String term, com.alexandria.service.analysis.SearchSettings settings) {
         if (currentTexts.isEmpty()) {
-            return MultiSearchOutcome.error("No texts currently selected.");
+            return MultiSearchOutcome.error(LocalizationService.getInstance().get("sm.noTextsSelected"));
         }
         try {
             Map<Integer, String> contentsByTextId = new LinkedHashMap<>();
@@ -185,14 +186,14 @@ public class CompareController {
     public SaveOutcome saveFindings(Collection<String> trackedTerms) {
         User user = session.getCurrentUser();
         if (user == null) {
-            return SaveOutcome.error("Log in to save comparison findings.");
+            return SaveOutcome.error(LocalizationService.getInstance().get("sm.logInToSaveComparisonFindings"));
         }
         if (currentTexts.size() < 2) {
-            return SaveOutcome.error("No texts currently selected for comparison.");
+            return SaveOutcome.error(LocalizationService.getInstance().get("sm.noTextsSelectedForComparison"));
         }
         for (Text text : currentTexts) {
             if (text.getId() == null || !java.util.Objects.equals(user.getId(), text.getUserId())) {
-                return SaveOutcome.error("Both texts must be saved in your library to save findings.");
+                return SaveOutcome.error(LocalizationService.getInstance().get("sm.bothTextsMustBeSaved"));
             }
         }
 
@@ -233,22 +234,22 @@ public class CompareController {
             }
             return SaveOutcome.ok(saved);
         } catch (Exception e) {
-            return SaveOutcome.error("Could not save findings: " + e.getMessage());
+            return SaveOutcome.error(LocalizationService.getInstance().get("sm.couldNotSaveFindings") + " " + e.getMessage());
         }
     }
 
     private void validateTexts(List<Text> texts) {
         if (texts == null || texts.size() < 2) {
-            throw new IllegalArgumentException("Select at least two texts to compare.");
+            throw new IllegalArgumentException(LocalizationService.getInstance().get("sm.selectAtLeastTwoTexts"));
         }
 
         Set<Integer> textIds = new HashSet<>();
         for (Text text : texts) {
             if (text == null) {
-                throw new IllegalArgumentException("Select valid texts to compare.");
+                throw new IllegalArgumentException(LocalizationService.getInstance().get("sm.selectValidTexts"));
             }
             if (text.getId() != null && !textIds.add(text.getId())) {
-                throw new IllegalArgumentException("Selected texts must be unique.");
+                throw new IllegalArgumentException(LocalizationService.getInstance().get("sm.selectedTextsMustBeUnique"));
             }
         }
     }
@@ -258,13 +259,13 @@ public class CompareController {
             return;
         }
         if (files.size() != texts.size()) {
-            throw new IllegalArgumentException("A source file is required for every selected text.");
+            throw new IllegalArgumentException(LocalizationService.getInstance().get("sm.sourceFileRequired"));
         }
 
         for (int index = 0; index < texts.size(); index++) {
             if (texts.get(index).getFileType() != com.alexandria.model.FileType.MANUAL
                     && files.get(index) == null) {
-                throw new IllegalArgumentException("A source file is required for every selected text.");
+                throw new IllegalArgumentException(LocalizationService.getInstance().get("sm.sourceFileRequired"));
             }
         }
     }

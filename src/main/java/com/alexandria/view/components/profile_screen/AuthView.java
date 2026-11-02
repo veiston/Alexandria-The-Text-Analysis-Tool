@@ -59,6 +59,12 @@ public class AuthView extends VBox {
         LocalizationService i18n = LocalizationService.getInstance();
         title.setText(i18n.get("profile.welcome"));
         toggle.setLabels(i18n.get("profile.logIn"), i18n.get("profile.createAccount"));
+        if (loginForm != null) {
+            loginForm.refreshText();
+        }
+        if (registerForm != null) {
+            registerForm.refreshText();
+        }
     }
 
     private void showLogin() {
