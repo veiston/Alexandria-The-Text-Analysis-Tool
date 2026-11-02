@@ -1,6 +1,5 @@
 package com.alexandria.view.screens;
 
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -30,10 +29,7 @@ import javafx.scene.layout.VBox;
 
 public class LibraryScreen extends StackPane {
 
-    private static final DateTimeFormatter DATE_FORMAT =
-            DateTimeFormatter.ofPattern("d.MM.uuuu");
-
-    private final SearchInput searchInput = new SearchInput("Search library...");
+    private final SearchInput searchInput = new SearchInput(LocalizationService.getInstance().get("library.search"));
     private final FlowPane cardsPane = new FlowPane(16, 16);
     private final StackPane contentArea = new StackPane();
     private final BorderPane libraryLayout = new BorderPane();
@@ -41,6 +37,8 @@ public class LibraryScreen extends StackPane {
     private final Modal modal = new Modal();
     private final ComparisonTextModal comparisonTextModal = new ComparisonTextModal();
     private final HBox filterBar = new HBox(8);
+    private final Label title = new Label();
+    private final Label subtitle = new Label();
     private String activeFilter = "ALL";
 
     private List<Text> texts = List.of();
@@ -77,10 +75,8 @@ public class LibraryScreen extends StackPane {
             modal.hide();
             onAddNewComparisonText.accept(firstText);
         });
-        showTexts();
-        LocalizationService.getInstance().addListener(locale -> {
-            showTexts();
-        });
+        refreshText();
+        LocalizationService.getInstance().addListener(locale -> refreshText());
 
         // Refresh when router mounts screen into active scene
         sceneProperty().addListener((observable, oldScene, newScene) -> {
@@ -96,11 +92,20 @@ public class LibraryScreen extends StackPane {
         });
     }
 
+    public void refreshText() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        title.setText(i18n.get("library"));
+        subtitle.setText(i18n.get("library.subtitle"));
+        searchInput.setPromptText(i18n.get("library.search"));
+        updateFilterButtons();
+        showTexts();
+    }
+
     private VBox buildHeader() {
-        Label title = new Label("Library");
+        title.setText(LocalizationService.getInstance().get("library"));
         title.getStyleClass().add("heading-xl");
 
-        Label subtitle = new Label("Saved texts and documents");
+        subtitle.setText(LocalizationService.getInstance().get("library.subtitle"));
         subtitle.getStyleClass().addAll("text-muted", "archive-subtitle");
 
         VBox header = new VBox(10, title, subtitle, filterBar);
@@ -110,18 +115,28 @@ public class LibraryScreen extends StackPane {
 
     private void updateFilterButtons() {
         filterBar.getChildren().clear();
-        for (String filter : new String[]{"All", "PDF", "TXT", "Manual"}) {
-            Button btn = new Button(filter);
+        LocalizationService i18n = LocalizationService.getInstance();
+        String[][] filterDefs = {
+            {"ALL", i18n.get("all")},
+            {"PDF", i18n.get("pdf")},
+            {"TXT", i18n.get("txt")},
+            {"MANUAL", i18n.get("manual")}
+        };
+
+        for (String[] def : filterDefs) {
+            String filterKey = def[0];
+            String filterLabel = def[1];
+            Button btn = new Button(filterLabel);
             btn.getStyleClass().add("button");
-            
-            if (filter.toUpperCase().equals(activeFilter)) {
+
+            if (filterKey.equals(activeFilter)) {
                 btn.getStyleClass().add("primary");
             } else {
                 btn.getStyleClass().add("secondary");
             }
 
             btn.setOnAction(e -> {
-                activeFilter = filter.toUpperCase();
+                activeFilter = filterKey;
                 updateFilterButtons();
                 showTexts();
             });
@@ -140,14 +155,6 @@ public class LibraryScreen extends StackPane {
         searchInput.textProperty().addListener((observable, oldText, newText) -> {
             showTexts();
         });
-    }
-
-    public void setTexts(List<Text> texts) {
-        this.texts = List.of();
-        if (texts != null) {
-            this.texts = List.copyOf(texts);
-        }
-        showTexts();
     }
 
     public void setOnOpenInAnalysis(Consumer<Text> handler) {
@@ -187,11 +194,20 @@ public class LibraryScreen extends StackPane {
     }
 
     public void showSignInMessage() {
+        LocalizationService i18n = LocalizationService.getInstance();
         EmptyState emptyState = new EmptyState(
-                "Sign in to view your library",
-                "Create an account to save and organize your texts and datasets here");
+                i18n.get("library.signInTitle"),
+                i18n.get("library.signInSubtitle"));
         libraryLayout.setCenter(emptyState);
         BorderPane.setAlignment(emptyState, Pos.CENTER);
+    }
+
+    public void setTexts(List<Text> texts) {
+        this.texts = List.of();
+        if (texts != null) {
+            this.texts = List.copyOf(texts);
+        }
+        showTexts();
     }
 
     private void showTexts() {
@@ -200,32 +216,32 @@ public class LibraryScreen extends StackPane {
 
         boolean searching = !searchInput.getText().isBlank();
 
+        List<Text> visibleTexts = texts.stream()
+                .filter(text -> switch (activeFilter) {
+                    case "PDF" -> "PDF".equalsIgnoreCase(text.getFileType() != null ? text.getFileType().name() : "");
+                    case "TXT" -> "TXT".equalsIgnoreCase(text.getFileType() != null ? text.getFileType().name() : "");
+                    case "MANUAL" -> text.getFileType() == null;
+                    default -> true;
+                })
+                .filter(text -> matchesSearch(text.getTitle(), text.getFileName()))
+                .toList();
+
         if (!searching) {
             cardsPane.getChildren().add(createNewProjectCard());
         }
 
-        for (Text text : texts) {
-            String fileType = null;
-            if (text.getFileType() != null) {
-                fileType = text.getFileType().name();
-            }
-
-            if (!"ALL".equals(activeFilter) && !activeFilter.equalsIgnoreCase(fileType)) {
-                continue;
-            }
-
-            if (matchesSearch(text.getTitle(), text.getFileName(), fileType)) {
-                cardsPane.getChildren().add(createProjectCard(text));
-            }
+        for (Text text : visibleTexts) {
+            cardsPane.getChildren().add(createProjectCard(text));
         }
 
         StackPane libraryContent = new StackPane();
-        libraryContent.getStyleClass().add("archive-content");
 
-        if (cardsPane.getChildren().isEmpty()) {
-            EmptyState empty = new EmptyState(emptyMessage(), emptySubtitle());
-            libraryContent.getChildren().add(empty);
-            StackPane.setAlignment(empty, Pos.CENTER);
+        if (searching && visibleTexts.isEmpty()) {
+            EmptyState emptyState = new EmptyState(
+                    emptyMessage(),
+                    emptySubtitle());
+            emptyState.setMaxHeight(Double.MAX_VALUE);
+            libraryContent.getChildren().add(emptyState);
         } else {
             ScrollPane cardsScroll = new ScrollPane(cardsPane);
             cardsScroll.getStyleClass().add("shared-scroll");
@@ -239,25 +255,26 @@ public class LibraryScreen extends StackPane {
         VBox.setVgrow(libraryContent, Priority.ALWAYS);
 
         contentArea.getChildren().setAll(searchAndContent);
-        LocalizationService.getInstance().apply(cardsPane);
-        LocalizationService.getInstance().apply(libraryContent);
     }
 
     private String emptyMessage() {
+        LocalizationService i18n = LocalizationService.getInstance();
         if (!searchInput.getText().isBlank()) {
-            return "Nothing found";
+            return i18n.get("nothingFound");
         }
-        return "No saved texts yet";
+        return i18n.get("library.noSavedTexts");
     }
 
     private String emptySubtitle() {
+        LocalizationService i18n = LocalizationService.getInstance();
         if (!searchInput.getText().isBlank()) {
-            return "Try changing your search query";
+            return i18n.get("tryChangingSearchQuery");
         }
-        return "Create a new project to add a text to your library";
+        return i18n.get("library.emptySubtitle");
     }
 
     private Card createProjectCard(Text text) {
+        LocalizationService i18n = LocalizationService.getInstance();
         Card card = new Card(titleText(text));
 
         if (text.getFileType() != null) {
@@ -266,21 +283,21 @@ public class LibraryScreen extends StackPane {
         card.setSourceText(text.getFileName());
 
         if (text.getCreatedAt() != null) {
-            String dateText = DATE_FORMAT.format(text.getCreatedAt());
-            String footer = LocalizationService.getInstance().get("added").replace("{date}", dateText);
+            String dateText = i18n.formatDate(text.getCreatedAt().toLocalDate());
+            String footer = i18n.get("added").replace("{date}", dateText);
             card.setFooterText(footer);
         }
 
-        card.setActionText("Open with");
+        card.setActionText(i18n.get("openWith"));
         card.getActionButton().setOnAction(e -> {
             showOpenWithModal(text);
         });
 
         card.getDeleteButton().setOnAction(e -> {
             if (ConfirmationAlert.show(
-                    "Delete Text",
-                    "Delete this text?",
-                    "This action cannot be undone!")) {
+                    i18n.get("cm.deleteAnalysisTitle"),
+                    i18n.get("cm.deleteAnalysisQuestion"),
+                    i18n.get("cm.permanentActionWarning"))) {
                 onDeleteText.accept(text.getId());
             }
         });
@@ -289,14 +306,15 @@ public class LibraryScreen extends StackPane {
     }
 
     private VBox createNewProjectCard() {
+        LocalizationService i18n = LocalizationService.getInstance();
         FontIcon addIcon = new FontIcon("fas-plus-circle");
         addIcon.setIconSize(24);
         addIcon.getStyleClass().add("text-muted");
 
-        Label title = new Label("Start New Analysis");
+        Label title = new Label(i18n.get("library.startAnalysis"));
         title.getStyleClass().add("heading-md");
 
-        Label subtitle = new Label("From library documents");
+        Label subtitle = new Label(i18n.get("library.startAnalysisSubtitle"));
         subtitle.getStyleClass().add("text-muted");
 
         VBox card = new VBox(12, addIcon, title, subtitle);
@@ -312,13 +330,14 @@ public class LibraryScreen extends StackPane {
     }
 
     private void showOpenWithModal(Text text) {
-        Label title = new Label("Open Project");
+        LocalizationService i18n = LocalizationService.getInstance();
+        Label title = new Label(i18n.get("library.openProject"));
         title.getStyleClass().add("heading-lg");
 
         Label subtitle = new Label(titleText(text));
         subtitle.getStyleClass().add("text-muted");
 
-        Button analysisBtn = new Button("Open in Text Analysis");
+        Button analysisBtn = new Button(i18n.get("library.openInTextAnalysis"));
         analysisBtn.getStyleClass().addAll("button", "primary");
         analysisBtn.setMaxWidth(Double.MAX_VALUE);
         analysisBtn.setOnAction(e -> {
@@ -326,7 +345,7 @@ public class LibraryScreen extends StackPane {
             onOpenInAnalysis.accept(text);
         });
 
-        Button compareBtn = new Button("Compare with another file...");
+        Button compareBtn = new Button(i18n.get("library.compareWithFile"));
         compareBtn.getStyleClass().addAll("button", "secondary");
         compareBtn.setMaxWidth(Double.MAX_VALUE);
         compareBtn.setOnAction(e -> {

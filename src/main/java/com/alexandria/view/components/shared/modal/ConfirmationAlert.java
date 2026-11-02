@@ -1,6 +1,9 @@
 package com.alexandria.view.components.shared.modal;
 
+import com.alexandria.service.LocalizationService;
+
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 
 public class ConfirmationAlert {
@@ -11,6 +14,11 @@ public class ConfirmationAlert {
         alert.setHeaderText(header);
         alert.setContentText(message);
 
-        return alert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK;
+        LocalizationService i18n = LocalizationService.getInstance();
+        ButtonType okButton = new ButtonType(i18n.get("ok"), ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancelButton = new ButtonType(i18n.get("cancel"), ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().setAll(okButton, cancelButton);
+
+        return alert.showAndWait().orElse(cancelButton) == okButton;
     }
 }

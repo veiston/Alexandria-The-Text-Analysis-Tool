@@ -9,6 +9,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
+import com.alexandria.service.LocalizationService;
 import com.alexandria.view.components.shared.FrequencyBar;
 
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
@@ -19,13 +20,13 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class TrackedWordsList extends VBox {
-    private final Label headingLabel = new Label("Tracked Words");
+    private final Label headingLabel = new Label();
     private final Label countBadge = new Label("0");
     private final FontIcon toggleIcon = new FontIcon(FontAwesomeSolid.CHEVRON_UP);
     private final Button toggleButton = new Button();
 
     private final VBox rowsHost = new VBox(8);
-    private final Label emptyLabel = new Label("Search a term to start tracking it.");
+    private final Label emptyLabel = new Label();
 
     private final Map<String, Row> rows = new LinkedHashMap<>();
 
@@ -63,7 +64,16 @@ public class TrackedWordsList extends VBox {
         emptyLabel.getStyleClass().add("text-muted");
 
         getChildren().addAll(header, rowsHost);
+
+        refreshText();
+        LocalizationService.getInstance().addListener(locale -> refreshText());
         showEmptyIfNeeded();
+    }
+
+    public void refreshText() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        headingLabel.setText(i18n.get("analyse.trackedWords"));
+        emptyLabel.setText(i18n.get("analyse.searchTermToTrack"));
     }
 
     public void addOrUpdate(String word, int count) {

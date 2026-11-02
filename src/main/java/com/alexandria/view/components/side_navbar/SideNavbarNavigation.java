@@ -9,6 +9,8 @@ import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import com.alexandria.service.LocalizationService;
+
 import javafx.geometry.Pos;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
@@ -33,19 +35,21 @@ public class SideNavbarNavigation {
     }
 
     private VBox buildMainNavigation() {
+        LocalizationService i18n = LocalizationService.getInstance();
         return buildNavGroup(List.of(
-                new NavItem("library", "Library", FontAwesomeSolid.FOLDER),
-                new NavItem("analyze", "Analyze", FontAwesomeSolid.CHART_BAR),
-                new NavItem("compare", "Compare", FontAwesomeSolid.BALANCE_SCALE),
-                new NavItem("archive", "Archive", FontAwesomeSolid.ARCHIVE)),
+                new NavItem("library", i18n.get("library"), FontAwesomeSolid.FOLDER),
+                new NavItem("analyze", i18n.get("analyze"), FontAwesomeSolid.CHART_BAR),
+                new NavItem("compare", i18n.get("compare"), FontAwesomeSolid.BALANCE_SCALE),
+                new NavItem("archive", i18n.get("archive"), FontAwesomeSolid.ARCHIVE)),
                 false);
     }
 
     private VBox buildFooterNavigation() {
+        LocalizationService i18n = LocalizationService.getInstance();
         return buildNavGroup(List.of(
-                new NavItem("settings", "Settings", FontAwesomeSolid.COG),
-                new NavItem("userguide", "User Guide", FontAwesomeSolid.QUESTION_CIRCLE),
-                new NavItem("profile", "Profile", FontAwesomeSolid.USER)),
+                new NavItem("settings", i18n.get("settings"), FontAwesomeSolid.COG),
+                new NavItem("userguide", i18n.get("userGuide"), FontAwesomeSolid.QUESTION_CIRCLE),
+                new NavItem("profile", i18n.get("profile"), FontAwesomeSolid.USER)),
                 true);
     }
 
@@ -87,6 +91,14 @@ public class SideNavbarNavigation {
         return button;
     }
 
+    public void refreshText() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        for (Map.Entry<String, ToggleButton> entry : navButtons.entrySet()) {
+            String key = "userguide".equals(entry.getKey()) ? "userGuide" : entry.getKey();
+            entry.getValue().setText(i18n.get(key));
+        }
+    }
+
     public VBox getMainNavigation() {
         return mainNavigation;
     }
@@ -102,21 +114,18 @@ public class SideNavbarNavigation {
         }
     }
 
-    public void setOnNavigate(Consumer<String> handler) {
-        this.onNavigate = handler;
-    }
-
-    public void setOnFooterNavigate(Consumer<String> handler) {
-        this.onFooterNavigate = handler;
-    }
-
     public ToggleButton getButton(String id) {
         return navButtons.get(id);
     }
 
-    private record NavItem(
-            String id,
-            String label,
-            Ikon icon) {
+    public void setOnNavigate(Consumer<String> onNavigate) {
+        this.onNavigate = onNavigate;
+    }
+
+    public void setOnFooterNavigate(Consumer<String> onFooterNavigate) {
+        this.onFooterNavigate = onFooterNavigate;
+    }
+
+    private record NavItem(String id, String label, Ikon icon) {
     }
 }

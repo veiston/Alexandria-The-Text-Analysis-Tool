@@ -2,10 +2,8 @@ package com.alexandria.view.components.shared.quotation;
 
 import com.alexandria.model.Quotation;
 import com.alexandria.model.QuotationType;
+import com.alexandria.service.LocalizationService;
 import com.alexandria.view.components.shared.Card;
-
-import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -15,6 +13,9 @@ import javafx.scene.control.TextArea;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
+import org.kordamp.ikonli.javafx.FontIcon;
+
 import java.util.function.Consumer;
 
 public class QuotationCard extends Card {
@@ -22,7 +23,7 @@ public class QuotationCard extends Card {
     private static final double QUOTE_AREA_HEIGHT = 180;
 
     private final Quotation quotation;
-    private final Button editButton = iconButton(FontAwesomeSolid.PEN, "Edit");
+    private final Button editButton;
     private final TextArea quoteEditor = new TextArea();
 
     private boolean editing = false;
@@ -31,18 +32,19 @@ public class QuotationCard extends Card {
 
     public QuotationCard(Quotation quotation) {
         super("");
+        LocalizationService i18n = LocalizationService.getInstance();
 
         this.quotation = quotation;
 
         setPrefHeight(CARD_HEIGHT);
 
         QuotationType type = QuotationLocation.parseType(quotation.getLocation());
-        setTypeText(type == null ? null : type.label());
+        setTypeText(type == null ? null : type.getLocalizedLabel());
 
         Integer page = QuotationLocation.parsePage(quotation.getLocation());
 
         if (page != null) {
-            addTag("Page " + page).getStyleClass().add("tags-secondary");
+            addTag(i18n.get("quotations.page").replace("{page}", String.valueOf(page))).getStyleClass().add("tags-secondary");
         }
 
         Label quote = new Label("\u201C" + quotation.getQuotationText() + "\u201D");
@@ -67,13 +69,15 @@ public class QuotationCard extends Card {
 
         setExtraContent(quoteScroll);
 
-        setActionText("Go to \u2192");
+        setActionText(i18n.get("quotations.goTo"));
         setActionButtonExpand(false);
         setActionAlignment(Pos.CENTER_RIGHT);
         setActionDividerVisible(true);
         getActionButton().getStyleClass().setAll("button", "card-link-action");
 
-        Button copyButton = iconButton(FontAwesomeSolid.COPY, "Copy");
+        editButton = iconButton(FontAwesomeSolid.PEN, i18n.get("quotations.edit"));
+
+        Button copyButton = iconButton(FontAwesomeSolid.COPY, i18n.get("quotations.copy"));
         copyButton.setOnAction(e -> copyQuotationText());
 
         editButton.setOnAction(e -> toggleEdit(quote, quoteScroll));
@@ -99,6 +103,7 @@ public class QuotationCard extends Card {
     }
 
     private void toggleEdit(Label quote, ScrollPane quoteScroll) {
+        LocalizationService i18n = LocalizationService.getInstance();
         if (!editing) {
             editing = true;
 
@@ -112,7 +117,7 @@ public class QuotationCard extends Card {
             quoteEditor.setVisible(true);
             quoteEditor.setManaged(true);
 
-            editButton.setText("Update");
+            editButton.setText(i18n.get("quotations.update"));
 
             FontIcon icon = new FontIcon(FontAwesomeSolid.SAVE);
             icon.setIconSize(12);
@@ -140,7 +145,7 @@ public class QuotationCard extends Card {
             quoteScroll.setVisible(true);
             quoteScroll.setManaged(true);
 
-            editButton.setText("Edit");
+            editButton.setText(i18n.get("quotations.edit"));
 
             FontIcon icon = new FontIcon(FontAwesomeSolid.PEN);
             icon.setIconSize(12);

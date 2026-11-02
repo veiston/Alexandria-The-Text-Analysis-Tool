@@ -8,6 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
 import com.alexandria.model.User;
+import com.alexandria.service.LocalizationService;
 import com.alexandria.view.components.shared.form.Form;
 import com.alexandria.view.components.shared.form.FormField;
 import com.alexandria.view.components.shared.form.validation.EmailValidator;
@@ -16,6 +17,7 @@ import com.alexandria.view.components.shared.form.validation.TextValidator;
 
 public class EditProfileForm extends VBox {
     private static final double MAX_WIDTH = 380;
+    private final Label title = new Label();
     private final Form form;
     private Consumer<Map<String, String>> onSave = values -> {
     };
@@ -27,25 +29,31 @@ public class EditProfileForm extends VBox {
         setMaxWidth(MAX_WIDTH);
         setPrefWidth(420);
 
-        Label title = new Label("Edit Profile");
         title.getStyleClass().add("heading-lg");
 
         form = new Form.Builder()
-                .field("name", "Username", FormField.Type.TEXT, false, new TextValidator())
-                .field("email", "Email", FormField.Type.TEXT, false, new EmailValidator())
-                .field("organization", "Organization", FormField.Type.TEXT, false, new TextValidator())
-                .field("photo", "Profile Photo", FormField.Type.IMG_FILE, false, new FileValidator())
-                .submitLabel("Save Changes")
+                .field("name", "profile.username", FormField.Type.TEXT, false, new TextValidator())
+                .field("email", "profile.email", FormField.Type.TEXT, false, new EmailValidator())
+                .field("organization", "profile.organization", FormField.Type.TEXT, false, new TextValidator())
+                .field("photo", "profile.photo", FormField.Type.IMG_FILE, false, new FileValidator())
+                .submitLabel("profile.saveChanges")
                 .customValidator(values -> {
                     boolean anyFilled = values.values().stream()
                             .anyMatch(v -> v != null && !v.isBlank());
 
-                    return anyFilled ? null : "Change at least one field.";
+                    return anyFilled ? null : LocalizationService.getInstance().get("vm.changeAtLeastOneField");
                 })
                 .build();
 
         form.setOnSubmit(values -> onSave.accept(values));
         getChildren().addAll(title, form);
+
+        refreshText();
+        LocalizationService.getInstance().addListener(locale -> refreshText());
+    }
+
+    public void refreshText() {
+        title.setText(LocalizationService.getInstance().get("profile.edit"));
     }
 
     public void prefill(User user) {

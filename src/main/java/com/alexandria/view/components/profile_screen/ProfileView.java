@@ -1,6 +1,7 @@
 package com.alexandria.view.components.profile_screen;
 
 import com.alexandria.model.User;
+import com.alexandria.service.LocalizationService;
 
 import javafx.geometry.Rectangle2D;
 import javafx.geometry.Pos;
@@ -25,6 +26,12 @@ public class ProfileView extends VBox {
     private final Button logoutButton;
     private final Button deleteAccountButton;
 
+    private final Label securityTitleLabel = new Label();
+    private final Label passwordFieldLabel = new Label();
+    private final Label dangerZoneTitleLabel = new Label();
+
+    private User currentUser;
+
     private Runnable onEdit = () -> {
     };
     private Runnable onChangePassword = () -> {
@@ -35,6 +42,7 @@ public class ProfileView extends VBox {
     };
 
     public ProfileView() {
+        LocalizationService i18n = LocalizationService.getInstance();
         getStyleClass().add("profile-view");
         setSpacing(24);
 
@@ -57,7 +65,7 @@ public class ProfileView extends VBox {
         VBox profileInfo = new VBox(4, nameLabel, emailLabel, organizationLabel);
         profileInfo.getStyleClass().add("profile-info");
 
-        editButton = new Button("Edit Profile");
+        editButton = new Button(i18n.get("profile.edit"));
         editButton.getStyleClass().addAll("button", "secondary", "profile-edit-button");
         editButton.setOnAction(e -> onEdit.run());
 
@@ -70,18 +78,27 @@ public class ProfileView extends VBox {
         VBox profileCard = new VBox(profileHeader);
         profileCard.getStyleClass().add("profile-card");
 
-        changePasswordButton = new Button("Change Password");
+        changePasswordButton = new Button(i18n.get("profile.changePassword"));
         changePasswordButton.getStyleClass().addAll("button", "secondary", "settings-action-button");
         changePasswordButton.setOnAction(e -> onChangePassword.run());
 
-        VBox securitySection = createSection("Security",
-                createSettingRow("Password", changePasswordButton));
+        securityTitleLabel.getStyleClass().add("settings-section-title");
+        passwordFieldLabel.getStyleClass().add("settings-name");
+        HBox.setHgrow(passwordFieldLabel, Priority.ALWAYS);
 
-        logoutButton = new Button("Log Out");
+        HBox passwordRow = new HBox(passwordFieldLabel, changePasswordButton);
+        passwordRow.setAlignment(Pos.CENTER_LEFT);
+        passwordRow.getStyleClass().add("settings-row");
+
+        VBox securitySection = new VBox();
+        securitySection.getStyleClass().add("settings-section");
+        securitySection.getChildren().addAll(securityTitleLabel, passwordRow);
+
+        logoutButton = new Button(i18n.get("profile.logOut"));
         logoutButton.getStyleClass().addAll("button", "danger");
         logoutButton.setOnAction(e -> onLogout.run());
 
-        deleteAccountButton = new Button("Delete Account");
+        deleteAccountButton = new Button(i18n.get("cm.deleteAccountTitle"));
         deleteAccountButton.getStyleClass().addAll("button", "danger", "danger-action-button");
         deleteAccountButton.setOnAction(e -> onDeleteAccount.run());
 
@@ -89,44 +106,46 @@ public class ProfileView extends VBox {
         dangerActions.setAlignment(Pos.CENTER_RIGHT);
         dangerActions.getStyleClass().add("danger-actions");
 
-        VBox dangerSection = createSection("Danger Zone", dangerActions);
+        dangerZoneTitleLabel.getStyleClass().add("settings-section-title");
+        VBox dangerSection = new VBox();
+        dangerSection.getStyleClass().add("settings-section");
+        dangerSection.getChildren().addAll(dangerZoneTitleLabel, dangerActions);
 
         VBox settingsList = new VBox(securitySection, dangerSection);
         settingsList.getStyleClass().add("settings-list");
         getChildren().addAll(profileCard, settingsList);
+
+        refreshText();
+        LocalizationService.getInstance().addListener(locale -> refreshText());
     }
 
-    private VBox createSection(String title, Node... content) {
-        Label titleLabel = new Label(title);
-        titleLabel.getStyleClass().add("settings-section-title");
+    public void refreshText() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        editButton.setText(i18n.get("profile.edit"));
+        changePasswordButton.setText(i18n.get("profile.changePassword"));
+        securityTitleLabel.setText(i18n.get("profile.security"));
+        passwordFieldLabel.setText(i18n.get("profile.password"));
+        dangerZoneTitleLabel.setText(i18n.get("profile.dangerZone"));
+        logoutButton.setText(i18n.get("profile.logOut"));
+        deleteAccountButton.setText(i18n.get("cm.deleteAccountTitle"));
 
-        VBox section = new VBox();
-        section.getStyleClass().add("settings-section");
-        section.getChildren().add(titleLabel);
-        section.getChildren().addAll(content);
-
-        return section;
-    }
-
-    private HBox createSettingRow(String name, Node control) {
-        Label nameLabel = new Label(name);
-        nameLabel.getStyleClass().add("settings-name");
-
-        HBox.setHgrow(nameLabel, Priority.ALWAYS);
-        HBox row = new HBox(nameLabel, control);
-        row.setAlignment(Pos.CENTER_LEFT);
-        row.getStyleClass().add("settings-row");
-
-        return row;
+        if (currentUser != null) {
+            organizationLabel.setText(
+                    currentUser.getOrganization() == null || currentUser.getOrganization().isBlank()
+                            ? i18n.get("profile.noOrganization")
+                            : currentUser.getOrganization());
+        }
     }
 
     public void setUser(User user) {
+        this.currentUser = user;
         nameLabel.setText(user.getName());
         emailLabel.setText(user.getEmail());
 
+        LocalizationService i18n = LocalizationService.getInstance();
         organizationLabel.setText(
                 user.getOrganization() == null || user.getOrganization().isBlank()
-                        ? "No organization set"
+                        ? i18n.get("profile.noOrganization")
                         : user.getOrganization());
 
         if (user.getPhoto() != null && !user.getPhoto().isBlank()) {
@@ -161,7 +180,7 @@ public class ProfileView extends VBox {
         avatar.setViewport(new Rectangle2D(x, y, size, size));
     }
 
-    /* Actioin callbacks */
+    /* Action callbacks */
 
     public void setOnEdit(Runnable action) {
         this.onEdit = action;

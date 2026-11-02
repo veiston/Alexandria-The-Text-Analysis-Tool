@@ -3,6 +3,7 @@ package com.alexandria.view.components.side_navbar.new_project;
 import java.io.File;
 import java.util.function.Consumer;
 
+import com.alexandria.service.LocalizationService;
 import com.alexandria.view.components.shared.LoadingIndicator;
 import com.alexandria.view.components.shared.toggle.Toggle;
 
@@ -46,6 +47,8 @@ public class NewProjectModal extends VBox {
     private final Toggle sourceToggle;
     private final Toggle uploadDestinationToggle;
     private final Toggle pasteDestinationToggle;
+    private final Label uploadDestinationLabel = new Label();
+    private final Label pasteDestinationLabel = new Label();
     private final VBox uploadDestinationBox;
     private final VBox pasteDestinationBox;
     private final Label heading;
@@ -59,6 +62,7 @@ public class NewProjectModal extends VBox {
 
     private final LoadingIndicator loadingIndicator;
     private boolean addingSecondComparisonText;
+    private String comparisonFirstTextTitle;
 
     private Consumer<CreatedProject> onCreated = project -> {
     };
@@ -69,7 +73,7 @@ public class NewProjectModal extends VBox {
         setPadding(new Insets(24));
         setPrefWidth(380);
 
-        heading = new Label("New Project");
+        heading = new Label();
         heading.getStyleClass().add("heading-lg");
 
         subtitle = new Label();
@@ -78,18 +82,17 @@ public class NewProjectModal extends VBox {
         subtitle.setManaged(false);
         header = new VBox(4, heading, subtitle);
 
-        sourceToggle = new Toggle("Upload File", "Paste Text");
+        sourceToggle = new Toggle("", "");
 
         uploadDestinationToggle = createDestinationToggle();
         pasteDestinationToggle = createDestinationToggle();
 
         formHost = new VBox();
 
-        uploadDestinationBox = createDestinationBox(uploadDestinationToggle);
-        pasteDestinationBox = createDestinationBox(pasteDestinationToggle);
+        uploadDestinationBox = createDestinationBox(uploadDestinationLabel, uploadDestinationToggle);
+        pasteDestinationBox = createDestinationBox(pasteDestinationLabel, pasteDestinationToggle);
 
         uploadForm = new UploadPdfForm(uploadDestinationBox);
-
         pasteForm = new PasteTextForm(pasteDestinationBox);
 
         loadingIndicator = new LoadingIndicator();
@@ -111,19 +114,42 @@ public class NewProjectModal extends VBox {
                 header,
                 sourceToggle,
                 formStack);
+
+        refreshText();
+        LocalizationService.getInstance().addListener(locale -> refreshText());
+    }
+
+    public void refreshText() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        sourceToggle.setLabels(i18n.get("newProject.uploadFile"), i18n.get("newProject.pasteText"));
+        uploadDestinationToggle.setLabels(i18n.get("analyze"), i18n.get("compare"));
+        pasteDestinationToggle.setLabels(i18n.get("analyze"), i18n.get("compare"));
+        uploadDestinationLabel.setText(i18n.get("newProject.openIn"));
+        pasteDestinationLabel.setText(i18n.get("newProject.openIn"));
+
+        if (addingSecondComparisonText) {
+            String title = comparisonFirstTextTitle != null ? comparisonFirstTextTitle : "";
+            heading.setText(i18n.get("library.comparisonTitle").replace("{title}", title));
+            subtitle.setText(i18n.get("newProject.addSecondText"));
+            uploadForm.getForm().getSubmitButton().setText(i18n.get("newProject.addToComparison"));
+            pasteForm.getForm().getSubmitButton().setText(i18n.get("newProject.addToComparison"));
+        } else {
+            heading.setText(i18n.get("newProject.title"));
+            uploadForm.getForm().getSubmitButton().setText(i18n.get("newProject.createProject"));
+            pasteForm.getForm().getSubmitButton().setText(i18n.get("newProject.createProject"));
+        }
     }
 
     private Toggle createDestinationToggle() {
-        return new Toggle("Analyse", "Compare");
+        return new Toggle("", "");
     }
 
-    private VBox createDestinationBox(Toggle destinationToggle) {
-        Label destinationLabel = new Label("Open In");
-        destinationLabel.getStyleClass().add("form-label");
+    private VBox createDestinationBox(Label label, Toggle destinationToggle) {
+        label.getStyleClass().add("form-label");
 
         VBox destinationBox = new VBox(8);
         destinationBox.getChildren().addAll(
-                destinationLabel,
+                label,
                 destinationToggle);
 
         return destinationBox;
@@ -217,7 +243,9 @@ public class NewProjectModal extends VBox {
 
     public void reset() {
         addingSecondComparisonText = false;
-        heading.setText("New Project");
+        comparisonFirstTextTitle = null;
+        LocalizationService i18n = LocalizationService.getInstance();
+        heading.setText(i18n.get("newProject.title"));
         subtitle.setText("");
         subtitle.setVisible(false);
         subtitle.setManaged(false);
@@ -225,8 +253,8 @@ public class NewProjectModal extends VBox {
         uploadDestinationBox.setManaged(true);
         pasteDestinationBox.setVisible(true);
         pasteDestinationBox.setManaged(true);
-        uploadForm.getForm().getSubmitButton().setText("Create Project");
-        pasteForm.getForm().getSubmitButton().setText("Create Project");
+        uploadForm.getForm().getSubmitButton().setText(i18n.get("newProject.createProject"));
+        pasteForm.getForm().getSubmitButton().setText(i18n.get("newProject.createProject"));
         uploadForm.reset();
         pasteForm.reset();
 
@@ -240,16 +268,18 @@ public class NewProjectModal extends VBox {
 
     public void showSecondComparisonTextForm(String firstTextTitle) {
         addingSecondComparisonText = true;
-        heading.setText("Compare \"" + firstTextTitle + "\" with:");
-        subtitle.setText("Add a second text to compare");
+        comparisonFirstTextTitle = firstTextTitle;
+        LocalizationService i18n = LocalizationService.getInstance();
+        heading.setText(i18n.get("library.comparisonTitle").replace("{title}", firstTextTitle != null ? firstTextTitle : ""));
+        subtitle.setText(i18n.get("newProject.addSecondText"));
         subtitle.setVisible(true);
         subtitle.setManaged(true);
         uploadDestinationBox.setVisible(false);
         uploadDestinationBox.setManaged(false);
         pasteDestinationBox.setVisible(false);
         pasteDestinationBox.setManaged(false);
-        uploadForm.getForm().getSubmitButton().setText("Add to comparison");
-        pasteForm.getForm().getSubmitButton().setText("Add to comparison");
+        uploadForm.getForm().getSubmitButton().setText(i18n.get("newProject.addToComparison"));
+        pasteForm.getForm().getSubmitButton().setText(i18n.get("newProject.addToComparison"));
         uploadForm.reset();
         pasteForm.reset();
         sourceToggle.setSelectedIndex(0);

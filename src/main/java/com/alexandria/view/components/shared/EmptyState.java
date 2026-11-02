@@ -1,6 +1,7 @@
 package com.alexandria.view.components.shared;
 
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
@@ -21,5 +22,9 @@ public class EmptyState extends VBox {
             subtitle.getStyleClass().add("empty-state-subtitle");
             getChildren().add(subtitle);
         }
+    }
+
+    public void setAction(Button action) {
+        getChildren().add(action);
     }
 }

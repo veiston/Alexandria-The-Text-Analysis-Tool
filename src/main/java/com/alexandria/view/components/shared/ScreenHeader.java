@@ -52,6 +52,11 @@ public class ScreenHeader extends HBox {
             getChildren().addAll(viewToggle, saveButton);
         }
 
+        public void refreshText(String firstView, String secondView, String saveLabel) {
+            viewToggle.setLabels(firstView, secondView);
+            saveButton.setText(saveLabel);
+        }
+
         public void setOnViewChange(IntConsumer handler) {
             onViewChange = handler == null ? index -> {
             } : handler;

@@ -1,7 +1,9 @@
 package com.alexandria.view.screens;
 
-import com.alexandria.view.components.shared.toggle.Toggle;
+import java.util.List;
 
+import com.alexandria.service.LocalizationService;
+import com.alexandria.view.components.shared.toggle.Toggle;
 import com.alexandria.view.components.user_guide.UserGuideData;
 import com.alexandria.view.components.user_guide.UserGuideSection;
 import com.alexandria.view.components.user_guide.UserGuideSectionContent;
@@ -21,16 +23,27 @@ import javafx.scene.text.TextFlow;
 
 public class UserGuideScreen extends VBox {
 
-    private final Toggle sectionToggle = new Toggle(
-            "New Project", "Library", "Analyze", "Compare", "Archive", "Profile", "Settings");
+    private final Toggle sectionToggle;
     private final VBox sectionContent = new VBox(24);
+    private final Label title = new Label();
+    private final Label subtitle = new Label();
+    private final UserGuideTourButton tourButton = new UserGuideTourButton();
+    private final VBox description = new VBox(8);
 
     public UserGuideScreen() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        sectionToggle = new Toggle(
+                i18n.get("sidebar.newProject"),
+                i18n.get("library"),
+                i18n.get("analyze"),
+                i18n.get("compare"),
+                i18n.get("archive"),
+                i18n.get("profile"),
+                i18n.get("settings"));
+
         getStyleClass().add("user-guide-screen");
         setSpacing(20);
         setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-
-        VBox description = buildDescription();
 
         sectionToggle.getStyleClass().add("user-guide-tabs");
         sectionToggle.setMaxWidth(Double.MAX_VALUE);
@@ -43,29 +56,47 @@ public class UserGuideScreen extends VBox {
         VBox.setVgrow(scrollPane, Priority.ALWAYS);
 
         getChildren().addAll(buildHeader(), description, sectionToggle, scrollPane);
-        showSection(0);
+
+        refreshText();
+        LocalizationService.getInstance().addListener(locale -> refreshText());
+    }
+
+    public void refreshText() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        title.setText(i18n.get("userGuide"));
+        subtitle.setText(i18n.get("userGuide.subtitle"));
+        tourButton.refreshText();
+        sectionToggle.setLabels(
+                i18n.get("sidebar.newProject"),
+                i18n.get("library"),
+                i18n.get("analyze"),
+                i18n.get("compare"),
+                i18n.get("archive"),
+                i18n.get("profile"),
+                i18n.get("settings"));
+        buildDescription();
+        int selected = sectionToggle.getSelectedIndex();
+        showSection(selected < 0 ? 0 : selected);
     }
 
     private HBox buildHeader() {
-        Label title = new Label("User Guide");
         title.getStyleClass().add("heading-xl");
 
-        Label subtitle = new Label("Guidelines for using the application");
         subtitle.getStyleClass().addAll("text-muted", "user-guide-subtitle");
 
         VBox titleBox = new VBox(6, title, subtitle);
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        HBox header = new HBox(titleBox, spacer, new UserGuideTourButton());
+        HBox header = new HBox(titleBox, spacer, tourButton);
         header.setAlignment(Pos.CENTER_LEFT);
         header.getStyleClass().add("user-guide-header");
         return header;
     }
 
-    private VBox buildDescription() {
-        VBox description = new VBox(8);
-        for (String text : UserGuideData.ABOUT_PARAGRAPHS) {
+    private void buildDescription() {
+        description.getChildren().clear();
+        for (String text : UserGuideData.getAboutParagraphs()) {
             Text paragraph = new Text(text);
             paragraph.getStyleClass().add("user-guide-description-text");
 
@@ -77,27 +108,26 @@ public class UserGuideScreen extends VBox {
             description.getChildren().add(paragraphFlow);
         }
         description.setMaxWidth(Double.MAX_VALUE);
-        return description;
     }
 
     private void showSection(int index) {
         Node section = switch (index) {
             case 0 -> new UserGuideSection(
-                    new UserGuideSectionContent(UserGuideData.NEW_PROJECT_STEPS, null),
+                    new UserGuideSectionContent(UserGuideData.getNewProjectSteps(), null),
                     "/images/user-guide/new-project.png");
             case 1 -> new UserGuideSection(
-                    new UserGuideSectionContent(UserGuideData.LIBRARY_STEPS, null),
+                    new UserGuideSectionContent(UserGuideData.getLibrarySteps(), null),
                     "/images/user-guide/library.png");
             case 2 -> buildAnalyzeGuide();
             case 3 -> buildCompareGuide();
             case 4 -> new UserGuideSection(
-                    new UserGuideSectionContent(UserGuideData.ARCHIVE_STEPS, null),
+                    new UserGuideSectionContent(UserGuideData.getArchiveSteps(), null),
                     "/images/user-guide/archive.png");
             case 5 -> new UserGuideSection(
-                    new UserGuideSectionContent(UserGuideData.PROFILE_STEPS, null),
+                    new UserGuideSectionContent(UserGuideData.getProfileSteps(), null),
                     "/images/user-guide/profile.png");
             case 6 -> new UserGuideSection(
-                    new UserGuideSectionContent(UserGuideData.SETTINGS_STEPS, UserGuideData.SETTINGS_NOTE),
+                    new UserGuideSectionContent(UserGuideData.getSettingsSteps(), UserGuideData.getSettingsNote()),
                     "/images/user-guide/settings.png");
             default -> new VBox();
         };
@@ -105,18 +135,20 @@ public class UserGuideScreen extends VBox {
     }
 
     private Node buildAnalyzeGuide() {
-        Label startTitle = guideHeading("Open a text for analysis");
-        Label startDescription = new Label(UserGuideData.ANALYZE_INTRODUCTION);
+        LocalizationService i18n = LocalizationService.getInstance();
+        Label startTitle = guideHeading(i18n.get("userGuide.analyzeTitle"));
+        Label startDescription = new Label(UserGuideData.getAnalyzeIntroduction());
         startDescription.getStyleClass().add("user-guide-row-text");
         startDescription.setWrapText(true);
         startDescription.setMinWidth(0);
         startDescription.setMaxWidth(Double.MAX_VALUE);
 
-        Label functionsTitle = guideHeading("How analysis results are calculated");
+        Label functionsTitle = guideHeading(i18n.get("userGuide.analyzeMethodsTitle"));
 
         VBox functionList = new VBox(10);
-        for (int i = 0; i < UserGuideData.ANALYZE_METHODS.size(); i++) {
-            functionList.getChildren().add(new UserGuideStep(i + 1, UserGuideData.ANALYZE_METHODS.get(i)));
+        List<String> methods = UserGuideData.getAnalyzeMethods();
+        for (int i = 0; i < methods.size(); i++) {
+            functionList.getChildren().add(new UserGuideStep(i + 1, methods.get(i)));
         }
 
         VBox content = new VBox(12, startTitle, startDescription, functionsTitle, functionList);
@@ -125,18 +157,20 @@ public class UserGuideScreen extends VBox {
     }
 
     private Node buildCompareGuide() {
-        Label startTitle = guideHeading("Open texts for comparison");
-        Label startDescription = new Label(UserGuideData.COMPARE_INTRODUCTION);
+        LocalizationService i18n = LocalizationService.getInstance();
+        Label startTitle = guideHeading(i18n.get("userGuide.compareTitle"));
+        Label startDescription = new Label(UserGuideData.getCompareIntroduction());
         startDescription.getStyleClass().add("user-guide-row-text");
         startDescription.setWrapText(true);
         startDescription.setMinWidth(0);
         startDescription.setMaxWidth(Double.MAX_VALUE);
 
-        Label functionsTitle = guideHeading("How comparison results are calculated");
+        Label functionsTitle = guideHeading(i18n.get("userGuide.compareMethodsTitle"));
 
         VBox functionList = new VBox(10);
-        for (int i = 0; i < UserGuideData.COMPARE_METHODS.size(); i++) {
-            functionList.getChildren().add(new UserGuideStep(i + 1, UserGuideData.COMPARE_METHODS.get(i)));
+        List<String> methods = UserGuideData.getCompareMethods();
+        for (int i = 0; i < methods.size(); i++) {
+            functionList.getChildren().add(new UserGuideStep(i + 1, methods.get(i)));
         }
 
         VBox content = new VBox(12, startTitle, startDescription, functionsTitle, functionList);

@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 
 import javafx.scene.layout.VBox;
 
+import com.alexandria.service.LocalizationService;
 import com.alexandria.view.components.shared.form.Form;
 import com.alexandria.view.components.shared.form.FormField;
 import com.alexandria.view.components.shared.form.validation.EmailValidator;
@@ -20,17 +21,21 @@ public class RegisterForm extends VBox {
         getStyleClass().add("register-form");
 
         form = new Form.Builder()
-                .field("name", "Username", FormField.Type.TEXT, true, new TextValidator())
-                .field("email", "Email", FormField.Type.TEXT, true, new EmailValidator())
-                .field("password", "Password", FormField.Type.PASSWORD, true, new PasswordValidator())
-                .field("organization", "Organization", FormField.Type.TEXT, false, new TextValidator())
-                .field("photo", "Profile Photo", FormField.Type.IMG_FILE, false, new FileValidator())
-                .submitLabel("Create Account")
+                .field("name", "profile.username", FormField.Type.TEXT, true, new TextValidator())
+                .field("email", "profile.email", FormField.Type.TEXT, true, new EmailValidator())
+                .field("password", "profile.password", FormField.Type.PASSWORD, true, new PasswordValidator())
+                .field("organization", "profile.organization", FormField.Type.TEXT, false, new TextValidator())
+                .field("photo", "profile.photo", FormField.Type.IMG_FILE, false, new FileValidator())
+                .submitLabel("profile.createAccount")
                 .build();
 
         form.getSubmitButton().setDefaultButton(true);
         form.setOnSubmit(values -> onRegister.accept(values));
         getChildren().add(form);
+    }
+
+    public void refreshText() {
+        form.refreshText();
     }
 
     public void setOnRegister(Consumer<Map<String, String>> handler) {

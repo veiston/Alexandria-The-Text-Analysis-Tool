@@ -13,6 +13,7 @@ import com.alexandria.model.TextComparisonText;
 import com.alexandria.model.User;
 import com.alexandria.service.ArchiveTermAnalysisService;
 import com.alexandria.service.ArchiveTextAnalysisService;
+import com.alexandria.service.LocalizationService;
 import com.alexandria.service.analysis.TermComparisonResult;
 import com.alexandria.service.analysis.TextComparisonResult;
 import com.alexandria.utils.JsonMapper;
@@ -113,7 +114,7 @@ public class ArchiveController {
 
         } catch (SQLException | RuntimeException e) {
             System.err.println("Could not load archive: " + e.getMessage());
-            ErrorAlert.show("Could not load saved analyses.");
+            ErrorAlert.show(LocalizationService.getInstance().get("sm.couldNotLoadSavedAnalyses"));
 
             archiveScreen.setTextAnalyses(List.of());
             archiveScreen.setTermAnalyses(List.of());
@@ -272,7 +273,7 @@ public class ArchiveController {
             System.err.println(
                     "Could not delete text analysis: " + e.getMessage());
 
-            ErrorAlert.show("Could not delete text analysis.");
+            ErrorAlert.show(LocalizationService.getInstance().get("sm.couldNotDeleteTextAnalysis"));
         }
     }
 
@@ -291,7 +292,7 @@ public class ArchiveController {
             System.err.println(
                     "Could not delete term analysis: " + e.getMessage());
 
-            ErrorAlert.show("Could not delete term analysis.");
+            ErrorAlert.show(LocalizationService.getInstance().get("sm.couldNotDeleteTermAnalysis"));
         }
     }
 
@@ -326,7 +327,7 @@ public class ArchiveController {
             System.err.println(
                     "Could not delete text comparison: " + e.getMessage());
 
-            ErrorAlert.show("Could not delete text comparison.");
+            ErrorAlert.show(LocalizationService.getInstance().get("sm.couldNotDeleteTextComparison"));
         }
     }
 
@@ -361,7 +362,7 @@ public class ArchiveController {
             System.err.println(
                     "Could not delete term comparison: " + e.getMessage());
 
-            ErrorAlert.show("Could not delete term comparison.");
+            ErrorAlert.show(LocalizationService.getInstance().get("sm.couldNotDeleteTermComparison"));
         }
     }
 }

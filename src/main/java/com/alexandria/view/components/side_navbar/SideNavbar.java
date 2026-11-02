@@ -2,6 +2,8 @@ package com.alexandria.view.components.side_navbar;
 
 import java.util.function.Consumer;
 
+import com.alexandria.service.LocalizationService;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -28,7 +30,10 @@ public class SideNavbar extends VBox {
     };
 
     public SideNavbar() {
-        this("Alexandria Text Analysis", "Statistics Intelligence.");
+        this(
+            LocalizationService.getInstance().get("logo"),
+            LocalizationService.getInstance().get("logoSubtitle")
+        );
     }
 
     public SideNavbar(String title, String subtitle) {
@@ -61,6 +66,9 @@ public class SideNavbar extends VBox {
                 buildSpacer(),
                 buildSeparator(),
                 navigation.getFooterNavigation());
+
+        refreshText();
+        LocalizationService.getInstance().addListener(locale -> refreshText());
     }
 
     private VBox buildBrandSection() {
@@ -89,7 +97,7 @@ public class SideNavbar extends VBox {
     }
 
     private Button buildNewProjectButton() {
-        Button button = new Button("+ New Project");
+        Button button = new Button(LocalizationService.getInstance().get("sidebar.newProject"));
         button.getStyleClass().addAll("button", "primary");
         button.setMaxWidth(Double.MAX_VALUE);
         button.setOnAction(e -> onNewProject.run());
@@ -110,6 +118,14 @@ public class SideNavbar extends VBox {
         separator.getStyleClass().add("separator");
 
         return separator;
+    }
+
+    public void refreshText() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        titleLabel.setText(i18n.get("logo"));
+        subtitleLabel.setText(i18n.get("logoSubtitle"));
+        newProjectButton.setText(i18n.get("sidebar.newProject"));
+        navigation.refreshText();
     }
 
     public void selectItem(String id) {
