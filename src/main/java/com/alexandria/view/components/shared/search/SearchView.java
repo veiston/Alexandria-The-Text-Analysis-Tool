@@ -1,9 +1,9 @@
 package com.alexandria.view.components.shared.search;
 
-
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import com.alexandria.service.LocalizationService;
 import com.alexandria.service.analysis.SearchSettings;
 import com.alexandria.view.components.shared.SearchInput;
 
@@ -23,10 +23,12 @@ public class SearchView extends VBox {
     private final Button nextButton;
     private final TrackedWordsList trackedWordsList;
 
-    private final CheckBox fuzzyCheckBox = new CheckBox("Fuzzy");
-    private final CheckBox caseCheckBox = new CheckBox("Case sensitive");
-    private final CheckBox wholeWordCheckBox = new CheckBox("Whole word");
-    private final CheckBox stopWordsCheckBox = new CheckBox("Stop words");
+    private final CheckBox fuzzyCheckBox = new CheckBox();
+    private final CheckBox caseCheckBox = new CheckBox();
+    private final CheckBox wholeWordCheckBox = new CheckBox();
+    private final CheckBox stopWordsCheckBox = new CheckBox();
+
+    private String promptKey = "analyse.searchTermFrequency";
 
     private SearchCallback onSearch;
     private Runnable onPreviousMatch;
@@ -35,7 +37,7 @@ public class SearchView extends VBox {
     public SearchView() {
         getStyleClass().add("search-view");
 
-        searchInput = new SearchInput("Search Term Frequency");
+        searchInput = new SearchInput("");
 
         previousButton = createIconButton(FontAwesomeSolid.CHEVRON_UP);
         nextButton = createIconButton(FontAwesomeSolid.CHEVRON_DOWN);
@@ -72,6 +74,23 @@ public class SearchView extends VBox {
                 trackedWordsList);
 
         wireEvents();
+        refreshText();
+        LocalizationService.getInstance().addListener(locale -> refreshText());
+    }
+
+    public void setPromptKey(String promptKey) {
+        this.promptKey = promptKey;
+        refreshText();
+    }
+
+    public void refreshText() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        searchInput.setPromptText(i18n.get(promptKey));
+        fuzzyCheckBox.setText(i18n.get("analyse.fuzzy"));
+        caseCheckBox.setText(i18n.get("analyse.caseSensitive"));
+        wholeWordCheckBox.setText(i18n.get("analyse.wholeWord"));
+        stopWordsCheckBox.setText(i18n.get("analyse.stopWords"));
+        trackedWordsList.refreshText();
     }
 
     private void wireEvents() {

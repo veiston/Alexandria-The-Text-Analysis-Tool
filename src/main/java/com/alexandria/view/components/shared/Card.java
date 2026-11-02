@@ -3,6 +3,8 @@ package com.alexandria.view.components.shared;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import com.alexandria.service.LocalizationService;
+
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -175,7 +177,7 @@ public class Card extends VBox {
 
         Button delete = new Button();
         delete.setGraphic(icon);
-        delete.setTooltip(new Tooltip("Delete"));
+        delete.setTooltip(new Tooltip(LocalizationService.getInstance().get("delete")));
         delete.getStyleClass().addAll("button", "card-delete-button");
         return delete;
     }

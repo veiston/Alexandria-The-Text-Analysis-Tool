@@ -5,6 +5,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.alexandria.service.LocalizationService;
+
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -23,6 +25,8 @@ public final class FormRenderer {
     private final Map<String, File> files = new LinkedHashMap<>();
     private final Map<String, Node> fieldNodes = new LinkedHashMap<>();
     private final Map<String, Label> fileLabels = new LinkedHashMap<>();
+    private final Map<String, Label> labels = new LinkedHashMap<>();
+    private final Map<String, Button> chooseButtons = new LinkedHashMap<>();
 
     public void render(VBox container, List<FormField> fields) {
         for (FormField field : fields) {
@@ -35,6 +39,7 @@ public final class FormRenderer {
     private VBox buildFieldRow(VBox container, FormField field) {
         Label label = new Label(field.label() + (field.required() ? " *" : ""));
         label.getStyleClass().add("form-label");
+        labels.put(field.key(), label);
 
         VBox row = new VBox(6, label);
         row.getChildren().add(switch (field.type()) {
@@ -44,6 +49,25 @@ public final class FormRenderer {
             case IMG_FILE, DOCUMENT_FILE -> buildFilePicker(container, field);
         });
         return row;
+    }
+
+    public void setFieldLabel(String key, String newText, boolean required) {
+        Label label = labels.get(key);
+        if (label != null) {
+            label.setText(newText + (required ? " *" : ""));
+        }
+    }
+
+    public void refreshFileLabels() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        for (Map.Entry<String, Label> entry : fileLabels.entrySet()) {
+            if (files.get(entry.getKey()) == null) {
+                entry.getValue().setText(i18n.get("form.noFileSelected"));
+            }
+        }
+        for (Button btn : chooseButtons.values()) {
+            btn.setText(i18n.get("form.chooseFile"));
+        }
     }
 
     private TextField buildTextField(FormField field) {
@@ -69,12 +93,13 @@ public final class FormRenderer {
     }
 
     private HBox buildFilePicker(VBox container, FormField field) {
-        Label fileLabel = new Label("No file selected");
+        LocalizationService i18n = LocalizationService.getInstance();
+        Label fileLabel = new Label(i18n.get("form.noFileSelected"));
         fileLabels.put(field.key(), fileLabel);
         fileLabel.getStyleClass().add("file-name");
 
-
-        Button chooseButton = new Button("Choose File");
+        Button chooseButton = new Button(i18n.get("form.chooseFile"));
+        chooseButtons.put(field.key(), chooseButton);
         chooseButton.getStyleClass().addAll("button", "secondary");
         chooseButton.setOnAction(e -> chooseFile(container, field, fileLabel));
         chooseButton.setMinWidth(Region.USE_PREF_SIZE);
@@ -169,8 +194,9 @@ public final class FormRenderer {
     public void reset() {
         inputs.values().forEach(TextInputControl::clear);
         files.clear();
+        LocalizationService i18n = LocalizationService.getInstance();
         fileLabels.values().forEach(label -> {
-            label.setText("No file selected");
+            label.setText(i18n.get("form.noFileSelected"));
             label.getStyleClass().remove("file-name-selected");
             if (!label.getStyleClass().contains("file-name")) {
                 label.getStyleClass().add("file-name");

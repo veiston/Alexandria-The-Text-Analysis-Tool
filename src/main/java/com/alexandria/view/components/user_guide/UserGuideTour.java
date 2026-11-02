@@ -63,75 +63,71 @@ public class UserGuideTour {
     private List<Tour.Step> steps() {
         return List.of(
                 new Tour.Step(
-                        "Welcome to Alexandria!",
-                        "Alexandria is a statistical text analysis tool for language researchers. "
-                                + "It can help you explore texts through word frequencies, term searches, "
-                                + "key paragraphs, quotations, and comparisons.\n\n"
-                                + "Take a quick tour through the application to get familiar with its main "
-                                + "features. You can return to this tutorial at any time from the User Guide page.",
+                        "tour.welcomeTitle",
+                        "tour.welcomeText",
                         sideNavbar::getBrandSection,
                         () -> navigateTo(Route.LIBRARY),
                         false,
                         new Tour.StepOptions(null, Tour.TooltipPosition.BELOW)),
                 new Tour.Step(
-                        "Your Library",
-                        "This is the first page of the application. If you already have saved projects, you can find them here. Open any project to continue working with it.",
+                        "tour.libraryTitle",
+                        "tour.libraryText",
                         () -> viewRouter,
                         () -> navigateTo(Route.LIBRARY),
                         true,
                         new Tour.StepOptions(
                                 () -> sideNavbar.getNavigation().getButton("library"))),
                 new Tour.Step(
-                        "Create a project",
-                        "If you do not have a project yet, or want to create a new one, click + New Project in the sidebar.",
+                        "tour.createProjectTitle",
+                        "tour.createProjectText",
                         sideNavbar::getNewProjectButton,
                         modal::hide,
                         true),
                 new Tour.Step(
-                        "Choose how to add your text",
-                        "Upload a PDF or TXT file, or choose Paste Text to enter the text manually.",
+                        "tour.addTextTitle",
+                        "tour.addTextText",
                         newProjectModal::getSourceToggle,
                         this::showProjectForm,
                         true),
                 new Tour.Step(
-                        "Name your project",
-                        "Add a clear project name so you can recognise it later in Library.",
+                        "tour.projectNameTitle",
+                        "tour.projectNameText",
                         () -> newProjectModal.getPasteForm().getForm().getFieldNode("title"),
                         null,
                         true),
                 new Tour.Step(
-                        "Choose a file name",
-                        "This name is optional. Leave it blank to use the original file name.",
+                        "tour.fileNameTitle",
+                        "tour.fileNameText",
                         () -> newProjectModal.getPasteForm().getForm().getFieldNode("fileName"),
                         null,
                         true),
                 new Tour.Step(
-                        "Add your text",
-                        "Paste or write the text you want to analyse in this field.",
+                        "tour.pasteTextTitle",
+                        "tour.pasteTextText",
                         () -> newProjectModal.getPasteForm().getForm().getFieldNode("content"),
                         null,
                         true),
                 new Tour.Step(
-                        "Choose how to work with your text",
-                        "Choose Analyse to work with one text, or Compare to work with several texts.",
+                        "tour.workspaceTitle",
+                        "tour.workspaceText",
                         () -> newProjectModal.getDestinationToggle(SourceType.PASTE),
                         null,
                         true),
                 new Tour.Step(
-                        "Create your project",
-                        "When you are ready, click Create Project to add your text and open it in the selected workspace.",
+                        "tour.createTitle",
+                        "tour.createText",
                         () -> newProjectModal.getPasteForm().getForm().getSubmitButton(),
                         null,
                         true),
                 new Tour.Step(
-                        "Read your text",
-                        "Your text opens in the reader. Use the controls below to zoom in or out and move between pages while you analyse it.",
+                        "tour.readerTitle",
+                        "tour.readerText",
                         () -> analyseScreen().getDocumentView(),
                         this::openAnalysis,
                         false),
                 new Tour.Step(
-                        "Create a quotation",
-                        "Select a passage you want to keep to make it a quotation. This helps you collect important excerpts while you read. You need to be signed in to save quotations to your account.",
+                        "tour.quotationTitle",
+                        "tour.quotationText",
                         () -> analyseScreen().getDocumentView(),
                         () -> {
                             openAnalysis();
@@ -140,101 +136,101 @@ public class UserGuideTour {
                         true,
                         new Tour.StepOptions(0.5)),
                 new Tour.Step(
-                        "View your quotations",
-                        "Click Quotations to review the passages you have saved as quotations.",
+                        "tour.quotationsTitle",
+                        "tour.quotationsText",
                         () -> analyseScreen().getHeader().getQuotationsButton(),
                         null,
                         true,
                         new Tour.StepOptions(
                                 null, Tour.TooltipPosition.BELOW)),
                 new Tour.Step(
-                        "Analyze your text",
-                        "The panel on the right brings together the analysis results for your text. Alexandria counts words and their uses to create these results. Here you can review frequent words, analyse a word or phrase, and find key paragraphs.",
+                        "tour.analyzeTitle",
+                        "tour.analyzeText",
                         () -> analyseScreen().getStatisticsSidebar(),
                         this::clearQuotationPreview,
                         true),
                 new Tour.Step(
-                        "Review frequent words",
-                        "This list shows the five words used most often in the text. Common words such as “the” and “and” are ignored. Click on a word to see its occurrences, frequency, nearby words, and every place where it appears.",
+                        "tour.frequentWordsTitle",
+                        "tour.frequentWordsText",
                         () -> analyseScreen().getTextTermFrequencyPanel(),
                         null,
                         true),
                 new Tour.Step(
-                        "Search and track terms",
-                        "Search for a word or phrase in the current text. Use Fuzzy to find approximate matches, Case sensitive to match capitalisation, Whole word to exclude partial matches, or Stop words to exclude common words. Your searches appear in Tracked Words, where you can reopen a term, move through its matches, or remove it from the list.",
+                        "tour.searchTitle",
+                        "tour.searchText",
                         () -> analyseScreen().getSearchView(),
                         null,
                         true),
                 new Tour.Step(
-                        "Review key paragraphs",
-                        "Key Paragraphs identifies sentences that contain words used frequently across the text. This can help you notice repeated topics. Use Go to button to open the relevant page in the reader.",
+                        "tour.keyParagraphsTitle",
+                        "tour.keyParagraphsText",
                         () -> analyseScreen().getTextContextPanel(),
                         null,
                         true),
                 new Tour.Step(
-                        "Save your analysis",
-                        "Use Save Findings button to keep the current results of a text analysis, term search, or comparison in Archive. You need to be signed in to save findings.",
+                        "tour.saveAnalysisTitle",
+                        "tour.saveAnalysisText",
                         () -> analyseScreen().getHeader().getSaveButton(),
                         this::openAnalysis,
                         true),
                 new Tour.Step(
-                        "Compare texts",
-                        "Choose at least two texts to compare. Each text can be a PDF, TXT file, or pasted text, and you can combine different formats in one comparison. The selected texts are shown side by side.",
+                        "tour.compareTitle",
+                        "tour.compareText",
                         () -> compareScreen().getDocumentView(),
                         this::openComparison,
                         true,
                         new Tour.StepOptions(
                                 () -> sideNavbar.getNavigation().getButton("compare"))),
                 new Tour.Step(
-                        "Review the comparison",
-                        "The similarity score in the header summarises how alike the word-frequency profiles of the two texts are.",
+                        "tour.comparisonTitle",
+                        "tour.comparisonText",
                         () -> compareScreen().getHeader(),
                         null,
                         true,
                         new Tour.StepOptions(null, Tour.TooltipPosition.BELOW)),
                 new Tour.Step(
-                        "Review shared words",
-                        "Most frequent shared words lists vocabulary found in both texts and shows each word's count in Doc A and Doc B. Select a word to search for it in both documents.",
+                        "tour.sharedWordsTitle",
+                        "tour.sharedWordsText",
                         () -> compareScreen().getComparisonSidePanel().getCommonWordsPanel(),
                         null,
                         true),
                 new Tour.Step(
-                        "Search both texts",
-                        "Search for a word or phrase across both documents. Fuzzy finds approximate matches, Case sensitive matches capitalisation, Whole word excludes partial matches, and Stop words excludes common words. Tracked Words keeps separate result rows for Doc A and Doc B.",
+                        "tour.searchBothTitle",
+                        "tour.searchBothText",
                         () -> compareScreen().getComparisonSidePanel().getSearchView(),
                         null,
                         true),
                 new Tour.Step(
-                        "Review similar paragraphs",
-                        "Key Paragraphs shows the strongest matching passages from the two documents. Select a passage preview to open its location in the corresponding reader.",
+                        "tour.similarParagraphsTitle",
+                        "tour.similarParagraphsText",
                         () -> compareScreen().getComparisonSidePanel().getSimilarParagraphsPanel(),
                         null,
                         true),
                 new Tour.Step(
-                        "Save comparison findings",
-                        "Use Save Findings to store the comparison and any tracked search terms in Archive. You need to be signed in, and both texts must be saved in your Library.",
+                        "tour.saveComparisonTitle",
+                        "tour.saveComparisonText",
                         () -> compareScreen().getHeader().getSaveButton(),
                         null,
                         true),
                 new Tour.Step(
-                        "Archive",
-                        "Open Archive to view the the results of a text analysis, term search, or comparison you saved while working with your texts.",
+                        "archive",
+                        "tour.archiveText",
                         () -> viewRouter,
                         this::showArchivePreview,
                         true,
                         new Tour.StepOptions(
                                 () -> sideNavbar.getNavigation().getButton("archive"))),
                 new Tour.Step(
-                        "Settings",
-                        "Open Settings to manage application preferences.",
+                        "settings",
+                        "tour.settingsText",
                         () -> viewRouter,
                         () -> navigateTo(Route.SETTINGS),
                         true,
                         new Tour.StepOptions(
                                 () -> sideNavbar.getNavigation().getButton("settings"))),
                 new Tour.Step(
-                        "Profile",
-                        "Use Profile page to create an account, sign in, or edit your profile if you are already signed in.",
+                        "profile",
+                        "tour.profileText",
                         () -> viewRouter,
                         () -> navigateTo(Route.PROFILE),
                         true,
@@ -290,10 +286,10 @@ public class UserGuideTour {
             }
 
             quotationPreview = TxtTextLayout.shapeFor(
-                    flow,
-                    start,
-                    start + UserGuideTourData.QUOTATION.length(),
-                    TxtHighlight.QUOTATION_STYLE_CLASS);
+                flow,
+                start,
+                start + UserGuideTourData.QUOTATION.length(),
+                TxtHighlight.QUOTATION_STYLE_CLASS);
 
             Point2D point = analyseScreen().sceneToLocal(flow.localToScene(0, 0));
             quotationPreview.setTranslateX(point.getX());

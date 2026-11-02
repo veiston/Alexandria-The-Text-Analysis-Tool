@@ -1,5 +1,6 @@
 package com.alexandria.view.components.analyse_screen;
 
+import com.alexandria.service.LocalizationService;
 import com.alexandria.view.components.shared.ScreenHeader;
 
 import javafx.scene.control.Button;
@@ -17,13 +18,28 @@ public class AnalyseHeader extends ScreenHeader {
 
     private final Label titleLabel = new Label();
     private final Label subtitleLabel = new Label();
-    private final Actions actions = new Actions("Reader", "Quotations", "Save Findings");
+    private final Actions actions = new Actions(
+            LocalizationService.getInstance().get("analyse.reader"),
+            LocalizationService.getInstance().get("analyse.quotations"),
+            LocalizationService.getInstance().get("saveFindings")
+    );
 
     public AnalyseHeader() {
         titleLabel.getStyleClass().add("heading-lg");
         subtitleLabel.getStyleClass().add("text-muted");
 
         setContent(new VBox(2, titleLabel, subtitleLabel), actions);
+
+        LocalizationService.getInstance().addListener(locale -> refreshText());
+    }
+
+    public void refreshText() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        actions.refreshText(
+                i18n.get("analyse.reader"),
+                i18n.get("analyse.quotations"),
+                i18n.get("saveFindings")
+        );
     }
 
     public void setTitle(String title, String subtitle) {

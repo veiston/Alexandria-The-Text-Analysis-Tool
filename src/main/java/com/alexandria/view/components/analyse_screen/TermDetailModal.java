@@ -1,5 +1,6 @@
 package com.alexandria.view.components.analyse_screen;
 
+import com.alexandria.service.LocalizationService;
 import com.alexandria.service.analysis.SearchMatch;
 import com.alexandria.service.analysis.TermAnalysisResult;
 import com.alexandria.service.analysis.WordFrequency;
@@ -19,8 +20,10 @@ public class TermDetailModal extends VBox {
 
     private final Label titleLabel = new Label();
     private final Label statsLabel = new Label();
-    private final VBox neighborsHost = new VBox(6);
+    private final VBox neighborsHost = new VBox(8);
     private final VBox occurrencesHost = new VBox(8);
+    private final Label neighborsHeading = new Label();
+    private final Label occurrencesHeading = new Label();
 
     public TermDetailModal() {
         getStyleClass().add("modal-card");
@@ -32,9 +35,7 @@ public class TermDetailModal extends VBox {
         titleLabel.getStyleClass().add("heading-lg");
         statsLabel.getStyleClass().add("text-muted");
 
-        Label neighborsHeading = new Label("Nearby Words");
         neighborsHeading.getStyleClass().add("heading-md");
-        Label occurrencesHeading = new Label("Occurrences");
         occurrencesHeading.getStyleClass().add("heading-sm");
 
         ScrollPane occurrencesScroll = new ScrollPane(occurrencesHost);
@@ -45,6 +46,14 @@ public class TermDetailModal extends VBox {
                 titleLabel, statsLabel,
                 neighborsHeading, neighborsHost,
                 occurrencesHeading, occurrencesScroll);
+
+        refreshHeadings();
+    }
+
+    private void refreshHeadings() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        neighborsHeading.setText(i18n.get("termDetail.nearbyWords"));
+        occurrencesHeading.setText(i18n.get("termDetail.occurrences"));
     }
 
     public void setData(
@@ -52,19 +61,22 @@ public class TermDetailModal extends VBox {
             TermAnalysisResult analysis,
             List<SearchMatch> matches,
             IntConsumer onJumpToMatch) {
+        refreshHeadings();
+        LocalizationService i18n = LocalizationService.getInstance();
         titleLabel.setText("\"" + term + "\"");
-        statsLabel.setText(String.format(
-                "%d occurrences · %.1f per 1,000 words · %d sentences · %d paragraphs",
-                analysis.totalOccurrences(), analysis.relativeFrequency(),
-                analysis.sentenceCount(), analysis.paragraphCount()));
+        statsLabel.setText(i18n.get("termDetail.statistics")
+                .replace("{occurrences}", String.valueOf(analysis.totalOccurrences()))
+                .replace("{frequency}", String.format("%.1f", analysis.relativeFrequency()))
+                .replace("{sentences}", String.valueOf(analysis.sentenceCount()))
+                .replace("{paragraphs}", String.valueOf(analysis.paragraphCount())));
 
         neighborsHost.getChildren().clear();
         if (analysis.neighboringWords().isEmpty()) {
-            neighborsHost.getChildren().add(mutedLabel("No nearby words found."));
+            neighborsHost.getChildren().add(mutedLabel(i18n.get("termDetail.noNearbyWords")));
         } else {
             HBox chips = new HBox(6);
             for (WordFrequency word : analysis.neighboringWords()) {
-                Label chip = new Label(word.word() + " (" + word.count() + ")");
+                Label chip = new Label(word.word() + " (" + i18n.formatNumber(word.count()) + ")");
                 chip.getStyleClass().add("chip");
                 chips.getChildren().add(chip);
             }
@@ -73,7 +85,7 @@ public class TermDetailModal extends VBox {
 
         occurrencesHost.getChildren().clear();
         if (matches == null || matches.isEmpty()) {
-            occurrencesHost.getChildren().add(mutedLabel("No located occurrences."));
+            occurrencesHost.getChildren().add(mutedLabel(i18n.get("termDetail.noLocatedOccurrences")));
         } else {
             for (int i = 0; i < matches.size(); i++) {
                 occurrencesHost.getChildren().add(buildOccurrenceRow(i, matches.get(i), onJumpToMatch));
@@ -82,7 +94,7 @@ public class TermDetailModal extends VBox {
     }
 
     private HBox buildOccurrenceRow(int index, SearchMatch match, IntConsumer onJumpToMatch) {
-
+        LocalizationService i18n = LocalizationService.getInstance();
         VBox textBox = new VBox(2);
         textBox.setMinWidth(0);
         HBox.setHgrow(textBox, javafx.scene.layout.Priority.ALWAYS);
@@ -98,7 +110,7 @@ public class TermDetailModal extends VBox {
 
         textBox.getChildren().addAll(pageLabel, snippet);
 
-        Button goToButton = new Button("Go to →");
+        Button goToButton = new Button(i18n.get("termDetail.goTo"));
         goToButton.getStyleClass().addAll("button", "secondary");
         goToButton.setMinWidth(90);
         goToButton.setMaxWidth(100);
@@ -119,12 +131,18 @@ public class TermDetailModal extends VBox {
     }
 
     private static String formatPageLabel(Integer page, Integer paragraph) {
-        if (page != null && paragraph != null)
-            return "Page " + page + " · Para " + paragraph;
-        if (page != null)
-            return "Page " + page;
-        if (paragraph != null)
-            return "Para " + paragraph;
+        LocalizationService i18n = LocalizationService.getInstance();
+        if (page != null && paragraph != null) {
+            return i18n.get("termDetail.pageAndParagraph")
+                    .replace("{page}", String.valueOf(page))
+                    .replace("{paragraph}", String.valueOf(paragraph));
+        }
+        if (page != null) {
+            return i18n.get("termDetail.page").replace("{page}", String.valueOf(page));
+        }
+        if (paragraph != null) {
+            return i18n.get("termDetail.paragraph").replace("{paragraph}", String.valueOf(paragraph));
+        }
         return "";
     }
 }

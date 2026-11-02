@@ -29,6 +29,10 @@ public class SearchInput extends HBox {
         getChildren().addAll(searchIcon, input);
     }
 
+    public void setPromptText(String promptText) {
+        input.setPromptText(promptText);
+    }
+
     public String getText() {
         return input.getText();
     }

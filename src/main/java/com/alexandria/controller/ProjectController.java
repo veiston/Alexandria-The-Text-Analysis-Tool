@@ -10,6 +10,7 @@ import com.alexandria.model.FileType;
 import com.alexandria.model.Text;
 import com.alexandria.model.User;
 import com.alexandria.service.FileStorageService;
+import com.alexandria.service.LocalizationService;
 import com.alexandria.service.PdfService;
 import com.alexandria.view.components.shared.document.highlight.TextPaginator;
 import com.alexandria.view.components.side_navbar.new_project.NewProjectModal;
@@ -43,7 +44,7 @@ public class ProjectController {
             } else {
                 File file = created.file();
                 if (file == null)
-                    throw new IllegalArgumentException("No file was selected.");
+                    throw new IllegalArgumentException(LocalizationService.getInstance().get("sm.noFileSelected"));
 
                 sourceFile = file;
                 String name = file.getName().toLowerCase();
@@ -55,7 +56,7 @@ public class ProjectController {
                 } else if (name.endsWith(".txt")) {
                     content = Files.readString(file.toPath());
                 } else {
-                    throw new IllegalArgumentException("Unsupported file type. Please upload a PDF or TXT file.");
+                    throw new IllegalArgumentException(LocalizationService.getInstance().get("sm.unsupportedFileType"));
                 }
             }
 
@@ -91,7 +92,7 @@ public class ProjectController {
             return Result.ok(persisted, pageOffsets, storedFile == null ? sourceFile : storedFile.toFile());
 
         } catch (Exception e) {
-            return Result.error("Could not create project: " + e.getMessage());
+            return Result.error(e.getMessage());
         }
     }
 
@@ -101,7 +102,7 @@ public class ProjectController {
 
         File file = created.file();
         if (file == null)
-            throw new IllegalArgumentException("No file was selected.");
+            throw new IllegalArgumentException(LocalizationService.getInstance().get("sm.noFileSelected"));
 
         String name = file.getName().toLowerCase();
         if (name.endsWith(".pdf"))
@@ -109,7 +110,7 @@ public class ProjectController {
         if (name.endsWith(".txt"))
             return FileType.TXT;
 
-        throw new IllegalArgumentException("Unsupported file type.");
+        throw new IllegalArgumentException(LocalizationService.getInstance().get("sm.unsupportedFileType"));
     }
 
     private String resolveFileName(NewProjectModal.CreatedProject created) {

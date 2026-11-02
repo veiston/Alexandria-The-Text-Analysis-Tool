@@ -1,6 +1,7 @@
 package com.alexandria;
 
 import com.alexandria.controller.MainController;
+import com.alexandria.service.LocalizationService;
 import com.alexandria.utils.ThemeSettings;
 import com.alexandria.view.MainView;
 
@@ -21,7 +22,11 @@ public class Main extends Application {
         Scene scene = new Scene(mainView, 1200, 600);
         scene.getStylesheets().add(
                 getClass().getResource("/styles/index.css").toExternalForm());
-        stage.setTitle("Alexandria - Statistical Text Analysis Tool");
+
+        LocalizationService i18n = LocalizationService.getInstance();
+        stage.setTitle(i18n.get("app.title"));
+        i18n.addListener(locale -> stage.setTitle(i18n.get("app.title")));
+
         stage.setScene(scene);
         stage.show();
 

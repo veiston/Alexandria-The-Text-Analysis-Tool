@@ -76,6 +76,10 @@ public class MainView extends StackPane {
         userGuideTour.start();
     }
 
+    public void refreshText() {
+        sideNavbar.refreshText();
+    }
+
     /* New Project */
 
     public void setOnProjectCreated(

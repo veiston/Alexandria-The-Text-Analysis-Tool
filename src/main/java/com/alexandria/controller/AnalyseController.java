@@ -13,6 +13,7 @@ import com.alexandria.service.analysis.TextAnalysisServiceINT;
 import com.alexandria.view.screens.AnalyseScreen;
 import com.alexandria.service.ArchiveTermAnalysisService;
 import com.alexandria.service.ArchiveTextAnalysisService;
+import com.alexandria.service.LocalizationService;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -53,7 +54,7 @@ public class AnalyseController {
 
     public TextAnalysisOutcome openText(Text text, List<Integer> pageOffsets) {
         if (text == null)
-            return TextAnalysisOutcome.error("No text was supplied.");
+            return TextAnalysisOutcome.error(LocalizationService.getInstance().get("sm.noTextSupplied"));
 
         currentText = text;
         currentPageOffsets = pageOffsets == null ? List.of() : List.copyOf(pageOffsets);
@@ -76,7 +77,7 @@ public class AnalyseController {
             return TextAnalysisOutcome.ok(computeTextAnalysis());
         } catch (Exception e) {
             return TextAnalysisOutcome.error(
-                    "Could not process text analysis: " + e.getMessage());
+                    LocalizationService.getInstance().get("sm.couldNotProcessTextAnalysis") + " " + e.getMessage());
         }
     }
 
@@ -141,11 +142,11 @@ public class AnalyseController {
 
     public SaveOutcome saveAnalysis() {
         if (currentText == null) {
-            return SaveOutcome.error("No text is currently open.");
+            return SaveOutcome.error(LocalizationService.getInstance().get("sm.noTextOpen"));
         }
 
         if (currentText.getUserId() == null || currentText.getId() == null) {
-            return SaveOutcome.error("Log in and save the project to keep its analysis.");
+            return SaveOutcome.error(LocalizationService.getInstance().get("sm.logInAndSaveProject"));
         }
 
         int saved = 0;
@@ -166,7 +167,7 @@ public class AnalyseController {
                 saved++;
             }
         } catch (SQLException | RuntimeException e) {
-            return SaveOutcome.error("Could not save analysis: " + e.getMessage());
+            return SaveOutcome.error(LocalizationService.getInstance().get("sm.couldNotSaveAnalysis") + " " + e.getMessage());
         }
 
         return SaveOutcome.ok(saved);
@@ -214,11 +215,11 @@ public class AnalyseController {
             boolean ignoreStopWords) {
 
         if (currentText == null) {
-            return SearchOutcome.error("No text is currently open.");
+            return SearchOutcome.error(LocalizationService.getInstance().get("sm.noTextOpen"));
         }
 
         if (term == null || term.isBlank()) {
-            return SearchOutcome.error("Search term cannot be empty.");
+            return SearchOutcome.error(LocalizationService.getInstance().get("sm.searchTermEmpty"));
         }
 
         try {
@@ -236,7 +237,7 @@ public class AnalyseController {
 
         } catch (RuntimeException e) {
             return SearchOutcome.error(
-                    "Could not complete search: " + e.getMessage());
+                    LocalizationService.getInstance().get("sm.couldNotCompleteSearch") + " " + e.getMessage());
         }
     }
 

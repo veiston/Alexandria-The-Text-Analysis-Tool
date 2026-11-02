@@ -3,6 +3,7 @@ package com.alexandria.view.components.side_navbar.new_project;
 import java.io.File;
 import java.util.function.Consumer;
 
+import com.alexandria.service.LocalizationService;
 import com.alexandria.view.components.shared.form.Form;
 import com.alexandria.view.components.shared.form.FormField;
 
@@ -23,10 +24,10 @@ public class UploadPdfForm extends VBox {
         getStyleClass().add("upload-pdf-form");
 
         form = new Form.Builder()
-                .field("title", "Project Name", FormField.Type.TEXT, true)
-                .field("fileName", "File Name (optional)", FormField.Type.TEXT, false)
-                .field("file", "Document", FormField.Type.DOCUMENT_FILE, true)
-                .submitLabel("Create Project")
+                .field("title", "newProject.projectName", FormField.Type.TEXT, true)
+                .field("fileName", "newProject.fileNameOptional", FormField.Type.TEXT, false)
+                .field("file", "newProject.document", FormField.Type.DOCUMENT_FILE, true)
+                .submitLabel("newProject.createProject")
                 .build();
 
         form.addCustomContent(customContent);
@@ -37,6 +38,10 @@ public class UploadPdfForm extends VBox {
                 form.getFile("file"))));
 
         getChildren().add(form);
+    }
+
+    public void refreshText() {
+        form.refreshText();
     }
 
     public void setOnSubmit(Consumer<UploadData> handler) {

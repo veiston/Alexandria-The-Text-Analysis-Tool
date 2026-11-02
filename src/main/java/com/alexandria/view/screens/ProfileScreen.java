@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 
 import com.alexandria.controller.UserSessionController;
 import com.alexandria.model.User;
+import com.alexandria.service.LocalizationService;
 import com.alexandria.view.components.profile_screen.AuthView;
 import com.alexandria.view.components.profile_screen.ChangePasswordForm;
 import com.alexandria.view.components.profile_screen.EditProfileForm;
@@ -50,6 +51,7 @@ public class ProfileScreen extends StackPane {
         getChildren().addAll(content, modal);
 
         session.addListener(user -> refresh());
+        LocalizationService.getInstance().addListener(locale -> refresh());
 
         refresh();
     }
@@ -90,6 +92,7 @@ public class ProfileScreen extends StackPane {
         modal.hide();
         content.setAlignment(Pos.TOP_LEFT);
         profileView.setUser(user);
+        profileView.refreshText();
         VBox.setVgrow(profileView, Priority.ALWAYS);
         content.getChildren().add(profileView);
     }
@@ -97,17 +100,20 @@ public class ProfileScreen extends StackPane {
     /* Modal composition */
     private void showAuthModal() {
         authView.reset();
+        authView.refreshText();
         modal.show(authView, false);
     }
 
     private void showEditProfileModal() {
         editProfileForm.reset();
+        editProfileForm.refreshText();
         editProfileForm.prefill(session.getCurrentUser());
         modal.show(editProfileForm);
     }
 
     private void showChangePasswordModal() {
         changePasswordForm.reset();
+        changePasswordForm.refreshText();
         modal.show(changePasswordForm);
     }
 

@@ -1,5 +1,6 @@
 package com.alexandria.view.components.compare_screen;
 
+import com.alexandria.service.LocalizationService;
 import com.alexandria.view.components.shared.ScreenHeader;
 
 import javafx.scene.control.Button;
@@ -7,7 +8,11 @@ import javafx.scene.control.Button;
 public class CompareHeader extends ScreenHeader {
 
     private final SimilarityIndicator similarityIndicator = new SimilarityIndicator();
-    private final Actions actions = new Actions("Reader", "Quotations", "Save Findings");
+    private final Actions actions = new Actions(
+            LocalizationService.getInstance().get("analyse.reader"),
+            LocalizationService.getInstance().get("analyse.quotations"),
+            LocalizationService.getInstance().get("saveFindings")
+    );
 
     public CompareHeader() {
         setContent(similarityIndicator, actions);
@@ -16,6 +21,18 @@ public class CompareHeader extends ScreenHeader {
         // hidden entirely.
         actions.getViewToggle().setVisible(false);
         actions.getViewToggle().setManaged(false);
+
+        LocalizationService.getInstance().addListener(locale -> refreshText());
+    }
+
+    public void refreshText() {
+        LocalizationService i18n = LocalizationService.getInstance();
+        actions.refreshText(
+                i18n.get("analyse.reader"),
+                i18n.get("analyse.quotations"),
+                i18n.get("saveFindings")
+        );
+        similarityIndicator.refreshText();
     }
 
     /** 0-100, or null while there is no result yet. */

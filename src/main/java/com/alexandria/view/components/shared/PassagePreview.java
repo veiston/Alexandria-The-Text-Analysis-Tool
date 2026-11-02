@@ -1,5 +1,7 @@
 package com.alexandria.view.components.shared;
 
+import com.alexandria.service.LocalizationService;
+
 import javafx.geometry.Pos;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
@@ -19,7 +21,7 @@ public class PassagePreview extends VBox {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        Hyperlink goTo = new Hyperlink("Go to →");
+        Hyperlink goTo = new Hyperlink(LocalizationService.getInstance().get("termDetail.goTo"));
         goTo.getStyleClass().add("hyperlink");
         goTo.setOnAction(event -> {
             if (onGoTo != null) {

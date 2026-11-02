@@ -2,6 +2,7 @@ package com.alexandria.view.components.side_navbar.new_project;
 
 import java.util.function.Consumer;
 
+import com.alexandria.service.LocalizationService;
 import com.alexandria.view.components.shared.form.Form;
 import com.alexandria.view.components.shared.form.FormField;
 
@@ -22,10 +23,10 @@ public class PasteTextForm extends VBox {
         getStyleClass().add("paste-text-form");
 
         form = new Form.Builder()
-                .field("title", "Project Name", FormField.Type.TEXT, true)
-                .field("fileName", "File Name", FormField.Type.TEXT, true)
-                .field("content", "Text", FormField.Type.TEXT_AREA, true)
-                .submitLabel("Create Project")
+                .field("title", "newProject.projectName", FormField.Type.TEXT, true)
+                .field("fileName", "newProject.fileName", FormField.Type.TEXT, true)
+                .field("content", "newProject.text", FormField.Type.TEXT_AREA, true)
+                .submitLabel("newProject.createProject")
                 .build();
 
         form.addCustomContent(customContent);
@@ -36,6 +37,10 @@ public class PasteTextForm extends VBox {
                 values.get("content"))));
 
         getChildren().add(form);
+    }
+
+    public void refreshText() {
+        form.refreshText();
     }
 
     public void setOnSubmit(Consumer<PasteData> handler) {

@@ -1,6 +1,7 @@
 package com.alexandria.view.components.shared.quotation;
 
 import com.alexandria.model.Quotation;
+import com.alexandria.service.LocalizationService;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -59,7 +60,7 @@ public class QuotationsView extends VBox {
                 cardsContainer.getChildren().clear();
 
                 if (quotations == null || quotations.isEmpty()) {
-                        Label empty = new Label("No quotations yet.");
+                        Label empty = new Label(LocalizationService.getInstance().get("quotations.noItems"));
                         empty.getStyleClass().add("text-muted");
 
                         cardsContainer.setAlignment(Pos.TOP_LEFT);

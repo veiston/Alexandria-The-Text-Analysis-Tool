@@ -11,6 +11,7 @@ import com.alexandria.model.Text;
 import com.alexandria.model.User;
 import com.alexandria.model.FileType;
 import com.alexandria.service.FileStorageService;
+import com.alexandria.service.LocalizationService;
 import com.alexandria.view.components.shared.modal.ErrorAlert;
 import com.alexandria.view.screens.LibraryScreen;
 
@@ -56,7 +57,7 @@ public class LibraryController {
         File sourceFile = text.getFileType() == FileType.MANUAL ? null : fileStorageService.getFile(text.getFilePath());
 
         if (text.getFileType() != FileType.MANUAL && sourceFile == null) {
-            ErrorAlert.show("The source file is not available on this device.");
+            ErrorAlert.show(LocalizationService.getInstance().get("sm.fileNotAvailable"));
             return;
         }
 
@@ -67,14 +68,14 @@ public class LibraryController {
         File firstSourceFile = firstText.getFileType() == FileType.MANUAL ? null : fileStorageService.getFile(firstText.getFilePath());
 
         if (firstText.getFileType() != FileType.MANUAL && firstSourceFile == null) {
-            ErrorAlert.show("The source file is not available on this device.");
+            ErrorAlert.show(LocalizationService.getInstance().get("sm.fileNotAvailable"));
             return;
         }
 
         File secondSourceFile = secondText.getFileType() == FileType.MANUAL ? null : fileStorageService.getFile(secondText.getFilePath());
 
         if (secondText.getFileType() != FileType.MANUAL && secondSourceFile == null) {
-            ErrorAlert.show("The source file is not available on this device.");
+            ErrorAlert.show(LocalizationService.getInstance().get("sm.fileNotAvailable"));
             return;
         }
 
@@ -90,7 +91,7 @@ public class LibraryController {
                 ? null
                 : fileStorageService.getFile(firstText.getFilePath());
         if (firstText.getFileType() != FileType.MANUAL && sourceFile == null) {
-            ErrorAlert.show("The source file is not available on this device.");
+            ErrorAlert.show(LocalizationService.getInstance().get("sm.fileNotAvailable"));
             return;
         }
 
@@ -111,7 +112,7 @@ public class LibraryController {
             libraryScreen.setTexts(texts);
         } catch (SQLException e) {
             System.err.println("Could not load library: " + e.getMessage());
-            ErrorAlert.show("Could not load saved texts.");
+            ErrorAlert.show(LocalizationService.getInstance().get("sm.couldNotLoadTexts"));
             libraryScreen.setTexts(List.of());
         }
     }
@@ -134,7 +135,7 @@ public class LibraryController {
             loadTexts();
         } catch (SQLException | java.io.IOException e) {
             System.err.println("Could not delete text: " + e.getMessage());
-            ErrorAlert.show("Could not delete from library.");
+            ErrorAlert.show(LocalizationService.getInstance().get("sm.couldNotDeleteFromLibrary"));
         }
     }
 }

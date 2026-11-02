@@ -54,6 +54,12 @@ public class Toggle extends HBox {
         this.onToggle = handler;
     }
 
+    public void setLabels(String... labels) {
+        for (int i = 0; i < labels.length && i < buttons.size(); i++) {
+            buttons.get(i).setText(labels[i]);
+        }
+    }
+
     public int getSelectedIndex() {
         for (int i = 0; i < buttons.size(); i++) {
             if (buttons.get(i).isSelected()) {
