@@ -182,6 +182,12 @@ For Docker setup:
 
 More database information is in [database/README.md](https://github.com/veiston/Alexandria-The-Text-Analysis-Tool/blob/main/database/README.md).
 
+### Localization
+
+The application currently provides selectable English, Japanese, and Russian interface translations. After starting Alexandria with `mvn javafx:run` or the Docker instructions above, open **Settings** and choose a language from the **Language** menu. The selection takes effect immediately and is remembered the next time you launch the application; no separate localized build or launch command is needed.
+
+Translations are bundled as Java resource bundles in `src/main/resources/i18n/` (`MessagesBundle_en_US.properties`, `MessagesBundle_ja_JP.properties`, and `MessagesBundle_ru_RU.properties`). The project uses Java's built-in `ResourceBundle` and `Locale` APIs.
+
 ### Docker Setup
 
 Before starting the application, open Docker Desktop and start an X server: XQuartz on macOS or XMing on Windows.

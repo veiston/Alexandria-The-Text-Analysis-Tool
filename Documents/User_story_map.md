@@ -21,3 +21,6 @@
 |  | Saved Statistics | As a user, I want to save text statistics results so that I can return to them later. | 3 |
 |  |  | As a user, I want to view saved statistics with information about the source text and date so that I can review previous analysis. | 5 |
 |  | Saved Quotations | As a user, I want to save quotations from texts with source information and location so that I can use them later. | 3 |
+| Use the application in the chosen language | Localization | As a user, I want to choose from the application's supported languages so that I can use its interface in a language I understand. | 3 |
+|  |  | As a user, I want menus, screens, messages, and help content to use my selected language consistently so that I can navigate the application confidently. | 5 |
+|  |  | As a user, I want my language choice to be remembered when I reopen the application so that I do not have to select it every time. | 3 |
