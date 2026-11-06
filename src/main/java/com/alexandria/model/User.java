@@ -12,32 +12,17 @@ public class User {
 	private String password; // ONLY HASHED PASSWORDS!
 	private Language locale = Language.ENGLISH;
 
-	public User() {
-	}
-
-	public User(String name, String email, String photo,
-			String organization, String password) {
+	public User(String name, String email, String photo, String organization, String password, Language locale) {
 		this.name = name;
 		this.email = email;
 		this.photo = photo;
 		this.organization = organization;
-		this.password = password;
+		this.password = password; 
+		this.locale = locale;
 	}
 
-	public User(Integer id, String name, String email,
-			String photo, String organization, String password) {
-		this.id = id;
-		this.name = name;
-		this.email = email;
-		this.photo = photo;
-		this.organization = organization;
-		this.password = password; // ONLY HASHED PASSWORDS!
-	}
-
-	public User(Integer id, String name, String email,
-			String photo, String organization, String password, Language locale) {
-		this(id, name, email, photo, organization, password);
-		setLocale(locale);
+	public User(Integer id, String name, String email, String photo, String organization, String password, Language locale) {
+		this(name, email, photo, organization, password, locale);		this.id = id;
 	}
 
 	public Integer getId() {
