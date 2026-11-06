@@ -10,6 +10,7 @@ public class User {
 	private String photo;
 	private String organization;
 	private String password; // ONLY HASHED PASSWORDS!
+	private Language locale = Language.ENGLISH;
 
 	public User() {
 	}
@@ -31,6 +32,12 @@ public class User {
 		this.photo = photo;
 		this.organization = organization;
 		this.password = password; // ONLY HASHED PASSWORDS!
+	}
+
+	public User(Integer id, String name, String email,
+			String photo, String organization, String password, Language locale) {
+		this(id, name, email, photo, organization, password);
+		setLocale(locale);
 	}
 
 	public Integer getId() {
@@ -79,5 +86,13 @@ public class User {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public Language getLocale() {
+		return locale;
+	}
+
+	public void setLocale(Language locale) {
+		this.locale = locale;
 	}
 }
