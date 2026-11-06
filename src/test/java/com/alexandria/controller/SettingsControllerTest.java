@@ -31,7 +31,7 @@ public class SettingsControllerTest extends JavaFxTestBase {
         runOnFxThread(() -> {
             localizationService = new LocalizationService();
             settingsScreen = new SettingsScreen();
-            controller = new LanguageSettingsController(localizationService, settingsScreen);
+            controller = new LanguageSettingsController(localizationService, settingsScreen, null, null);
         });
     }
 
@@ -100,8 +100,9 @@ public class SettingsControllerTest extends JavaFxTestBase {
 
             // Simulate next launch
             LocalizationService nextService = new LocalizationService();
+            nextService.setLocale(LanguageSettings.getLanguage().getLocale());
             SettingsScreen nextScreen = new SettingsScreen();
-            LanguageSettingsController nextController = new LanguageSettingsController(nextService, nextScreen);
+            LanguageSettingsController nextController = new LanguageSettingsController(nextService, nextScreen, null, null);
 
             assertEquals(Language.RUSSIAN, nextScreen.getSelectedLanguage());
             assertEquals(LocalizationService.RUSSIAN, nextService.getLocale());
@@ -186,7 +187,7 @@ public class SettingsControllerTest extends JavaFxTestBase {
             libraryNavLabel.setText(localizationService.get("library"));
             analyzeNavLabel.setText(localizationService.get("analyze"));
             assertEquals("Библиотека", libraryNavLabel.getText());
-            assertEquals("Анализ", analyzeNavLabel.getText());
+            assertEquals("Анализ текстов", analyzeNavLabel.getText());
 
             // Reset back to English
             controller.applyLanguage(Language.ENGLISH);

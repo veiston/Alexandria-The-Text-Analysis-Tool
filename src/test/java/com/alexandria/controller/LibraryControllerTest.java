@@ -1,5 +1,7 @@
 package com.alexandria.controller;
 
+import com.alexandria.model.Language;
+
 import com.alexandria.dao.TextDAO;
 import com.alexandria.model.FileType;
 import com.alexandria.model.Text;
@@ -152,7 +154,8 @@ public class LibraryControllerTest extends JavaFxTestBase {
                 "test@example.com",
                 null,
                 null,
-                "password");
+                "password",
+				Language.ENGLISH);
     }
 
     private Text sampleText(int id, String title) {

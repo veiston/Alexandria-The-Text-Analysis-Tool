@@ -1,5 +1,7 @@
 package com.alexandria.dao;
 
+import com.alexandria.model.Language;
+
 import com.alexandria.model.FileType;
 import com.alexandria.model.Text;
 import com.alexandria.model.TextComparison;
@@ -40,7 +42,8 @@ public class TextComparisonTextDAOTest {
 				"test-" + UUID.randomUUID() + "@test.com",
 				null,
 				"Test organization",
-				"test-hashed-password");
+				"test-hashed-password",
+				Language.ENGLISH);
 
 		user = userDAO.create(user);
 

@@ -1,5 +1,7 @@
 package com.alexandria.view.components.profile_screen;
 
+import com.alexandria.model.Language;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -42,7 +44,8 @@ public class EditProfileFormTest {
                 "taken@example.com",
                 null,
                 "OldOrg",
-                "hash");
+                "hash",
+				Language.ENGLISH);
 
         view.prefill(user);
 
