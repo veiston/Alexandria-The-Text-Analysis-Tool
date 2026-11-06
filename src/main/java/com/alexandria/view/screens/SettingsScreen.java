@@ -138,6 +138,13 @@ public class SettingsScreen extends VBox {
     }
 
     public void refreshText(LocalizationService localizationService) {
+        for (Language language : Language.values()) {
+            if (language.getLocale().equals(localizationService.getLocale())) {
+                setSelectedLanguage(language);
+                break;
+            }
+        }
+		
         title.setText(localizationService.get("settings"));
         subtitle.setText(localizationService.get("settings.subtitle"));
         appearanceTitle.setText(localizationService.get("settings.appearance"));
