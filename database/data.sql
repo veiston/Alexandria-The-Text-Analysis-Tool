@@ -2,8 +2,8 @@
 
 INSERT INTO users (id, name, email, photo, organization, password, locale)
 VALUES
-    (1, 'Test User', 'test@test.com', NULL, 'Test organization', '$argon2id$v=19$m=19456,t=2,p=1$qmQTy9hIABc6GUbYn5xSAAvAZn5v6ziduEN3wsiGtlIJo5Qxxql1KASWXcZ1Oytm9SoniUeDjQ5BYeD8V9PDSQ$y19kCGYo05Iq4bDv+8sTmROPhAQOmwwZXUqiKPPhMrE', DEFAULT),
-    (2, 'Sample User 2', 'sample-user-2@alexandria.local', NULL, 'Sample organization 1', 'sample-hashed-password-2', DEFAULT);
+    (1, 'Test User', 'test@test.com', NULL, 'Test organization', '$argon2id$v=19$m=19456,t=2,p=1$qmQTy9hIABc6GUbYn5xSAAvAZn5v6ziduEN3wsiGtlIJo5Qxxql1KASWXcZ1Oytm9SoniUeDjQ5BYeD8V9PDSQ$y19kCGYo05Iq4bDv+8sTmROPhAQOmwwZXUqiKPPhMrE', 'ENGLISH'),
+    (2, 'Sample User 2', 'sample-user-2@alexandria.local', NULL, 'Sample organization 1', 'sample-hashed-password-2', 'JAPANESE');
 
 INSERT INTO texts (id, user_id, title, file_name, file_path, file_type, content)
 VALUES
