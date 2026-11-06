@@ -1,5 +1,6 @@
 CREATE DATABASE IF NOT EXISTS alexandria
-    CHARACTER SET utf8mb4;
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
 
 CREATE USER IF NOT EXISTS 'alexandria'@'localhost'
     IDENTIFIED BY 'alexandria';
