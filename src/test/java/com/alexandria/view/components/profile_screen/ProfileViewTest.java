@@ -1,5 +1,7 @@
 package com.alexandria.view.components.profile_screen;
 
+import com.alexandria.model.Language;
+
 import static org.junit.Assert.assertEquals;
 
 import org.junit.BeforeClass;
@@ -32,7 +34,8 @@ public class ProfileViewTest {
                 "taken@example.com",
                 null,
                 "OldOrg",
-                "hash");
+                "hash",
+				Language.ENGLISH);
 
         view.setUser(user);
 
@@ -51,7 +54,7 @@ public class ProfileViewTest {
                 "taken@example.com",
                 null,
                 "",
-                "hash");
+                "hash", Language.ENGLISH);
 
         view.setUser(user);
 
