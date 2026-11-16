@@ -1,5 +1,7 @@
 package com.alexandria.controller;
 
+import com.alexandria.model.Language;
+
 import com.alexandria.dao.TextDAO;
 import com.alexandria.model.FileType;
 import com.alexandria.model.Text;
@@ -271,7 +273,7 @@ public class ProjectControllerTest {
                                 "lua@example.com",
                                 null,
                                 null,
-                                "hash");
+                                "hash", Language.ENGLISH);
 
                 session.login(user);
 
@@ -311,7 +313,8 @@ public class ProjectControllerTest {
                                 "lua@example.com",
                                 null,
                                 null,
-                                "hash");
+                                "hash",
+								Language.ENGLISH);
 
                 session.login(user);
 
@@ -353,7 +356,7 @@ public class ProjectControllerTest {
         public void createUploadedProjectCopiesFileAndStoresItsPath()
                         throws Exception {
 
-                session.login(new User(1, "Lua", "lua@example.com", null, null, "hash"));
+                session.login(new User(1, "Lua", "lua@example.com", null, null, "hash", Language.ENGLISH));
                 Path uploadsDirectory = Files.createTempDirectory("alexandria-uploads");
                 File sourceFile = File.createTempFile("source", ".txt");
                 Files.writeString(sourceFile.toPath(), "Stored file content");
@@ -409,7 +412,7 @@ public class ProjectControllerTest {
                                 "lua@example.com",
                                 null,
                                 null,
-                                "hash");
+                                "hash", Language.ENGLISH);
 
                 session.login(user);
 

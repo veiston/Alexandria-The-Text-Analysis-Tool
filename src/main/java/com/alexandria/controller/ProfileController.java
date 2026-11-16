@@ -4,9 +4,11 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import com.alexandria.dao.UserDAO;
+import com.alexandria.model.Language;
 import com.alexandria.model.User;
 import com.alexandria.service.LocalizationService;
 import com.alexandria.utils.PasswordHasher;
+import com.alexandria.utils.LanguageSettings;
 import com.alexandria.view.components.shared.modal.ConfirmationAlert;
 import com.alexandria.view.components.shared.modal.ErrorAlert;
 import com.alexandria.view.components.shared.modal.SuccessAlert;
@@ -99,13 +101,14 @@ public class ProfileController {
         String password = values.get("password");
         String photo = values.get("photo");
         String organization = values.get("organization");
+        Language locale = LanguageSettings.getLanguage();
 
         try {
             if (userDAO.findByEmail(email) != null) {
                 return Result.error(i18n.get("sm.accountAlreadyExists"));
             }
 
-            User user = new User(name, email, photo, organization, PasswordHasher.hash(password));
+            User user = new User(name, email, photo, organization, PasswordHasher.hash(password), locale);
             userDAO.create(user);
             session.login(user);
 
@@ -126,6 +129,7 @@ public class ProfileController {
             }
 
             session.login(user);
+            setUserLang(user);
 
             return Result.ok(i18n.get("profile.welcome"));
 
@@ -219,6 +223,12 @@ public class ProfileController {
 
     private boolean isBlank(String value) {
         return value == null || value.isBlank();
+    }
+
+    private void setUserLang(User user) {
+        Language language = user.getLocale();
+        LanguageSettings.setLanguage(language);
+        LocalizationService.getInstance().setLocale(language.getLocale());
     }
 
     public record Result(boolean success, String message) {

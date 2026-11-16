@@ -1,7 +1,10 @@
 package com.alexandria.controller;
 
+import com.alexandria.model.Language;
+
 import com.alexandria.dao.UserDAO;
 import com.alexandria.model.User;
+import com.alexandria.service.LocalizationService;
 
 import org.junit.After;
 import org.junit.Before;
@@ -35,6 +38,7 @@ public class ProfileControllerTest {
         @Before
         public void setUp() {
                 session.logout();
+                LocalizationService.getInstance().setLocale(LocalizationService.ENGLISH);
         }
 
         @After
@@ -78,7 +82,8 @@ public class ProfileControllerTest {
                                 "taken@example.com",
                                 null,
                                 null,
-                                "hash");
+                                "hash",
+								Language.ENGLISH);
 
                 when(userDAO.findByEmail("taken@example.com"))
                                 .thenReturn(existing);
@@ -107,8 +112,8 @@ public class ProfileControllerTest {
                                 "lua@example.com",
                                 null,
                                 null,
-                                com.alexandria.utils.PasswordHasher.hash(
-                                                "correctPassword"));
+                                com.alexandria.utils.PasswordHasher.hash("correctPassword"),
+                                Language.ENGLISH);
 
                 when(userDAO.findByEmail("lua@example.com"))
                                 .thenReturn(stored);
@@ -132,7 +137,8 @@ public class ProfileControllerTest {
                                 null,
                                 null,
                                 com.alexandria.utils.PasswordHasher.hash(
-                                                "correctPassword"));
+                                                "correctPassword"),
+                                Language.ENGLISH);
 
                 when(userDAO.findByEmail("lua@example.com"))
                                 .thenReturn(stored);
@@ -185,7 +191,7 @@ public class ProfileControllerTest {
                                 "old@example.com",
                                 null,
                                 "OldOrg",
-                                "hash");
+                                "hash", Language.ENGLISH);
 
                 session.login(user);
 
@@ -216,7 +222,7 @@ public class ProfileControllerTest {
                                 "old@example.com",
                                 null,
                                 "OldOrg",
-                                "hash");
+                                "hash", Language.ENGLISH);
                 session.login(user);
 
                 controller = newControllerWithoutScreen();
@@ -274,7 +280,8 @@ public class ProfileControllerTest {
                                 "lua@example.com",
                                 null,
                                 null,
-                                com.alexandria.utils.PasswordHasher.hash("correctPassword"));
+                                com.alexandria.utils.PasswordHasher.hash("correctPassword"),
+                                Language.ENGLISH);
                 session.login(user);
 
                 controller = newControllerWithoutScreen();
@@ -305,7 +312,7 @@ public class ProfileControllerTest {
                                 "taken@example.com",
                                 null,
                                 null,
-                                "hash");
+                                "hash", Language.ENGLISH);
                 session.login(user);
                 when(userDAO.update(user))
                                 .thenThrow(new SQLException("Database unavailable"));
@@ -326,7 +333,7 @@ public class ProfileControllerTest {
                                 "lua@example.com",
                                 null,
                                 null,
-                                "hash");
+                                "hash", Language.ENGLISH);
                 session.login(user);
                 when(userDAO.update(any(User.class)))
                                 .thenThrow(new SQLException("Database unavailable"));

@@ -1,6 +1,7 @@
 package com.alexandria.dao;
 
 import com.alexandria.db.DatabaseConnection;
+import com.alexandria.model.Language;
 import com.alexandria.model.User;
 
 import java.sql.Connection;
@@ -12,7 +13,7 @@ import java.sql.Statement;
 public class UserDAO {
 
 	public User create(User user) throws SQLException {
-		String sql = "INSERT INTO users (name, email, photo, organization, password) VALUES (?, ?, ?, ?, ?)";
+		String sql = "INSERT INTO users (name, email, photo, organization, password, locale) VALUES (?, ?, ?, ?, ?, ?)";
 
 		try (Connection connection = DatabaseConnection.getConnection();
 				PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -21,6 +22,7 @@ public class UserDAO {
 			statement.setString(3, user.getPhoto());
 			statement.setString(4, user.getOrganization());
 			statement.setString(5, user.getPassword());
+			statement.setString(6, user.getLocale().name());
 
 			statement.executeUpdate();
 
@@ -49,7 +51,8 @@ public class UserDAO {
 							resultSet.getString("email"),
 							resultSet.getString("photo"),
 							resultSet.getString("organization"),
-							resultSet.getString("password"));
+							resultSet.getString("password"),
+							Language.valueOf(resultSet.getString("locale")));
 				}
 			}
 
@@ -72,7 +75,8 @@ public class UserDAO {
 							resultSet.getString("email"),
 							resultSet.getString("photo"),
 							resultSet.getString("organization"),
-							resultSet.getString("password"));
+							resultSet.getString("password"),
+							Language.valueOf(resultSet.getString("locale")));
 				}
 			}
 
@@ -82,7 +86,7 @@ public class UserDAO {
 	}
 
 	public boolean update(User user) throws SQLException {
-		String sql = "UPDATE users SET name = ?, email = ?, photo = ?, organization = ?, password = ? WHERE id = ?";
+		String sql = "UPDATE users SET name = ?, email = ?, photo = ?, organization = ?, password = ?, locale = ? WHERE id = ?";
 
 		try (Connection connection = DatabaseConnection.getConnection();
 				PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -91,11 +95,24 @@ public class UserDAO {
 			statement.setString(3, user.getPhoto());
 			statement.setString(4, user.getOrganization());
 			statement.setString(5, user.getPassword());
-			statement.setInt(6, user.getId());
+			statement.setString(6, user.getLocale().name());
+			statement.setInt(7, user.getId());
 
 			int updatedRows = statement.executeUpdate();
 
 			return updatedRows > 0;
+		}
+	}
+
+	public boolean updateLocale(int userId, Language locale) throws SQLException {
+		String sql = "UPDATE users SET locale = ? WHERE id = ?";
+		try (Connection connection = DatabaseConnection.getConnection();
+				PreparedStatement statement = connection.prepareStatement(sql)) {
+
+			statement.setString(1, locale.name());
+			statement.setInt(2, userId);
+			
+			return statement.executeUpdate() > 0;
 		}
 	}
 
