@@ -1,5 +1,7 @@
 package com.alexandria.controller;
 
+import com.alexandria.model.Language;
+
 import com.alexandria.dao.UserDAO;
 import com.alexandria.model.User;
 import com.alexandria.utils.SessionStorage;
@@ -321,6 +323,7 @@ public class UserSessionControllerTest {
                 email,
                 null,
                 null,
-                "hash");
+                "hash",
+				Language.ENGLISH);
     }
 }

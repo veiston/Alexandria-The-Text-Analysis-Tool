@@ -1,5 +1,7 @@
 package com.alexandria.dao;
 
+import com.alexandria.model.Language;
+
 import com.alexandria.model.FileType;
 import com.alexandria.model.Text;
 import com.alexandria.model.User;
@@ -29,7 +31,8 @@ public class TextDAOTest {
 				"test-" + UUID.randomUUID() + "@test.com",
 				null,
 				"Test organization",
-				"test-hashed-password"
+				"test-hashed-password",
+				Language.ENGLISH
 		);
 
 		userDAO = new UserDAO();
@@ -99,6 +102,18 @@ public class TextDAOTest {
 		assertEquals("updated-test.pdf", foundText.getFileName());
 		assertEquals(FileType.PDF, foundText.getFileType());
 		assertEquals("Updated test text content", foundText.getContent());
+	}
+
+	@Test
+	public void savesDifferentLanguagesText() throws SQLException {
+		String multilingual = "English — Русский текст — 日本語の文章 — 😀";
+		text.setTitle("Project Привет 日本語 😀");
+		text.setContent(multilingual);
+
+		assertTrue(textDAO.update(text));
+		Text foundText = textDAO.findById(text.getId());
+		assertEquals("Project Привет 日本語 😀", foundText.getTitle());
+		assertEquals(multilingual, foundText.getContent());
 	}
 
 	@Test

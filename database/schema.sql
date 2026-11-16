@@ -6,10 +6,10 @@ CREATE TABLE IF NOT EXISTS users (
     photo VARCHAR(255),
     organization VARCHAR(150),
     password VARCHAR(255) NOT NULL,
+    locale VARCHAR(20) NOT NULL DEFAULT 'ENGLISH',
 
     PRIMARY KEY (id)
-);
-
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE TABLE IF NOT EXISTS texts (
     id INT NOT NULL AUTO_INCREMENT,
     user_id INT NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS texts (
 
     PRIMARY KEY (id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 ALTER TABLE texts ADD COLUMN IF NOT EXISTS file_path VARCHAR(1024) AFTER file_name;
 
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS search_results (
     PRIMARY KEY (id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (text_id) REFERENCES texts(id) ON DELETE CASCADE
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS text_analysis (
     id INT NOT NULL AUTO_INCREMENT,
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS text_analysis (
     PRIMARY KEY (id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (text_id) REFERENCES texts(id) ON DELETE CASCADE
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS term_analysis (
     id INT NOT NULL AUTO_INCREMENT,
@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS term_analysis (
     PRIMARY KEY (id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (text_id) REFERENCES texts(id) ON DELETE CASCADE
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS text_comparisons (
     id INT NOT NULL AUTO_INCREMENT,
@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS text_comparisons (
 
     PRIMARY KEY (id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS text_comparison_texts (
     comparison_id INT NOT NULL,
@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS text_comparison_texts (
     PRIMARY KEY (comparison_id, text_id),
     FOREIGN KEY (comparison_id) REFERENCES text_comparisons(id) ON DELETE CASCADE,
     FOREIGN KEY (text_id) REFERENCES texts(id) ON DELETE CASCADE
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS term_comparisons (
     id INT NOT NULL AUTO_INCREMENT,
@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS term_comparisons (
 
     PRIMARY KEY (id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS term_comparison_texts (
     comparison_id INT NOT NULL,
@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS term_comparison_texts (
     PRIMARY KEY (comparison_id, text_id),
     FOREIGN KEY (comparison_id) REFERENCES term_comparisons(id) ON DELETE CASCADE,
     FOREIGN KEY (text_id) REFERENCES texts(id) ON DELETE CASCADE
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS quotations (
     id INT NOT NULL AUTO_INCREMENT,
@@ -114,4 +114,4 @@ CREATE TABLE IF NOT EXISTS quotations (
     PRIMARY KEY (id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (text_id) REFERENCES texts(id) ON DELETE CASCADE
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

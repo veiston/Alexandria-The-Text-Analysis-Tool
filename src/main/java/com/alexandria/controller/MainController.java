@@ -7,6 +7,7 @@ import java.util.List;
 import com.alexandria.dao.TextDAO;
 import com.alexandria.dao.UserDAO;
 import com.alexandria.model.FileType;
+import com.alexandria.model.Language;
 import com.alexandria.model.Text;
 import com.alexandria.service.FileStorageService;
 import com.alexandria.service.LocalizationService;
@@ -14,6 +15,7 @@ import com.alexandria.service.PdfService;
 import com.alexandria.service.SearchService;
 import com.alexandria.service.TermAnalysisService;
 import com.alexandria.service.TextAnalysisService;
+import com.alexandria.utils.LanguageSettings;
 import com.alexandria.utils.UserGuideSettings;
 import com.alexandria.view.MainView;
 import com.alexandria.view.components.shared.document.highlight.TextPaginator;
@@ -51,7 +53,12 @@ public class MainController {
         restoreSession();
 
         LocalizationService localizationService = LocalizationService.getInstance();
-        localizationService.setLocale(com.alexandria.utils.LanguageSettings.getLanguage().getLocale());
+        Language userLanguage = session.isLoggedIn()
+            ? session.getCurrentUser().getLocale()
+            : LanguageSettings.getLanguage();
+
+        LanguageSettings.setLanguage(userLanguage);
+        localizationService.setLocale(userLanguage.getLocale());
 
         mainView = new MainView();
 
@@ -100,7 +107,10 @@ public class MainController {
     private void configureSettings() {
         SettingsScreen settingsScreen = (SettingsScreen) Route.SETTINGS.createScreen();
         LocalizationService localizationService = LocalizationService.getInstance();
-        new LanguageSettingsController(localizationService, settingsScreen);
+
+        LanguageSettingsController languageSettingsController = new LanguageSettingsController(localizationService, settingsScreen, userDAO, session.getCurrentUser());
+        session.addListener(user -> languageSettingsController.setUser(user));
+		
         localizationService.addListener(locale -> {
             mainView.refreshText();
             localizationService.apply(mainView);
