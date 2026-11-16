@@ -51,7 +51,7 @@
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
-            <version>3.5.10</version>
+            <version>3.5.11</version>
         </dependency>
 
         <!-- PDF processing -->
@@ -115,7 +115,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.18.11</version>
+            <version>2.18.2</version>
         </dependency>
 
         <!-- Testing -->
@@ -202,7 +202,7 @@
             </plugin>
 
             <!-- Creates the runnable application JAR used by Docker. JavaFX is
-                 supplied by the Linux JavaFX SDK in the Docker image. -->
+            supplied by the Linux JavaFX SDK in the Docker image. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -239,7 +239,7 @@
             </plugin>
 
             <!-- Static analysis: runs with mvn verify, reports in target/
-                 Reports only for now; switch to the :check goals once the baseline is clean. -->
+            Reports only for now; switch to the :check goals once the baseline is clean. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
