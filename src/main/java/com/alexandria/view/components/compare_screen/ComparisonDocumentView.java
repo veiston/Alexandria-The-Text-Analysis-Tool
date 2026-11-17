@@ -5,7 +5,6 @@ import com.alexandria.service.LocalizationService;
 import com.alexandria.service.analysis.SearchMatch;
 import com.alexandria.view.components.shared.document.DocumentView;
 
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.OverrunStyle;
@@ -13,7 +12,6 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import java.nio.file.Path;
@@ -43,8 +41,8 @@ public class ComparisonDocumentView extends VBox {
         documentA.setSelectionEnabled(false);
         documentB.setSelectionEnabled(false);
 
-        StackPane rowA = buildDocumentRow(typeLabelA, documentAName, documentA, "comparison-document-a");
-        StackPane rowB = buildDocumentRow(typeLabelB, documentBName, documentB, "comparison-document-b");
+        DocumentView rowA = buildDocumentRow(typeLabelA, documentAName, documentA, "comparison-document-a");
+        DocumentView rowB = buildDocumentRow(typeLabelB, documentBName, documentB, "comparison-document-b");
 
         rowA.setPrefHeight(0);
         rowB.setPrefHeight(0);
@@ -70,9 +68,7 @@ public class ComparisonDocumentView extends VBox {
         }
     }
 
-    private static final Insets NAME_TAG_MARGIN = new Insets(0, 14, 16, 0);
-
-    private StackPane buildDocumentRow(
+    private DocumentView buildDocumentRow(
             Label typeLabel,
             Label fileNameLabel,
             DocumentView documentView,
@@ -87,19 +83,15 @@ public class ComparisonDocumentView extends VBox {
         fileNameLabel.setMaxWidth(Double.MAX_VALUE);
 
         HBox label = new HBox(6, typeLabel, fileNameLabel);
-        label.getStyleClass().addAll("comparison-document-name-tag", "card");
+        label.getStyleClass().add("comparison-document-tag");
         label.setAlignment(Pos.CENTER_LEFT);
         label.setMinWidth(0);
         label.setMaxWidth(Region.USE_PREF_SIZE);
 
-        StackPane.setAlignment(label, Pos.BOTTOM_RIGHT);
-        StackPane.setMargin(label, NAME_TAG_MARGIN);
-
-        StackPane stack = new StackPane(documentView, label);
-        stack.getStyleClass().add(styleClass);
-        stack.setMinSize(0, 0);
-        stack.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        return stack;
+        // The "Doc A / Doc B" tag lives in the pagination/zoom toolbar.
+        documentView.setToolbarTrailing(label);
+        documentView.getStyleClass().add(styleClass);
+        return documentView;
     }
 
     public void loadDocuments(

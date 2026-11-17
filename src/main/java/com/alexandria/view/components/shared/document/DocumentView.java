@@ -9,6 +9,7 @@ import com.alexandria.service.LocalizationService;
 import com.alexandria.service.analysis.SearchMatch;
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -21,6 +22,7 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 
 public class DocumentView extends BorderPane {
         private final Label pageLabel = new Label();
@@ -28,6 +30,7 @@ public class DocumentView extends BorderPane {
         private final Button next = new Button("›");
         private final Button zoomOut = new Button("−");
         private final Button zoomIn = new Button("+");
+        private final HBox trailingSlot = new HBox();
         private PdfDocumentRenderer pdfRenderer;
         private TextDocumentRenderer textRenderer;
         private boolean showingPdf;
@@ -110,23 +113,47 @@ public class DocumentView extends BorderPane {
                 next.setDisable(true);
 
                 HBox zoomControls = new HBox(8, zoomOut, zoomIn);
+                zoomControls.setAlignment(Pos.CENTER_LEFT);
                 HBox pageControls = new HBox(8, previous, pageLabel, next);
                 pageControls.setAlignment(Pos.CENTER);
+                pageControls.setMinWidth(Region.USE_PREF_SIZE);
+                trailingSlot.setAlignment(Pos.CENTER_RIGHT);
 
-                HBox leftSpacer = spacer();
-                HBox rightSpacer = spacer();
-                HBox content = new HBox(12, zoomControls, leftSpacer, pageControls, rightSpacer);
+                // Left and right slots share the free space equally so the page
+                // controls stay centred whatever is placed in the trailing slot.
+                for (HBox side : List.of(zoomControls, trailingSlot)) {
+                        side.setPrefWidth(0);
+                        HBox.setHgrow(side, Priority.ALWAYS);
+                }
+                // The name tag may shrink (it ellipsizes); the zoom buttons may not.
+                trailingSlot.setMinWidth(0);
+
+                HBox content = new HBox(12, zoomControls, pageControls, trailingSlot);
                 content.setAlignment(Pos.CENTER);
+                HBox.setHgrow(content, Priority.ALWAYS);
 
                 ToolBar toolbar = new ToolBar(content);
                 toolbar.getStyleClass().add("viewer-toolbar");
+                // Stretch the content across the whole toolbar so the right slot sits at
+                // the far right edge.
+                content.prefWidthProperty().bind(Bindings.createDoubleBinding(
+                                () -> Math.max(0, toolbar.getWidth()
+                                                - toolbar.getPadding().getLeft()
+                                                - toolbar.getPadding().getRight()),
+                                toolbar.widthProperty(), toolbar.paddingProperty()));
                 setBottom(toolbar);
         }
 
-        private HBox spacer() {
-                HBox box = new HBox();
-                HBox.setHgrow(box, Priority.ALWAYS);
-                return box;
+        /**
+         * Places a node (e.g. a document name tag) at the right end of the
+         * pagination/zoom toolbar.
+         */
+        public void setToolbarTrailing(Node node) {
+                if (node == null) {
+                        trailingSlot.getChildren().clear();
+                } else {
+                        trailingSlot.getChildren().setAll(node);
+                }
         }
 
         public void loadDocument(String content, FileType fileType, Path sourcePath) {
