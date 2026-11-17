@@ -27,9 +27,10 @@ public class FileStorageService {
             extension = fileName.substring(extensionStart);
         }
 
-        Path path = uploadsDirectory.resolve(String.valueOf(userId)).resolve(UUID.randomUUID() + extension);
+        Path userDirectory = uploadsDirectory.resolve(String.valueOf(userId));
+        Path path = userDirectory.resolve(UUID.randomUUID() + extension);
 
-        Files.createDirectories(path.getParent());
+        Files.createDirectories(userDirectory);
 
         return Files.copy(sourceFile.toPath(), path, StandardCopyOption.REPLACE_EXISTING);
     }

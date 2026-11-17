@@ -26,7 +26,6 @@ public class SimilarityIndicator extends HBox {
     private String currentSimilarityAmount;
 
     public SimilarityIndicator() {
-        LocalizationService i18n = LocalizationService.getInstance();
         getStyleClass().add("similarity-indicator");
         setAlignment(Pos.CENTER_LEFT);
         setSpacing(12);

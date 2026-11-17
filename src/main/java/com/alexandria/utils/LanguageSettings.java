@@ -6,13 +6,13 @@ import com.alexandria.model.Language;
 
 public final class LanguageSettings {
     private static final String LANGUAGE_KEY = "language";
-    private static final Preferences preferences = Preferences.userNodeForPackage(LanguageSettings.class);
+    private static final Preferences PREFERENCES = Preferences.userNodeForPackage(LanguageSettings.class);
 
     private LanguageSettings() {
     }
 
     public static Language getLanguage() {
-        String languageName = preferences.get(LANGUAGE_KEY, Language.ENGLISH.name());
+        String languageName = PREFERENCES.get(LANGUAGE_KEY, Language.ENGLISH.name());
         try {
             return Language.valueOf(languageName);
         } catch (IllegalArgumentException exception) {
@@ -21,6 +21,6 @@ public final class LanguageSettings {
     }
 
     public static void setLanguage(Language language) {
-        preferences.put(LANGUAGE_KEY, language.name());
+        PREFERENCES.put(LANGUAGE_KEY, language.name());
     }
 }

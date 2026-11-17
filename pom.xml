@@ -246,6 +246,9 @@
                 <version>3.28.0</version>
                 <configuration>
                     <targetJdk>17</targetJdk>
+                    <rulesets>
+                        <ruleset>config/pmd-ruleset.xml</ruleset>
+                    </rulesets>
                     <linkXRef>false</linkXRef>
                 </configuration>
                 <executions>
@@ -286,6 +289,9 @@
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
                 <version>4.10.5.0</version>
+                <configuration>
+                    <excludeFilterFile>config/spotbugs-exclude.xml</excludeFilterFile>
+                </configuration>
                 <executions>
                     <execution>
                         <phase>verify</phase>
