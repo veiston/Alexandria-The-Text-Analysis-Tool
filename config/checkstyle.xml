@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+    "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+    "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<!-- Team code style -->
+<module name="Checker">
+    <property name="severity" value="warning"/>
+
+    <!-- Layout sizes and SQL parameter indexes are not magic numbers -->
+    <module name="SuppressionSingleFilter">
+        <property name="checks" value="MagicNumber"/>
+        <property name="files" value="[\\/](view|dao)[\\/]"/>
+    </module>
+
+    <module name="TreeWalker">
+        <!-- Readability -->
+        <module name="NeedBraces"/>
+        <module name="AvoidInlineConditionals"/>
+        <module name="BooleanExpressionComplexity"/>
+        <module name="SimplifyBooleanExpression"/>
+        <module name="SimplifyBooleanReturn"/>
+        <module name="OneStatementPerLine"/>
+        <module name="MultipleVariableDeclarations"/>
+        <module name="MagicNumber"/>
+
+        <!-- A method fits on one screen -->
+        <module name="MethodLength">
+            <property name="max" value="50"/>
+        </module>
+
+        <!-- Imports -->
+        <module name="AvoidStarImport"/>
+        <module name="RedundantImport"/>
+        <module name="UnusedImports"/>
+    </module>
+</module>

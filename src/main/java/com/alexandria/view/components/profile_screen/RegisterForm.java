@@ -5,7 +5,6 @@ import java.util.function.Consumer;
 
 import javafx.scene.layout.VBox;
 
-import com.alexandria.service.LocalizationService;
 import com.alexandria.view.components.shared.form.Form;
 import com.alexandria.view.components.shared.form.FormField;
 import com.alexandria.view.components.shared.form.validation.EmailValidator;

@@ -1,0 +1,49 @@
+# Tests, coverage and static analysis, published to SonarQube Cloud.
+# Needs the SONAR_TOKEN repository secret.
+name: Static analysis
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  sonar:
+    runs-on: ubuntu-latest
+
+    # Same database as docker/docker-compose.yml, for the DAO tests
+    services:
+      mariadb:
+        image: mariadb:11
+        env:
+          MARIADB_DATABASE: alexandria
+          MARIADB_USER: alexandria
+          MARIADB_PASSWORD: alexandria
+          MARIADB_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "healthcheck.sh --connect --innodb_initialized"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # Sonar needs full history for blame and new-code detection
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21 # Checkstyle 14 needs Java 21+; the code still compiles for 17
+          cache: maven
+
+      - name: Load database
+        run: cat database/schema.sql database/data.sql | mysql --default-character-set=utf8mb4 -h 127.0.0.1 -u alexandria -palexandria alexandria
+
+      # xvfb gives the TestFX tests a virtual display
+      - name: Build, test and analyse
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: xvfb-run mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar

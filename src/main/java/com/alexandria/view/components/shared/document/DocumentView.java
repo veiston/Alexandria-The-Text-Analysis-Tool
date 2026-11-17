@@ -200,7 +200,7 @@ public class DocumentView extends BorderPane {
                                         textRenderer.highlightPassage(page, passage);
                                 }
                         } catch (RuntimeException e) {
-                                e.printStackTrace();
+                                System.err.println("Could not highlight passage: " + e.getMessage());
                         }
                 });
         }

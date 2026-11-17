@@ -22,7 +22,8 @@ public class User {
 	}
 
 	public User(Integer id, String name, String email, String photo, String organization, String password, Language locale) {
-		this(name, email, photo, organization, password, locale);		this.id = id;
+		this(name, email, photo, organization, password, locale);
+		this.id = id;
 	}
 
 	public Integer getId() {

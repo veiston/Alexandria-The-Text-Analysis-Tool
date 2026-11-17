@@ -16,7 +16,10 @@ public final class PdfSelectionExtractor {
     public static String extractText(PDDocument document, int zeroBasedPage, double x, double y, double w, double h)
             throws IOException {
 
-        double minX = x, maxX = x + w, minY = y, maxY = y + h;
+        double minX = x;
+        double maxX = x + w;
+        double minY = y;
+        double maxY = y + h;
         List<TextPosition> hits = new ArrayList<>();
 
         PDFTextStripper stripper = new PDFTextStripper() {

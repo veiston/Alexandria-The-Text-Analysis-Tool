@@ -24,6 +24,13 @@ RUN wget https://download2.gluonhq.com/openjfx/17.0.2/openjfx-17.0.2_linux-x64_b
 
 COPY target/alexandria-1.0.0.jar app.jar
 
+RUN groupadd -g 10001 appgroup && \
+    useradd -u 10001 -g appgroup -m -s /bin/bash appuser && \
+    mkdir -p /app/uploads && \
+    chown -R appuser:appgroup /app /javafx-sdk
+
+USER appuser
+
 ENV DISPLAY=host.docker.internal:0.0
 
 CMD ["java", "--module-path", "/javafx-sdk/lib", "--add-modules", "javafx.controls,javafx.fxml,javafx.swing", "-jar", "app.jar"]
