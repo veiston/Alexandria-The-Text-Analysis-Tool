@@ -1,5 +1,7 @@
 package com.alexandria.controller;
 
+import com.alexandria.model.Language;
+
 import com.alexandria.dao.TermComparisonDAO;
 import com.alexandria.dao.TermComparisonTextDAO;
 import com.alexandria.dao.TextComparisonDAO;
@@ -422,7 +424,8 @@ public class ArchiveControllerTest {
                 "test@example.com",
                 null,
                 null,
-                "password");
+                "password",
+				Language.ENGLISH);
     }
 
 }
