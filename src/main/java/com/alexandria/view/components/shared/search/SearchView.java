@@ -123,10 +123,8 @@ public class SearchView extends VBox {
             option.getStyleClass().add("text-muted");
             option.setOnAction(e -> {
                 String term = searchInput.getText();
-                if (onSearch != null && term != null) {
-                    if (!term.isBlank()) {
-                        onSearch.onSearch(term);
-                    }
+                if (onSearch != null && term != null && !term.isBlank()) {
+                    onSearch.onSearch(term);
                 }
             });
         }

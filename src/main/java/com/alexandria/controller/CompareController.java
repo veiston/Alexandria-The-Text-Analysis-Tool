@@ -89,7 +89,7 @@ public class CompareController {
                 if (text.getFileType() != com.alexandria.model.FileType.MANUAL && file != null) {
                     try {
                         offsets = pdfService.extractTextWithPageBoundaries(file).pageOffsets();
-                    } catch (Exception e) {
+                    } catch (Exception ignored) {
                         // Stored content is still navigable if the original PDF is unavailable.
                     }
                 }

@@ -159,7 +159,7 @@ public class PdfDocumentRenderer {
                 renderedPages.put(pageIndex, page);
             }
             return page;
-        } catch (Exception e) {
+        } catch (IOException | RuntimeException e) {
             return null;
         }
     }
@@ -283,6 +283,7 @@ public class PdfDocumentRenderer {
             pageHost.getChildren().addAll(highlights);
             imageView.toBack();
         } catch (IOException | RuntimeException ignored) {
+            // Highlights are optional; the page still renders without them.
         }
     }
 
@@ -414,15 +415,8 @@ public class PdfDocumentRenderer {
         if (currentImage == null)
             return;
 
-        double viewportWidth = scrollPane.getViewportBounds().getWidth();
-        double viewportHeight = scrollPane.getViewportBounds().getHeight();
-        double contentWidth = pageHost.getWidth();
-        double contentHeight = pageHost.getHeight();
-        double maxX = Math.max(0, contentWidth - viewportWidth);
-        double maxY = Math.max(0, contentHeight - viewportHeight);
-
-        scrollPane.setHvalue(maxX <= 0 ? 0.5 : 0.5);
-        scrollPane.setVvalue(maxY <= 0 ? 0.5 : 0.5);
+        scrollPane.setHvalue(0.5);
+        scrollPane.setVvalue(0.5);
     }
 
     private void showError(String message) {
@@ -637,6 +631,7 @@ public class PdfDocumentRenderer {
             try {
                 document.close();
             } catch (IOException ignored) {
+                // Nothing to do if closing fails.
             }
         }
 

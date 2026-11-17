@@ -7,17 +7,17 @@ import javafx.scene.Node;
 public final class ThemeSettings {
     private static final String DARK_THEME_KEY = "darkTheme";
     private static final String DARK_THEME_CLASS = "dark";
-    private static final Preferences preferences = Preferences.userNodeForPackage(ThemeSettings.class);
+    private static final Preferences PREFERENCES = Preferences.userNodeForPackage(ThemeSettings.class);
 
     private ThemeSettings() {
     }
 
     public static boolean isDarkTheme() {
-        return preferences.getBoolean(DARK_THEME_KEY, false);
+        return PREFERENCES.getBoolean(DARK_THEME_KEY, false);
     }
 
     public static void setDarkTheme(Node root, boolean enabled) {
-        preferences.putBoolean(DARK_THEME_KEY, enabled);
+        PREFERENCES.putBoolean(DARK_THEME_KEY, enabled);
         apply(root);
     }
 
