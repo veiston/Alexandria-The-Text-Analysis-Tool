@@ -30,11 +30,6 @@
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx-fxml</artifactId>
-            <version>${javafx.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
             <artifactId>javafx-swing</artifactId>
             <version>${javafx.version}</version>
         </dependency>
@@ -162,7 +157,6 @@
                         <configuration>
                             <excludes>
                                 <exclude>com/alexandria/Main.class</exclude>
-                                <exclude>com/alexandria/ParsePdf.class</exclude>
                             </excludes>
                         </configuration>
                         <goals>

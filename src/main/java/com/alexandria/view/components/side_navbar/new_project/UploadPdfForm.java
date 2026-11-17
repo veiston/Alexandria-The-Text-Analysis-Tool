@@ -3,7 +3,6 @@ package com.alexandria.view.components.side_navbar.new_project;
 import java.io.File;
 import java.util.function.Consumer;
 
-import com.alexandria.service.LocalizationService;
 import com.alexandria.view.components.shared.form.Form;
 import com.alexandria.view.components.shared.form.FormField;
 

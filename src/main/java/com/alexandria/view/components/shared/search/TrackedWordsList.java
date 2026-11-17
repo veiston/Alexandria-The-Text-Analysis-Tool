@@ -6,7 +6,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 import com.alexandria.service.LocalizationService;
@@ -113,15 +112,7 @@ public class TrackedWordsList extends VBox {
     }
 
     public void setActiveTerm(String word) {
-        if (activeTerm != null) {
-            Row previous = rows.get(activeTerm);
-        }
-
         activeTerm = word;
-
-        if (activeTerm != null) {
-            Row current = rows.get(activeTerm);
-        }
     }
 
     public void setOnInfo(Consumer<String> handler) {
@@ -181,7 +172,6 @@ public class TrackedWordsList extends VBox {
     }
 
     private final class Row {
-        private final String word;
         private final HBox container;
         private final FrequencyBar frequencyBar;
         private final Label countLabel;
@@ -189,7 +179,6 @@ public class TrackedWordsList extends VBox {
         private int count;
 
         private Row(String word) {
-            this.word = word;
 
             Label termLabel = new Label(word);
             termLabel.getStyleClass().add("term-frequency-label");
