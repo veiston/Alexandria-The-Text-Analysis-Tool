@@ -40,7 +40,9 @@ jobs:
           cache: maven
 
       - name: Load database
-        run: cat database/schema.sql database/data.sql | mysql --default-character-set=utf8mb4 -h 127.0.0.1 -u alexandria -palexandria alexandria
+        env:
+          MYSQL_PWD: alexandria
+        run: cat database/schema.sql database/data.sql | mysql --default-character-set=utf8mb4 -h 127.0.0.1 -u alexandria alexandria
 
       # xvfb gives the TestFX tests a virtual display
       - name: Build, test and analyse

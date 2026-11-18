@@ -60,7 +60,7 @@ class AnalysisUtils {
 
     static final Pattern WORD_PATTERN = Pattern.compile("[\\p{L}]+");
     static final Pattern SENTENCE_PATTERN = Pattern.compile("[^.!?]+[.!?]*");
-    static final Pattern PARAGRAPH_SPLIT_PATTERN = Pattern.compile("(\\r?\\n\\s*){2,}");
+    static final Pattern PARAGRAPH_SPLIT_PATTERN = Pattern.compile("\\r?\\n\\s*\\r?\\n\\s*");
 
     static final Set<String> STOP_WORDS = Set.of(
         "a", "about", "above", "after", "again", "against", "all", "am", "an", "and",
