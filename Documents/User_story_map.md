@@ -24,3 +24,6 @@
 | Use the application in the chosen language | Localization | As a user, I want to choose from the application's supported languages so that I can use its interface in a language I understand. | 3 |
 |  |  | As a user, I want menus, screens, messages, and help content to use my selected language consistently so that I can navigate the application confidently. | 5 |
 |  |  | As a user, I want my language choice to be remembered when I reopen the application so that I do not have to select it every time. | 3 |
+|  |  | As a user, I want to change the application language at any time. As a user, I want the new language to be applied immediately without restarting the application. | 1 |
+|  |  | As a user, I want to use the application in English, Russian, or Japanese. As a user, I want all UI elements, including buttons, menus, and messages, to be displayed in my selected language. | 5 |
+|  |  | As a user, I want UI elements to adjust to different text lengths so that all content remains readable. As a user, I want the layout to display correctly in every supported language without overlapping or truncated text. | 2 |
