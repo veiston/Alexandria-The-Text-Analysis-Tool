@@ -13,6 +13,8 @@ RUN apt-get update && apt-get install -y \
     gdk-pixbuf2.0-bin \
     librsvg2-common \
     shared-mime-info \
+    fonts-ipafont-gothic \
+    fonts-ipafont-mincho \
     wget \
     unzip \
     && rm -rf /var/lib/apt/lists/*
