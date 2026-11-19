@@ -194,7 +194,17 @@ Translations are bundled as Java resource bundles in `src/main/resources/i18n/` 
 
 ### Docker Setup
 
-Before starting the application, open Docker Desktop and start an X server: XQuartz on macOS or XMing on Windows.
+The quickest way is to use the scripts. They start Docker and the X server (XQuartz on macOS, Xming on Windows), then start the application and the database from the current code.
+
+| | macOS | Windows |
+| --- | --- | --- |
+| Start | `scripts/run-docker-mac.sh` | `scripts\run-docker-windows.bat` |
+| Rebuild from the current code and start | `scripts/run-docker-mac.sh --build` | `scripts\run-docker-windows.bat --build` |
+| Stop | `scripts/stop-docker-mac.sh` | `scripts\stop-docker-windows.bat` |
+
+Use `--build` after you change the code or pull new changes. Without it, the scripts start the last built image.
+
+To run it manually, open Docker Desktop and start an X server: XQuartz on macOS or XMing on Windows.
 
 1. Build the application.
 

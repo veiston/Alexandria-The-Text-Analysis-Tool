@@ -27,6 +27,17 @@ test; run `xhost -` after testing to enable it again:
 xhost +
 ```
 
+## Quick start with scripts
+
+The scripts do the steps below for you: they start Docker and the X server,
+build the image if it does not exist, and start the application with MariaDB.
+
+- macOS (XQuartz): `scripts/run-docker-mac.sh`, stop with `scripts/stop-docker-mac.sh`
+- Windows (Xming): `scripts\run-docker-windows.bat`, stop with `scripts\stop-docker-windows.bat`
+
+Add `--build` to rebuild the image from the current code, for example after
+`git pull`.
+
 ## 1. Build and test the application JAR
 
 Create the executable JAR used by Docker. Maven also runs the project test
