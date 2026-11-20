@@ -35,7 +35,7 @@ Testing verifies that Alexandria:
 ### Out of Scope
 
 - Third-party libraries (PDFBox, iText, JavaFX, MariaDB). Only how Alexandria uses them is tested.
-- Operating systems other than Windows and macOS.
+- Operating systems other than Windows, macOS and Linux.
 - Load testing with many simultaneous users. Alexandria is a single-user desktop application.
 
 ## 4. Resources
