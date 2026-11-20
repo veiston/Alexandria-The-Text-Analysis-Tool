@@ -155,7 +155,7 @@ Testing is complete when:
 
 - all automated tests pass in GitHub Actions and Jenkins
 - all acceptance tests meet the sign-off criteria in the [Acceptance Test Plan](Acceptance_Test_Plan.md)
-- performance tests finish within their time limits
+- performance tests finish within0 their time limits
 - SonarQube ratings are A, or at least B, for reliability, security and maintainability
 - no critical or high-priority defects are open in [Bug Tracking](Bug_Tracking.md)
 - all fixed defects have been retested
