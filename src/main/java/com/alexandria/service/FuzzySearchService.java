@@ -73,15 +73,14 @@ public class FuzzySearchService {
             k = 0;
         }
 
+        boolean isPhrase = searchable.chars().anyMatch(Character::isWhitespace);
+
         // Build character masks
         long[] mask = new long[65536];
         Arrays.fill(mask, ~0L);
 
         for (int i = 0; i < m; i++) {
-            char c = searchable.charAt(i);
-            if (!caseSensitive) {
-                c = Character.toLowerCase(c);
-            }
+            char c = normalize(searchable.charAt(i), caseSensitive);
             mask[c] &= ~(1L << i);
         }
 
@@ -99,7 +98,7 @@ public class FuzzySearchService {
         int bestError = Integer.MAX_VALUE;
 
         for (int i = 0; i <= text.length(); i++) {
-            boolean atEnd = (i == text.length() || !Character.isLetterOrDigit(text.charAt(i)));
+            boolean atEnd = (i == text.length() || isWordBoundary(text.charAt(i), isPhrase));
             if (atEnd) {
                 if (i > wordStart) {
                     if (wholeWordsOnly) {
@@ -111,7 +110,8 @@ public class FuzzySearchService {
                             matches.add(new SearchMatch(matchedSnippet, wordStart, i, page, paragraph, ctx));
                         }
                     } else {
-                        if (Math.abs((i - wordStart) - m) <= k && (R[k] & matchBit) == 0L) {
+                        boolean isWholeSegmentMatch = Math.abs((i - wordStart) - m) <= k && (R[k] & matchBit) == 0L;
+                        if (isWholeSegmentMatch && !isPhrase) {
                             String matchedSnippet = text.substring(wordStart, i);
                             String ctx = text.substring(Math.max(0, wordStart - 40), Math.min(text.length(), i + 40)).strip();
                             Integer page = AnalysisUtils.resolvePage(wordStart, pageOffsets);
@@ -136,10 +136,7 @@ public class FuzzySearchService {
                 continue;
             }
 
-            char c = text.charAt(i);
-            if (!caseSensitive) {
-                c = Character.toLowerCase(c);
-            }
+            char c = normalize(text.charAt(i), caseSensitive);
             long charMask = mask[c];
 
             // Update exact match
@@ -176,6 +173,24 @@ public class FuzzySearchService {
         }
 
         return matches;
+    }
+
+    private boolean isWordBoundary(char c, boolean isPhrase) {
+        if (isPhrase && Character.isWhitespace(c)) {
+            return false;
+        }
+        return !Character.isLetterOrDigit(c);
+    }
+
+    // Phrases match across wrapped lines!!
+    private char normalize(char c, boolean caseSensitive) {
+        if (Character.isWhitespace(c)) {
+            return ' ';
+        }
+        if (caseSensitive) {
+            return c;
+        }
+        return Character.toLowerCase(c);
     }
 
     private int findBestStart(String text, int wordStart, int matchEnd, String searchable, int d, boolean caseSensitive) {
@@ -220,15 +235,9 @@ public class FuzzySearchService {
 
         for (int i = 1; i <= len1; i++) {
             curr[0] = i;
-            char c1 = s1.charAt(i - 1);
-            if (!caseSensitive) {
-                c1 = Character.toLowerCase(c1);
-            }
+            char c1 = normalize(s1.charAt(i - 1), caseSensitive);
             for (int j = 1; j <= len2; j++) {
-                char c2 = s2.charAt(j - 1);
-                if (!caseSensitive) {
-                    c2 = Character.toLowerCase(c2);
-                }
+                char c2 = normalize(s2.charAt(j - 1), caseSensitive);
                 int cost = 1;
                 if (c1 == c2) {
                     cost = 0;
