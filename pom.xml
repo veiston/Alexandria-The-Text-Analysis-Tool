@@ -28,13 +28,7 @@
         <sonar.java.spotbugs.reportPaths>target/spotbugsXml.xml</sonar.java.spotbugs.reportPaths>
 
         <!-- Sonar checks these files as web CSS, but they are JavaFX CSS, so it flags valid JavaFX syntax as errors -->
-        <sonar.issue.ignore.multicriteria>fxvalue,fxpseudo,fxfunction</sonar.issue.ignore.multicriteria>
-        <sonar.issue.ignore.multicriteria.fxvalue.ruleKey>css:S9424</sonar.issue.ignore.multicriteria.fxvalue.ruleKey>
-        <sonar.issue.ignore.multicriteria.fxvalue.resourceKey>**/*.css</sonar.issue.ignore.multicriteria.fxvalue.resourceKey>
-        <sonar.issue.ignore.multicriteria.fxpseudo.ruleKey>css:S4659</sonar.issue.ignore.multicriteria.fxpseudo.ruleKey>
-        <sonar.issue.ignore.multicriteria.fxpseudo.resourceKey>**/*.css</sonar.issue.ignore.multicriteria.fxpseudo.resourceKey>
-        <sonar.issue.ignore.multicriteria.fxfunction.ruleKey>css:S9448</sonar.issue.ignore.multicriteria.fxfunction.ruleKey>
-        <sonar.issue.ignore.multicriteria.fxfunction.resourceKey>**/*.css</sonar.issue.ignore.multicriteria.fxfunction.resourceKey>
+        <sonar.exclusions>**/*.css</sonar.exclusions>
     </properties>
 
     <dependencies>
