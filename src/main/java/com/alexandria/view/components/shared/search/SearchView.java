@@ -11,6 +11,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -27,6 +28,7 @@ public class SearchView extends VBox {
     private final CheckBox caseCheckBox = new CheckBox();
     private final CheckBox wholeWordCheckBox = new CheckBox();
     private final CheckBox stopWordsCheckBox = new CheckBox();
+    private final Label noMatchesLabel = new Label();
 
     private String promptKey = "analyse.searchTermFrequency";
 
@@ -68,8 +70,12 @@ public class SearchView extends VBox {
                 wholeWordCheckBox,
                 stopWordsCheckBox);
 
+        noMatchesLabel.getStyleClass().add("text-muted");
+        setNoMatchesVisible(false);
+
         getChildren().addAll(
                 searchControls,
+                noMatchesLabel,
                 searchOptions,
                 trackedWordsList);
 
@@ -90,10 +96,13 @@ public class SearchView extends VBox {
         caseCheckBox.setText(i18n.get("analyse.caseSensitive"));
         wholeWordCheckBox.setText(i18n.get("analyse.wholeWord"));
         stopWordsCheckBox.setText(i18n.get("analyse.stopWords"));
+        noMatchesLabel.setText(i18n.get("analyse.noMatches"));
         trackedWordsList.refreshText();
     }
 
     private void wireEvents() {
+        searchInput.textProperty().addListener((observable, oldText, newText) -> setNoMatchesVisible(false));
+
         searchInput.setOnSearch(term -> {
             if (onSearch != null) {
                 onSearch.onSearch(term);
@@ -175,7 +184,13 @@ public class SearchView extends VBox {
         return trackedWordsList;
     }
 
+    public void setNoMatchesVisible(boolean isVisible) {
+        noMatchesLabel.setVisible(isVisible);
+        noMatchesLabel.setManaged(isVisible);
+    }
+
     public void reset() {
+        searchInput.textProperty().set("");
         trackedWordsList.reset();
     }
 

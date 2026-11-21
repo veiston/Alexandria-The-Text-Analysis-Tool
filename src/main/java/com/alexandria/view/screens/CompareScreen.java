@@ -259,8 +259,17 @@ public class CompareScreen extends StackPane {
     private String trackSearch(String term, boolean first, List<SearchMatch> matches) {
         String key = trackedKey(term, first);
         trackedSearches.put(key, new TrackedSearch(term, first, List.copyOf(matches)));
-        comparisonSidePanel.getSearchView().getTrackedWordsList().addOrUpdate(key, matches.size());
+        comparisonSidePanel.getSearchView().getTrackedWordsList()
+                .addOrUpdateInGroup(term, documentLetter(first), key, matches.size());
         return key;
+    }
+
+    private static String documentLetter(boolean first) {
+        LocalizationService i18n = LocalizationService.getInstance();
+        if (first) {
+            return i18n.get("compare.documentALetter");
+        }
+        return i18n.get("compare.documentBLetter");
     }
 
     private static String trackedKey(String term, boolean first) {

@@ -345,7 +345,9 @@ public class AnalyseScreen extends StackPane {
     }
 
     public void showSearchResults(String term, List<SearchMatch> matches, TermAnalysisResult termAnalysis) {
-        if (matches == null || matches.isEmpty()) {
+        boolean hasNoMatches = matches == null || matches.isEmpty();
+        searchView.setNoMatchesVisible(hasNoMatches);
+        if (hasNoMatches) {
             resetSearchState();
             documentView.clearSearchHighlights();
             return;

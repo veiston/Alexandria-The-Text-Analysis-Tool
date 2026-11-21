@@ -1,22 +1,23 @@
 package com.alexandria.view.components.shared.search;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Consumer;
+
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
+import org.kordamp.ikonli.javafx.FontIcon;
+
+import com.alexandria.service.LocalizationService;
+import com.alexandria.view.components.shared.FrequencyBar;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-
-import com.alexandria.service.LocalizationService;
-import com.alexandria.view.components.shared.FrequencyBar;
-
-import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
-import org.kordamp.ikonli.javafx.FontIcon;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.function.Consumer;
 
 public class TrackedWordsList extends VBox {
     private final Label headingLabel = new Label();
@@ -28,6 +29,7 @@ public class TrackedWordsList extends VBox {
     private final Label emptyLabel = new Label();
 
     private final Map<String, Row> rows = new LinkedHashMap<>();
+    private final Map<String, VBox> groups = new LinkedHashMap<>();
 
     private boolean expanded = true;
     private String activeTerm;
@@ -76,16 +78,20 @@ public class TrackedWordsList extends VBox {
     }
 
     public void addOrUpdate(String word, int count) {
-        if (word == null || word.isBlank()) {
+        addOrUpdateInGroup(null, word, word, count);
+    }
+
+    public void addOrUpdateInGroup(String group, String label, String key, int count) {
+        if (key == null || key.isBlank()) {
             return;
         }
 
-        Row row = rows.get(word);
+        Row row = rows.get(key);
 
         if (row == null) {
-            row = new Row(word);
-            rows.put(word, row);
-            rowsHost.getChildren().add(row.container);
+            row = new Row(key, label, group);
+            rows.put(key, row);
+            hostFor(group).getChildren().add(row.container);
         }
 
         row.count = Math.max(0, count);
@@ -101,7 +107,8 @@ public class TrackedWordsList extends VBox {
             return;
         }
 
-        rowsHost.getChildren().remove(row.container);
+        hostFor(row.group).getChildren().remove(row.container);
+        removeGroupIfEmpty(row.group);
 
         if (word.equals(activeTerm)) {
             activeTerm = null;
@@ -132,9 +139,41 @@ public class TrackedWordsList extends VBox {
 
     public void reset() {
         rows.clear();
+        groups.clear();
         rowsHost.getChildren().clear();
         activeTerm = null;
         showEmptyIfNeeded();
+    }
+
+    private VBox hostFor(String group) {
+        if (group == null) {
+            return rowsHost;
+        }
+
+        return groups.computeIfAbsent(group, this::createGroup);
+    }
+
+    /* Group A/B together under one headline */
+    private VBox createGroup(String group) {
+        Label heading = new Label(group);
+        heading.getStyleClass().add("term-frequency-label");
+        heading.setWrapText(true);
+
+        VBox groupBox = new VBox(heading);
+        rowsHost.getChildren().add(groupBox);
+        return groupBox;
+    }
+
+    private void removeGroupIfEmpty(String group) {
+        if (group == null) {
+            return;
+        }
+
+        boolean hasRows = rows.values().stream().anyMatch(row -> group.equals(row.group));
+
+        if (!hasRows) {
+            rowsHost.getChildren().remove(groups.remove(group));
+        }
     }
 
     private void setExpanded(boolean value) {
@@ -175,15 +214,16 @@ public class TrackedWordsList extends VBox {
         private final HBox container;
         private final FrequencyBar frequencyBar;
         private final Label countLabel;
+        private final String group;
 
         private int count;
 
-        private Row(String word) {
+        private Row(String word, String label, String group) {
+            this.group = group;
 
-            Label termLabel = new Label(word);
+            Label termLabel = new Label(label);
             termLabel.getStyleClass().add("term-frequency-label");
-            termLabel.setMinWidth(80);
-            termLabel.setPrefWidth(80);
+            termLabel.setWrapText(true);
 
             frequencyBar = new FrequencyBar();
 
@@ -199,8 +239,18 @@ public class TrackedWordsList extends VBox {
             Button removeButton = createIconButton(FontAwesomeSolid.TRASH, "tracked-word-remove");
             removeButton.setOnAction(e -> onRemove.accept(word));
 
-            HBox clickableArea = new HBox(10, termLabel, frequencyBar, countLabel);
-            clickableArea.setAlignment(Pos.CENTER_LEFT);
+            HBox barLine = new HBox(10, frequencyBar, countLabel);
+            barLine.setAlignment(Pos.CENTER_LEFT);
+
+            Region clickableArea;
+            if (group == null) {
+                // Term gets its own line so long query has space to wrap instead of truncating
+                clickableArea = new VBox(4, termLabel, barLine);
+            } else {
+                barLine.getChildren().add(0, termLabel);
+                clickableArea = barLine;
+            }
+            clickableArea.setMinWidth(0);
             HBox.setHgrow(clickableArea, Priority.ALWAYS);
             clickableArea.setOnMouseClicked(e -> onInfo.accept(word));
 
