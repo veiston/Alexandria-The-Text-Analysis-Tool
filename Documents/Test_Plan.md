@@ -1,6 +1,6 @@
 # Test Plan
 
-*Version: 1.0.0*
+*Version: 1.0.1*
 
 *Team: Kseniia Shlenskaia, Veikka Liukkonen, Luara Moreira Da Silva, Unna Postila*
 
@@ -158,4 +158,4 @@ Testing is complete when:
 - performance tests finish within their time limits
 - SonarQube ratings are A, or at least B, for reliability, security and maintainability
 - no critical or high-priority defects are open in [Bug Tracking](Bug_Tracking.md)
-- all fixed defects have been retested
+- all fixed defects have been retested and confirmed to be resolved
