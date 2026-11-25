@@ -1,0 +1,80 @@
+// Windows version of jenkins/Jenkinsfile, used by Luara's Jenkins.
+// Builds, runs the tests with JaCoCo, analyses the code on a local SonarQube server
+// and pushes the Docker image to Docker Hub. Setup: Documents/jenkins_setup.md.
+
+pipeline {
+    agent any
+
+    tools {
+        maven 'Maven'   // Manage Jenkins -> Tools -> Maven installations
+    }
+
+    environment {
+        PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;${env.PATH}"
+        JAVA_HOME = 'C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.12.101-hotspot'
+
+        SONARQUBE_SERVER = 'SonarQubeServer'
+        DOCKERHUB_CREDENTIALS_ID = 'Docker_Hub'
+        DOCKERHUB_REPO = 'luaram/alexandria_luarasilva'
+        DOCKER_IMAGE_TAG = 'latest'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Uses the repository and branch set in the Jenkins job
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                bat 'mvn -B clean package -DskipTests'
+            }
+        }
+
+        stage('Unit Tests & JaCoCo') {
+            steps {
+                // The DAO tests use the local MariaDB on localhost:3306 (database "alexandria")
+                bat 'mvn -B verify'
+            }
+            post {
+                always {
+                    junit 'target/surefire-reports/*.xml'
+                    jacoco execPattern: 'target/jacoco.exec', classPattern: 'target/classes', sourcePattern: 'src/main/java'
+                }
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
+                    withSonarQubeEnv("${env.SONARQUBE_SERVER}") {
+                        // Overrides the SonarCloud settings in pom.xml with the local server
+                        bat 'mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:5.0.0.4389:sonar -Dsonar.host.url=http://localhost:9000 -Dsonar.token=%SONAR_TOKEN% -Dsonar.projectKey=Alexandria_LuaraSilva -Dsonar.projectName=Alexandria_LuaraSilva -Dsonar.organization='
+                    }
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    // The pom compiles for Java 21, so the image needs a Java 21 runtime
+                    bat 'powershell -Command "(Get-Content docker/Dockerfile) -replace \'eclipse-temurin:17-jdk-jammy\', \'eclipse-temurin:21-jdk-jammy\' | Set-Content docker/Dockerfile"'
+                    docker.build("${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}", '--platform linux/amd64 -f docker/Dockerfile .')
+                }
+            }
+        }
+
+        stage('Push Docker Image to Docker Hub') {
+            steps {
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKERHUB_CREDENTIALS_ID) {
+                        docker.image("${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}").push()
+                    }
+                }
+            }
+        }
+    }
+}
